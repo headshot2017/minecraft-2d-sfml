@@ -1,11 +1,15 @@
 #include "game_engine.h"
 #include "game_state.h"
 #include <SFML/Graphics.hpp>
+#include "bass.h"
+#include <stdio.h>
 
 void GameEngine::init()
 {
     app.create(sf::VideoMode(640, 480), "minecrap clone test");
     app.setFramerateLimit(60);
+    if (not BASS_Init(-1, 44100, 0, 0, 0))
+        printf("bass could not start. error code: %d\n", BASS_ErrorGetCode());
 }
 
 void GameEngine::cleanup()
@@ -15,6 +19,7 @@ void GameEngine::cleanup()
         states.back()->destroy();
         states.pop_back();
     }
+    BASS_Free();
 }
 
 void GameEngine::update()
