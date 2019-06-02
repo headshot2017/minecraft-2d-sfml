@@ -18,6 +18,9 @@ public:
 
 private:
     static MenuState m_Instance;
+
+    sf::Sprite dirt_tile;
+    sf::Texture m_dirt_tile;
 };
 
 #endif // MENU_STATE_H_INCLUDED
