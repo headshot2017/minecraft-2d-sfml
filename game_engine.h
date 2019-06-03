@@ -23,6 +23,13 @@ public:
     bool isRunning() {return m_running;}
 
     sf::RenderWindow app;
+    sf::Font mc_font;
+
+    sf::Texture m_button;
+    sf::Texture m_button_hover;
+
+    sf::Sprite button;
+    sf::Sprite button_hover;
 
 private:
     bool m_running = true;

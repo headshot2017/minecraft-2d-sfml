@@ -6,7 +6,7 @@
 class GameState
 {
 public:
-    virtual void init() = 0;
+    virtual void init(GameEngine* engine) = 0;
     virtual void destroy() = 0;
     virtual void update(GameEngine* engine) = 0;
     virtual void process_input(GameEngine* engine) = 0;

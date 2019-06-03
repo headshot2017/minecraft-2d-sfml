@@ -6,10 +6,23 @@
 
 void GameEngine::init()
 {
-    app.create(sf::VideoMode(640, 480), "minecrap clone test");
+    app.create(sf::VideoMode(800, 480), "minecrap clone test");
     app.setFramerateLimit(60);
+
+    mc_font.loadFromFile("data/font/Minecraftia.ttf");
+
     if (not BASS_Init(-1, 44100, 0, 0, 0))
         printf("bass could not start. error code: %d\n", BASS_ErrorGetCode());
+
+    sf::Image widgets;
+    widgets.loadFromFile("data/gui/widgets.png");
+
+    m_button.loadFromImage(widgets, sf::IntRect(0, 66, 200, 20));
+    m_button_hover.loadFromImage(widgets, sf::IntRect(0, 86, 200, 20));
+    button.setTexture(m_button);
+    button_hover.setTexture(m_button_hover);
+    button.setScale(2.0f, 2.0f);
+    button_hover.setScale(2.0f, 2.0f);
 }
 
 void GameEngine::cleanup()
@@ -61,7 +74,7 @@ void GameEngine::changeState(GameState* state)
         states.pop_back();
     }
     states.push_back(state);
-    states.back()->init();
+    states.back()->init(this);
 }
 
 void GameEngine::pushState(GameState* state)
@@ -71,7 +84,7 @@ void GameEngine::pushState(GameState* state)
 
     states.back()->pause();
     states.push_back(state);
-    states.back()->init();
+    states.back()->init(this);
 }
 
 void GameEngine::popState()
