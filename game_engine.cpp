@@ -23,6 +23,8 @@ void GameEngine::init()
     button_hover.setTexture(m_button_hover);
     button.setScale(2.0f, 2.0f);
     button_hover.setScale(2.0f, 2.0f);
+
+    snd_button_click = BASS_StreamCreateFile(false, "data/sounds/click.wav", 0, 0, 0);
 }
 
 void GameEngine::cleanup()
@@ -32,6 +34,7 @@ void GameEngine::cleanup()
         states.back()->destroy();
         states.pop_back();
     }
+    BASS_StreamFree(snd_button_click);
     BASS_Free();
 }
 
@@ -95,4 +98,9 @@ void GameEngine::popState()
     states.back()->destroy();
     states.pop_back();
     states.back()->resume();
+}
+
+void GameEngine::loadWorld(sf::String worldName)
+{
+
 }

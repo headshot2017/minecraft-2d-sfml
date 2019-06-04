@@ -1,6 +1,6 @@
 #include <SFML/Graphics.hpp>
 #include "button.h"
-//#include "bass.h"
+#include "../bass.h"
 #include "../game_engine.h"
 #include <stdio.h>
 
@@ -30,7 +30,7 @@ Button::Button(GameEngine* _engine, sf::String text, float X, float Y)
 
     m_text.setString(text);
     m_text.setFont(engine->mc_font);
-    m_text.setScale(0.25f, 0.25f);
+    m_text.setScale(0.16667f, 0.16667f);
     m_text.setCharacterSize(96);
 
     m_sprite = engine->button;
@@ -45,19 +45,21 @@ bool Button::update()
         sf::Mouse::getPosition(engine->app).y < m_pos.y + 40)
     {
         m_sprite = engine->button_hover;
+        m_text.setColor(sf::Color(255, 255, 128));
         if (sf::Mouse::isButtonPressed(sf::Mouse::Left) and not clicked) // left click
         {
-            printf("clicked\n");
+            BASS_ChannelPlay(engine->snd_button_click, true);
             clicked = true;
         }
         else if (not sf::Mouse::isButtonPressed(sf::Mouse::Left) and clicked)
-        {
-            printf("released\n");
             clicked = false;
-        }
     }
     else
+    {
+        clicked = false;
         m_sprite = engine->button;
+        m_text.setColor(sf::Color::White);
+    }
 
     m_sprite.setPosition(m_pos);
     m_text.setPosition(m_pos.x + 200 - (m_text.getGlobalBounds().width/2.0f),

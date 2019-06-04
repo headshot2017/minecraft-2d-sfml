@@ -10,7 +10,7 @@ typedef enum
     MENU_LOADWORLD,
     MENU_MULTIPLAYER,
     MENU_OPTIONS
-} MENU_STATES;
+} SUB_MENUS;
 
 class MenuState : public GameState
 {
@@ -27,7 +27,7 @@ public:
 
 private:
     static MenuState m_Instance;
-    MENU_STATES m_menustate = MENU_MAINMENU;
+    SUB_MENUS m_submenu = MENU_MAINMENU;
 
     sf::Sprite dirt_tile;
     sf::Sprite minecraft_logo;
@@ -35,10 +35,27 @@ private:
     sf::Texture m_dirt_tile;
     sf::Texture m_minecraft_logo;
 
+    // general buttons
+    Button b_back;
+
+    // main menu
     Button b_singleplayer;
     Button b_multiplayer;
     Button b_options;
     Button b_quit;
+
+    // singleplayer menu
+    Button b_world1;
+    Button b_world2;
+    Button b_world3;
+    Button b_world4;
+    Button b_world5;
+
+    // multiplayer menu
+    Button b_connect;
+
+    // options menu
+
 
 protected:
     MenuState() {}
