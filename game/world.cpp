@@ -5,6 +5,7 @@
 
 World::World()
 {
+    srand(time(0));
     m_blocks2.resize(WORLD_W*WORLD_H*4);
     m_blocks2.setPrimitiveType(sf::Quads);
 }
