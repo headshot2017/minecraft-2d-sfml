@@ -45,7 +45,7 @@ bool Button::update()
         sf::Mouse::getPosition(engine->app).y < m_pos.y + 40)
     {
         m_sprite = engine->button_hover;
-        m_text.setColor(sf::Color(255, 255, 128));
+        m_text.setFillColor(sf::Color(255, 255, 128));
         if (sf::Mouse::isButtonPressed(sf::Mouse::Left) and not clicked) // left click
         {
             BASS_ChannelPlay(engine->snd_button_click, true);
@@ -58,7 +58,7 @@ bool Button::update()
     {
         clicked = false;
         m_sprite = engine->button;
-        m_text.setColor(sf::Color::White);
+        m_text.setFillColor(sf::Color::White);
     }
 
     m_sprite.setPosition(m_pos);

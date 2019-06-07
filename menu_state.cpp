@@ -1,6 +1,7 @@
 #include <SFML/Graphics.hpp>
 #include "game_engine.h"
 #include "menu_state.h"
+#include "ingame_state.h"
 
 MenuState MenuState::m_Instance;
 
@@ -50,6 +51,18 @@ void MenuState::destroy()
 
 void MenuState::update(GameEngine* engine)
 {
+
+}
+
+void MenuState::process_input(GameEngine* engine)
+{
+    sf::Event event;
+    while (engine->app.pollEvent(event))
+    {
+        if (event.type == sf::Event::Closed)
+            engine->quit();
+    }
+
     if (m_submenu == MENU_MAINMENU)
     {
         if (b_singleplayer.update())
@@ -63,13 +76,37 @@ void MenuState::update(GameEngine* engine)
     }
     else if (m_submenu == MENU_LOADWORLD)
     {
+        int world = 0;
         if (b_back.update())
             m_submenu = MENU_MAINMENU;
-        b_world1.update();
-        b_world2.update();
-        b_world3.update();
-        b_world4.update();
-        b_world5.update();
+        if (b_world1.update())
+            world = 1;
+        if (b_world2.update())
+            world = 2;
+        if (b_world3.update())
+            world = 3;
+        if (b_world4.update())
+            world = 4;
+        if (b_world5.update())
+            world = 5;
+
+        if (world > 0) // world selected
+        {
+            IngameState* state = IngameState::Instance();
+            engine->changeState(state);
+            if (world == 1)
+                state->loadWorld("world 1");
+            if (world == 2)
+                state->loadWorld("world 2");
+            if (world == 3)
+                state->loadWorld("world 3");
+            if (world == 4)
+                state->loadWorld("world 4");
+            if (world == 5)
+                state->loadWorld("world 5");
+            printf("leaving menu state\n");
+            return;
+        }
     }
     else if (m_submenu == MENU_MULTIPLAYER)
     {
@@ -82,11 +119,6 @@ void MenuState::update(GameEngine* engine)
         if (b_back.update())
             m_submenu = MENU_MAINMENU;
     }
-}
-
-void MenuState::process_input(GameEngine* engine)
-{
-
 }
 
 void MenuState::draw(GameEngine* engine)

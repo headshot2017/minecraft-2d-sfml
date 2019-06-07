@@ -1,0 +1,13 @@
+#ifndef BLOCK_H_INCLUDED
+#define BLOCK_H_INCLUDED
+
+enum
+{
+    BLOCK_AIR,
+    BLOCK_GRASS,
+    BLOCK_DIRT,
+    BLOCK_STONE,
+    BLOCK_BEDROCK
+};
+
+#endif // BLOCK_H_INCLUDED

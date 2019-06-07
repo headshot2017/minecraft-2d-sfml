@@ -5,6 +5,17 @@
 #include <vector>
 #include "bass.h"
 
+
+enum
+{
+    BLOCK_AIR,
+    BLOCK_GRASS,
+    BLOCK_DIRT,
+    BLOCK_STONE,
+    BLOCK_BEDROCK
+};
+
+
 class GameState;
 
 class GameEngine
@@ -21,9 +32,9 @@ public:
     void pushState(GameState* state); // pause the current state and load this new one.
     void popState(); // destroy the current state and resume the paused one.
 
-    void loadWorld(sf::String worldName);
-
     bool isRunning() {return m_running;}
+
+    sf::Texture m_blocks;
 
     sf::RenderWindow app;
     sf::Font mc_font;

@@ -3,11 +3,15 @@
 #include <SFML/Graphics.hpp>
 #include "bass.h"
 #include <stdio.h>
+#include <string.h>
+#include <fstream>
 
 void GameEngine::init()
 {
     app.create(sf::VideoMode(800, 480), "minecrap clone test");
     app.setFramerateLimit(60);
+
+    m_blocks.loadFromFile("data/blocks.png");
 
     mc_font.loadFromFile("data/font/Minecraftia.ttf");
 
@@ -45,14 +49,6 @@ void GameEngine::update()
 
 void GameEngine::process_input()
 {
-    sf::Event event;
-    while (app.pollEvent(event))
-    {
-        // Close window : exit
-        if (event.type == sf::Event::Closed)
-            quit();
-    }
-
     states.back()->process_input(this);
 }
 
@@ -98,9 +94,4 @@ void GameEngine::popState()
     states.back()->destroy();
     states.pop_back();
     states.back()->resume();
-}
-
-void GameEngine::loadWorld(sf::String worldName)
-{
-
 }
