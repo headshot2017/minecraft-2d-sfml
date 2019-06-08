@@ -13,6 +13,7 @@ public:
 
     sf::Vector2f getPos() {return m_pos;}
     bool update();
+    void process_input();
     void draw();
 
 private:

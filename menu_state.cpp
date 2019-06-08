@@ -61,6 +61,34 @@ void MenuState::process_input(GameEngine* engine)
     {
         if (event.type == sf::Event::Closed)
             engine->quit();
+
+        else if (event.type == sf::Event::MouseButtonPressed)
+            if (event.mouseButton.button == sf::Mouse::Left)
+            {
+                if (m_submenu == MENU_MAINMENU)
+                {
+                    b_singleplayer.process_input();
+                    b_multiplayer.process_input();
+                    b_options.process_input();
+                    b_quit.process_input();
+                }
+                else if (m_submenu == MENU_LOADWORLD)
+                {
+                    b_back.process_input();
+                    b_world1.process_input();
+                    b_world2.process_input();
+                    b_world3.process_input();
+                    b_world4.process_input();
+                    b_world5.process_input();
+                }
+                else if (m_submenu == MENU_MULTIPLAYER)
+                {
+                    b_back.process_input();
+                    b_connect.process_input();
+                }
+                else if (m_submenu == MENU_OPTIONS)
+                    b_back.process_input();
+            }
     }
 
     if (m_submenu == MENU_MAINMENU)

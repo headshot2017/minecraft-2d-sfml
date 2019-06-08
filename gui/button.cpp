@@ -37,6 +37,15 @@ Button::Button(GameEngine* _engine, sf::String text, float X, float Y)
     m_sprite.setPosition(m_pos);
 }
 
+void Button::process_input()
+{
+    if (sf::Mouse::getPosition(engine->app).x > m_pos.x and
+        sf::Mouse::getPosition(engine->app).y > m_pos.y and
+        sf::Mouse::getPosition(engine->app).x < m_pos.x + 400 and
+        sf::Mouse::getPosition(engine->app).y < m_pos.y + 40)
+        clicked = true;
+}
+
 bool Button::update()
 {
     if (sf::Mouse::getPosition(engine->app).x > m_pos.x and
@@ -46,13 +55,8 @@ bool Button::update()
     {
         m_sprite = engine->button_hover;
         m_text.setFillColor(sf::Color(255, 255, 128));
-        if (sf::Mouse::isButtonPressed(sf::Mouse::Left) and not clicked) // left click
-        {
+        if (clicked)
             BASS_ChannelPlay(engine->snd_button_click, true);
-            clicked = true;
-        }
-        else if (not sf::Mouse::isButtonPressed(sf::Mouse::Left) and clicked)
-            clicked = false;
     }
     else
     {
