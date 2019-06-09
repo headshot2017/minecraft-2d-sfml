@@ -4,6 +4,7 @@
 #include "game_engine.h" //import game_engine
 #include "menu_state.h" //import menu_state
 #include "ingame_state.h"
+#include <stdlib.h>
 
 int main(int argc, char *argv[]) //def main(argc, argv):
 {

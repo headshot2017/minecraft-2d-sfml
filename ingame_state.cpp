@@ -17,14 +17,18 @@ int intwrap(int number, int minimum, int maximum)
 
 void IngameState::init(GameEngine *engine)
 {
-    cam_x = 128;
-    cam_y = 128;
+    cam_x = 0;
+    cam_y = 0;
     m_engine = engine;
+
     m_sky = sf::RectangleShape(sf::Vector2f(800, 480));
     m_sky.setFillColor(sf::Color(154, 190, 255));
+
     text_cam_pos.setFont(engine->mc_font);
     text_cam_pos.setScale(0.16667f, 0.16667f);
     text_cam_pos.setCharacterSize(96);
+    text_cam_pos.setOutlineColor(sf::Color::Black);
+    text_cam_pos.setOutlineThickness(10);
 }
 
 void IngameState::destroy()
@@ -73,14 +77,29 @@ void IngameState::draw(GameEngine *engine)
     m_sky.setPosition(m_view.getCenter().x - 400.0f, m_view.getCenter().y - 240.0f);
     engine->app.draw(m_sky);
 
-    char aBuf[192];
-    sprintf(aBuf, "%d,%d", cam_x, cam_y);
-    text_cam_pos.setString(sf::String(aBuf));
-    text_cam_pos.setPosition(cam_x-400, cam_y-240);
+    int xx = (cam_x+400)/32;
+    int yy = (cam_y+240)/32;
 
-    sf::RenderStates states;
-    engine->app.draw(m_world.getBlocks(), &engine->m_blocks);
-    return;
+    engine->app.draw(m_world.getBlocksFromPoint(xx, yy), &engine->m_blocks);
+    engine->app.draw(m_world.getBlocksFromPoint(xx+CHUNK_W, yy), &engine->m_blocks);
+    engine->app.draw(m_world.getBlocksFromPoint(xx-CHUNK_W, yy), &engine->m_blocks);
+
+    engine->app.draw(m_world.getBlocksFromPoint(xx-CHUNK_W, yy-CHUNK_H), &engine->m_blocks);
+    engine->app.draw(m_world.getBlocksFromPoint(xx, yy-CHUNK_H), &engine->m_blocks);
+    engine->app.draw(m_world.getBlocksFromPoint(xx+CHUNK_W, yy-CHUNK_H), &engine->m_blocks);
+
+    if ((yy+CHUNK_H)/CHUNK_H < CHUNK_H-2)
+    {
+        engine->app.draw(m_world.getBlocksFromPoint(xx-CHUNK_W, yy+CHUNK_H), &engine->m_blocks);
+        engine->app.draw(m_world.getBlocksFromPoint(xx, yy+CHUNK_H), &engine->m_blocks);
+        engine->app.draw(m_world.getBlocksFromPoint(xx+CHUNK_W, yy+CHUNK_H), &engine->m_blocks);
+    }
+
+    char aBuf[192];
+    sprintf(aBuf, "%d,%d", cam_x/32, cam_y/32);
+    text_cam_pos.setString(sf::String(aBuf));
+    text_cam_pos.setPosition(cam_x, cam_y);
+    engine->app.draw(text_cam_pos);
 }
 
 void IngameState::pause()
@@ -104,6 +123,7 @@ void IngameState::loadWorld(const char *worldName)
     {
         printf("world %s does not exist, creating\n", aName);
         worldFile.close();
+        srand(time(0));
         generateWorld(rand(), worldName);
     }
     else
