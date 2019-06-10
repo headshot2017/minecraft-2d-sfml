@@ -6,7 +6,7 @@
 
 IngameState IngameState::m_Instance;
 
-int intwrap(int number, int minimum, int maximum)
+float numwrap(float number, float minimum, float maximum)
 {
     if (number > maximum)
         return maximum;
@@ -38,7 +38,7 @@ void IngameState::destroy()
 
 void IngameState::update(GameEngine *engine)
 {
-
+    m_player.update(engine);
 }
 
 void IngameState::process_input(GameEngine *engine)
@@ -52,21 +52,30 @@ void IngameState::process_input(GameEngine *engine)
         else if (event.type == sf::Event::KeyPressed)
         {
             if (event.key.code == sf::Keyboard::R)
-                cam_x = cam_y = 0;
+                cam_x = cam_y = 0.f;
         }
     }
 
+    /*
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
-        cam_y += 8;
+        cam_y += 8.0f;
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
-        cam_y -= 8;
+        cam_y -= 8.0f;
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
-        cam_x += 8;
+        cam_x += 8.0f;
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
-        cam_x -= 8;
+        cam_x -= 8.0f;
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::R))
+    {
+    */
+        cam_x = m_player.getPos().x-400;
+        cam_y = m_player.getPos().y-240;
+    //}
 
-    cam_x = intwrap(cam_x, 0, WORLD_W*32-800);
-    cam_y = intwrap(cam_y, 0, WORLD_H*32-480);
+    m_player.process_input(engine);
+
+    cam_x = numwrap(cam_x, 0.0f, WORLD_W*32-800.f);
+    cam_y = numwrap(cam_y, 0.0f, WORLD_H*32-480.f);
 }
 
 void IngameState::draw(GameEngine *engine)
@@ -74,7 +83,7 @@ void IngameState::draw(GameEngine *engine)
     sf::View m_view(sf::FloatRect(cam_x, cam_y, 800, 480));
     engine->app.setView(m_view);
 
-    m_sky.setPosition(m_view.getCenter().x - 400.0f, m_view.getCenter().y - 240.0f);
+    m_sky.setPosition(cam_x, cam_y);
     engine->app.draw(m_sky);
 
     int xx = (cam_x+400)/32;
@@ -95,8 +104,10 @@ void IngameState::draw(GameEngine *engine)
         engine->app.draw(m_world.getBlocksFromPoint(xx+CHUNK_W, yy+CHUNK_H), &engine->m_blocks);
     }
 
+    m_player.draw(engine);
+
     char aBuf[192];
-    sprintf(aBuf, "%d,%d", cam_x/32, cam_y/32);
+    sprintf(aBuf, "%.1f,%.1f", cam_x/32, cam_y/32);
     text_cam_pos.setString(sf::String(aBuf));
     text_cam_pos.setPosition(cam_x, cam_y);
     engine->app.draw(text_cam_pos);
@@ -131,5 +142,9 @@ void IngameState::loadWorld(const char *worldName)
         worldFile.close();
         m_world.loadWorld(worldName);
     }
+
+    m_player = Player(m_world);
+    m_player.setPlayer(true);
+
     printf("starting\n");
 }

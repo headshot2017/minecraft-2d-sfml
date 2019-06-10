@@ -4,6 +4,7 @@
 #include <SFML/Graphics.hpp>
 #include "game_state.h"
 #include "game/world.h"
+#include "game/player.h"
 #include <fstream>
 
 class IngameState : public GameState
@@ -24,10 +25,11 @@ public:
 private:
     static IngameState m_Instance;
     World m_world;
+    Player m_player;
     GameEngine *m_engine;
     sf::RectangleShape m_sky;
     sf::Text text_cam_pos;
-    int cam_x, cam_y;
+    float cam_x, cam_y;
 
 protected:
     IngameState() {}

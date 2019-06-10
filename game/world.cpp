@@ -50,7 +50,6 @@ int World::getBlock(int x, int y)
     int x_block_chunk = x % CHUNK_W;
     int y_block_chunk = y % CHUNK_H;
     int ind = (y_block_chunk * CHUNK_W + x_block_chunk)*4;
-
     int block = m_blocks2[y_ind][x_ind][ind].texCoords.x / 32;
 
     return block;
@@ -121,13 +120,14 @@ void World::saveWorld()
     printf("opening file\n");
     std::fstream file(fileName, std::ios::out | std::ios::binary);
 
-    int total = WORLD_W*WORLD_H*4;
-    file.write((char*)&total, sizeof(total));
-    for(int i=0; i<total; i++)
+    int width = WORLD_W, height = WORLD_H;
+    file.write((char*)&width, sizeof(width));
+    file.write((char*)&height, sizeof(height));
+    for(int i=0; i<width*height*4; i++)
     {
-        int x = i % WORLD_W;
-        int y = i / WORLD_W;
-        if (x < 0 or x >= WORLD_W or y < 0 or y >= WORLD_H) continue;
+        int x = i % width;
+        int y = i / width;
+        if (x < 0 or x >= width or y < 0 or y >= height) continue;
         int block = getBlock(x,y);
 
         file.write((char*)&x, sizeof(x));
@@ -147,13 +147,22 @@ void World::loadWorld(const char *worldName)
 
     printf("loading world %s...\n", fileName);
 
-    int worldTotal, pos_x, pos_y, block_type;
+    int width, height, pos_x, pos_y, block_type;
 
-    printf("read worldtotal\n");
-    file.read((char*)&worldTotal, sizeof(worldTotal));
-    printf("got %d\n", worldTotal);
-    m_blocks2.resize(worldTotal);
-    for(int i=0; i<worldTotal; i++)
+    file.read((char*)&width, sizeof(width));
+    file.read((char*)&height, sizeof(height));
+    printf("world size: %d,%d\n", width, height);
+
+    for(int yy=0; yy < height/CHUNK_H+1; yy++)
+    {
+        m_blocks2.push_back(std::vector<sf::VertexArray>());
+        for (int xx=0; xx < width/CHUNK_W+1; xx++)
+        {
+            m_blocks2.back().push_back(sf::VertexArray(sf::Quads, CHUNK_W*CHUNK_H*4));
+        }
+    }
+
+    for(int i=0; i<width*height*4; i++)
     {
         //printf("read %d\n", i);
         file.read((char*)&pos_x, sizeof(pos_x));
