@@ -41,6 +41,7 @@ private:
     sf::VertexArray m_skinvertex;
     World m_world;
     float x, y, new_x, new_y, hspeed, vspeed, x_acc, gravity;
+    int m_dir;
     bool m_isPlayer = false, can_move = true;
 
 };

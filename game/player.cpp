@@ -130,7 +130,7 @@ void Player::update(GameEngine *engine)
     {
         gravity = 0.f;
         if (not sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
-        vspeed = 0.f;
+            vspeed = 0.f;
     }
     else
         gravity = 0.5f;
@@ -139,16 +139,23 @@ void Player::update(GameEngine *engine)
     vspeed += gravity;
     x += hspeed;
     y += vspeed;
+
+    if (hspeed > 0)
+        m_dir = 1;
+    else if (hspeed < 0)
+        m_dir = -1;
 }
 
 void Player::process_input(GameEngine *engine)
 {
     if (not m_isPlayer or not can_move) return;
 
+    int spd = (sf::Keyboard::isKeyPressed(sf::Keyboard::LControl)) ? 5 : 4;
+
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
-        x_acc = -0.25f;
+        x_acc = (hspeed > 0) ? -0.5f : -0.25f;
     else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
-        x_acc = 0.25f;
+        x_acc = (hspeed < 0) ? 0.5f : 0.25f;
     else
     {
         if (hspeed > 0)
@@ -158,10 +165,10 @@ void Player::process_input(GameEngine *engine)
         else
             x_acc = 0.f;
     }
-    if (hspeed > 7)
-        hspeed = 7;
-    if (hspeed < -7)
-        hspeed = -7;
+    if (hspeed > spd)
+        hspeed = spd;
+    if (hspeed < -spd)
+        hspeed = -spd;
 
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) and blockBelow())
         vspeed = -6.0f;
