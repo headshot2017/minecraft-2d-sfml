@@ -3,6 +3,7 @@
 
 #include "game_state.h"
 #include "gui/button.h"
+#include "gui/textinput.h"
 
 typedef enum
 {
@@ -55,6 +56,7 @@ private:
     Button b_connect;
 
     // options menu
+    TextInput input_test;
 
 
 protected:

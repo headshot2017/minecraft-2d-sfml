@@ -42,6 +42,8 @@ void MenuState::init(GameEngine* engine)
     b_world5 = Button(engine, sf::String("World 5"), 400 - 200, 96+(48*4));
 
     b_connect = Button(engine, sf::String("Connect"), 400-200, 96+64);
+
+    input_test = TextInput(engine, "test", sf::Vector2f(400-200, 96));
 }
 
 void MenuState::destroy()
@@ -51,7 +53,7 @@ void MenuState::destroy()
 
 void MenuState::update(GameEngine* engine)
 {
-
+    input_test.update();
 }
 
 void MenuState::process_input(GameEngine* engine)
@@ -62,33 +64,32 @@ void MenuState::process_input(GameEngine* engine)
         if (event.type == sf::Event::Closed)
             engine->quit();
 
-        else if (event.type == sf::Event::MouseButtonPressed)
-            if (event.mouseButton.button == sf::Mouse::Left)
-            {
-                if (m_submenu == MENU_MAINMENU)
-                {
-                    b_singleplayer.process_input();
-                    b_multiplayer.process_input();
-                    b_options.process_input();
-                    b_quit.process_input();
-                }
-                else if (m_submenu == MENU_LOADWORLD)
-                {
-                    b_back.process_input();
-                    b_world1.process_input();
-                    b_world2.process_input();
-                    b_world3.process_input();
-                    b_world4.process_input();
-                    b_world5.process_input();
-                }
-                else if (m_submenu == MENU_MULTIPLAYER)
-                {
-                    b_back.process_input();
-                    b_connect.process_input();
-                }
-                else if (m_submenu == MENU_OPTIONS)
-                    b_back.process_input();
-            }
+        if (m_submenu == MENU_MAINMENU)
+        {
+            b_singleplayer.process_input(event);
+            b_multiplayer.process_input(event);
+            b_options.process_input(event);
+            b_quit.process_input(event);
+        }
+        else if (m_submenu == MENU_LOADWORLD)
+        {
+            b_back.process_input(event);
+            b_world1.process_input(event);
+            b_world2.process_input(event);
+            b_world3.process_input(event);
+            b_world4.process_input(event);
+            b_world5.process_input(event);
+        }
+        else if (m_submenu == MENU_MULTIPLAYER)
+        {
+            b_back.process_input(event);
+            b_connect.process_input(event);
+        }
+        else if (m_submenu == MENU_OPTIONS)
+        {
+            b_back.process_input(event);
+            input_test.process_input(event);
+        }
     }
 
     if (m_submenu == MENU_MAINMENU)
@@ -176,6 +177,7 @@ void MenuState::draw(GameEngine* engine)
     }
     else if (m_submenu == MENU_OPTIONS)
     {
+        input_test.draw();
         b_back.draw();
     }
 }

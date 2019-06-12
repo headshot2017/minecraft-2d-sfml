@@ -37,13 +37,16 @@ Button::Button(GameEngine* _engine, sf::String text, float X, float Y)
     m_sprite.setPosition(m_pos);
 }
 
-void Button::process_input()
+void Button::process_input(sf::Event& event)
 {
-    if (sf::Mouse::getPosition(engine->app).x > m_pos.x and
-        sf::Mouse::getPosition(engine->app).y > m_pos.y and
-        sf::Mouse::getPosition(engine->app).x < m_pos.x + 400 and
-        sf::Mouse::getPosition(engine->app).y < m_pos.y + 40)
-        clicked = true;
+    if (event.type == sf::Event::MouseButtonPressed)
+    {
+        if (event.mouseButton.x > m_pos.x and
+            event.mouseButton.y > m_pos.y and
+            event.mouseButton.x < m_pos.x + 400 and
+            event.mouseButton.y < m_pos.y + 40)
+            clicked = true;
+    }
 }
 
 bool Button::update()
