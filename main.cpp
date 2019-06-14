@@ -17,6 +17,7 @@ int main(int argc, char *argv[]) //def main(argc, argv):
         engine.update();
         engine.process_input();
         engine.draw();
+        engine.m_ticks++;
     }
 
     printf("game closed, cleaning up...\n");

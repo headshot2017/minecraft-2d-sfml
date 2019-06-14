@@ -44,6 +44,8 @@ public:
 
     HSTREAM snd_button_click;
 
+    long int m_ticks = 0;
+
 private:
     bool m_running = true;
     std::vector<GameState*> states;

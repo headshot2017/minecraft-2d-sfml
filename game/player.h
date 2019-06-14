@@ -6,19 +6,19 @@
 
 enum
 {
-    PLAYER_HEAD,
-    PLAYER_ARMBACK=4,
-    PLAYER_BODY=8,
-    PLAYER_ARMFRONT=12,
-    PLAYER_LEGBACK=16,
-    PLAYER_LEGFRONT=20
+    PLAYER_ARMBACK,
+    PLAYER_BODY=4,
+    PLAYER_ARMFRONT=8,
+    PLAYER_LEGBACK=12,
+    PLAYER_LEGFRONT=16,
+    PLAYER_HEAD=20
 };
 
 class Player
 {
 public:
     Player();
-    Player(World& world);
+    Player(World& world, GameEngine* engine);
     ~Player();
     void setSkin(const char *name);
 
@@ -39,10 +39,13 @@ public:
 private:
     sf::Texture m_skin;
     sf::VertexArray m_skinvertex;
+    sf::Vector2f mousepos;
     World m_world;
-    float x, y, new_x, new_y, hspeed, vspeed, x_acc, gravity;
-    int m_dir;
+    float x, y, new_x, new_y, hspeed, vspeed, x_acc, gravity, m_angle;
+    int m_dir = 1;
     bool m_isPlayer = false, can_move = true;
+
+    GameEngine *m_engine;
 
 };
 

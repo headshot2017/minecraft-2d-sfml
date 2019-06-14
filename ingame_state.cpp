@@ -143,7 +143,7 @@ void IngameState::loadWorld(const char *worldName)
         m_world.loadWorld(worldName);
     }
 
-    m_player = Player(m_world);
+    m_player = Player(m_world, m_engine);
     m_player.setPlayer(true);
 
     printf("starting\n");

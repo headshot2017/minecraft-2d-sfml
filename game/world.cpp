@@ -141,7 +141,7 @@ void World::saveWorld()
 void World::loadWorld(const char *worldName)
 {
     sprintf(fileName, "worlds/%s.dat", worldName);
-    std::fstream file(fileName, std::fstream::in | std::fstream::binary);
+    std::fstream file(fileName, std::ios::in | std::ios::binary);
 
     m_blocks2.clear();
 
