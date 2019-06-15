@@ -47,10 +47,21 @@ void Player::moveToGround()
 {
     int yy = y/32;
 
-    while (m_world.getBlock(x/32, yy) == BLOCK_AIR)
+    if (blockCollide(x/32, yy))
     {
-        y+=1.f;
-        yy = y/32;
+        while (blockCollide(x/32, yy))
+        {
+            y-=1.f;
+            yy = y/32;
+        }
+    }
+    else
+    {
+        while (not blockCollide(x/32, yy))
+        {
+            y+=1.f;
+            yy = y/32;
+        }
     }
 
     //y -= 1.f;
@@ -212,12 +223,17 @@ void Player::adjustSkinDir()
 
 void Player::update(GameEngine *engine)
 {
-    if (blockCollide(x/32, (y+vspeed)/32)) // gravity.
+    if (blockCollide(x/32, (y+vspeed)/32) or blockCollide(x/32, (y+vspeed-64)/32)) // gravity.
     {
-        moveToGround();
-        gravity = 0.f;
-        if (not sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+        if (vspeed > 0)
+        {
+            moveToGround();
+            gravity = 0.f;
             vspeed = 0.f;
+        }
+        else if (vspeed < 0)
+            if (not sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+                vspeed = 0.f;
     }
     else
         gravity = 0.25f;
@@ -227,7 +243,10 @@ void Player::update(GameEngine *engine)
 
     if (hspeed != 0)
     {
-        if (blockCollide((x+hspeed+(4*m_dir))/32, (y-32)/32) or blockCollide((x+hspeed+(4*m_dir))/32, (y-64)/32)) // horizontal collisions
+        if (blockCollide((x+hspeed+(4*m_dir))/32, (y-32)/32) or
+            blockCollide((x+hspeed+(-4*m_dir))/32, (y-32)/32) or
+            blockCollide((x+hspeed+(4*m_dir))/32, (y-64)/32) or
+            blockCollide((x+hspeed+(-4*m_dir))/32, (y-64)/32)) // horizontal collisions
             hspeed = x_acc = 0;
     }
 
