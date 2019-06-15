@@ -53,12 +53,12 @@ void Player::moveToGround()
         yy = y/32;
     }
 
-    y -= 1.f;
+    //y -= 1.f;
 }
 
-bool Player::blockBelow()
+bool Player::blockCollide(int x, int y)
 {
-    return m_world.getBlock(x/32, y/32) != BLOCK_AIR;
+    return m_world.getBlock(x, y) != BLOCK_AIR;
 }
 
 void Player::adjustSkinDir()
@@ -71,7 +71,7 @@ void Player::adjustSkinDir()
     sf:: Transform arm1, arm2, leg1, leg2;
     float armswing = (hspeed > 5) ? 5 : hspeed;
     float maxangle = armswing*9.0f;
-    float angle = sin((m_engine->m_ticks/60.0f) * (armswing*2.5f)) * maxangle;
+    float angle = sin((m_ticks/60.0f)) * maxangle;
     arm1.rotate(angle, x-4, y-48);
     arm2.rotate(-angle, x+4, y-48);
     leg1.rotate(angle, x, y-24);
@@ -212,8 +212,9 @@ void Player::adjustSkinDir()
 
 void Player::update(GameEngine *engine)
 {
-    if (blockBelow())
+    if (blockCollide(x/32, (y+vspeed)/32)) // gravity.
     {
+        moveToGround();
         gravity = 0.f;
         if (not sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
             vspeed = 0.f;
@@ -223,6 +224,13 @@ void Player::update(GameEngine *engine)
 
     hspeed += x_acc;
     vspeed += gravity;
+
+    if (hspeed != 0)
+    {
+        if (blockCollide((x+hspeed+(4*m_dir))/32, (y-32)/32) or blockCollide((x+hspeed+(4*m_dir))/32, (y-64)/32)) // horizontal collisions
+            hspeed = x_acc = 0;
+    }
+
     x += hspeed;
     y += vspeed;
 
@@ -234,6 +242,12 @@ void Player::update(GameEngine *engine)
             m_dir = 1;
         else
             m_dir = -1;
+    }
+
+    if (hspeed != 0)
+    {
+        float armswing = (hspeed > 5) ? 5 : hspeed;
+        m_ticks += (armswing*2.5f);
     }
 }
 
@@ -261,7 +275,7 @@ void Player::process_input(GameEngine *engine)
     if (hspeed < -spd)
         hspeed = -spd;
 
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) and blockBelow())
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) and blockCollide(x/32, y/32))
         vspeed = -4.5f;
 }
 

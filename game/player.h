@@ -31,7 +31,7 @@ public:
 
     void setPlayer(bool t) {m_isPlayer = t;}
     bool isPlayer() {return m_isPlayer;}
-    bool blockBelow();
+    bool blockCollide(int x, int y);
 
     sf::VertexArray& getSkinVertex() {return m_skinvertex;}
     sf::Vector2f getPos() const {return sf::Vector2f(x,y);}
@@ -44,6 +44,7 @@ private:
     float x, y, new_x, new_y, hspeed, vspeed, x_acc, gravity, m_angle;
     int m_dir = 1;
     bool m_isPlayer = false, can_move = true;
+    double m_ticks = 0.0; // for footstep animations
 
     GameEngine *m_engine;
 
