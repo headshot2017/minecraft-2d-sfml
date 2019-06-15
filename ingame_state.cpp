@@ -56,21 +56,8 @@ void IngameState::process_input(GameEngine *engine)
         }
     }
 
-    /*
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
-        cam_y += 8.0f;
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
-        cam_y -= 8.0f;
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
-        cam_x += 8.0f;
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
-        cam_x -= 8.0f;
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::R))
-    {
-    */
-        cam_x = m_player.getPos().x-400;
-        cam_y = m_player.getPos().y-240;
-    //}
+    cam_x = m_player.getPos().x + (m_player.getSpeed().x*3.0f) -400;
+    cam_y = m_player.getPos().y-240;
 
     m_player.process_input(engine);
 

@@ -35,6 +35,7 @@ public:
 
     sf::VertexArray& getSkinVertex() {return m_skinvertex;}
     sf::Vector2f getPos() const {return sf::Vector2f(x,y);}
+    sf::Vector2f getSpeed() const {return sf::Vector2f(hspeed,vspeed);}
 
 private:
     sf::Texture m_skin;
