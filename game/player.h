@@ -33,6 +33,8 @@ public:
     bool isPlayer() {return m_isPlayer;}
     bool blockCollide(int x, int y);
 
+    void placeBlock(int x, int y, int block);
+
     sf::VertexArray& getSkinVertex() {return m_skinvertex;}
     sf::Vector2f getPos() const {return sf::Vector2f(x,y);}
     sf::Vector2f getSpeed() const {return sf::Vector2f(hspeed,vspeed);}
@@ -41,11 +43,17 @@ private:
     sf::Texture m_skin;
     sf::VertexArray m_skinvertex;
     sf::Vector2f mousepos;
+
     World m_world;
+
     float x, y, new_x, new_y, hspeed, vspeed, x_acc, gravity, m_angle;
     int m_dir = 1;
     bool m_isPlayer = false, can_move = true;
     double m_ticks = 0.0; // for footstep animations
+    int m_armtick = 0; // arm swing (when clicking)
+
+    bool lmb = false, rmb = false, mmb = false; // mouse buttons
+    int lmb_tick = 0;
 
     GameEngine *m_engine;
 

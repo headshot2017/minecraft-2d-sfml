@@ -83,7 +83,7 @@ void Player::adjustSkinDir()
     float armswing = (hspeed > 5) ? 5 : hspeed;
     float maxangle = armswing*9.0f;
     float angle = sin((m_ticks/60.0f)) * maxangle;
-    arm1.rotate(angle, x-4, y-48);
+    arm1.rotate(angle + (((m_armtick/10.0f)*(6.0f))*-m_dir), x-4, y-48);
     arm2.rotate(-angle, x+4, y-48);
     leg1.rotate(angle, x, y-24);
     leg2.rotate(-angle, x, y-24);
@@ -221,6 +221,11 @@ void Player::adjustSkinDir()
     }
 }
 
+void Player::placeBlock(int x, int y, int block)
+{
+    m_armtick = 150;
+}
+
 void Player::update(GameEngine *engine)
 {
     if (blockCollide(x/32, (y+vspeed)/32) or blockCollide(x/32, (y+vspeed-64)/32)) // gravity.
@@ -268,12 +273,42 @@ void Player::update(GameEngine *engine)
         float armswing = (hspeed > 5) ? 5 : hspeed;
         m_ticks += (armswing*2.5f);
     }
+
+    if (m_armtick)
+        m_armtick-=10;
 }
 
 void Player::process_input(GameEngine *engine)
 {
     if (not m_isPlayer or not can_move) return;
 
+    // mouse
+    if (sf::Mouse::isButtonPressed(sf::Mouse::Right) and not rmb)
+    {
+        placeBlock(0, 0, 0);
+        rmb = true;
+    }
+    else if (not sf::Mouse::isButtonPressed(sf::Mouse::Right) and rmb)
+        rmb = false;
+
+    if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
+    {
+        if (not lmb_tick)
+        {
+            placeBlock(0, 0, 0);
+            lmb_tick = 60 * 0.22;
+        }
+        else
+            lmb_tick--;
+        lmb = true;
+    }
+    else
+    {
+        lmb = false;
+        lmb_tick = 0;
+    }
+
+    // keyboard
     int spd = (sf::Keyboard::isKeyPressed(sf::Keyboard::LControl)) ? 4 : 3;
 
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))

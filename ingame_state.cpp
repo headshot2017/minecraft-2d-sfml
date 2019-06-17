@@ -56,8 +56,17 @@ void IngameState::process_input(GameEngine *engine)
         }
     }
 
-    cam_x = m_player.getPos().x + (m_player.getSpeed().x*3.0f) -400;
-    cam_y = m_player.getPos().y-240;
+    sf::Vector2f pos = m_player.getPos();
+    sf::Vector2f spd = m_player.getSpeed();
+    float old_cam_x = cam_x;
+    float old_cam_y = cam_y;
+
+    float cam_x_dist = ((pos.x - old_cam_x)-400)/16.0f;
+    float cam_y_dist = ((pos.y - old_cam_y)-240)/16.0f;
+
+    cam_x += cam_x_dist + (spd.x*2.0f);
+    if (spd.y == 0 or (cam_y_dist > 360 or cam_y_dist < -360))
+        cam_y += cam_y_dist;
 
     m_player.process_input(engine);
 
