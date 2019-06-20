@@ -49,8 +49,10 @@ private:
     float x, y, new_x, new_y, hspeed, vspeed, x_acc, gravity, m_angle;
     int m_dir = 1;
     bool m_isPlayer = false, can_move = true;
-    double m_ticks = 0.0; // for footstep animations
+    double m_footstepticks = 0.0; // for footstep animations
+    int m_ticks = 0; // ticks elapsed since creation (mainly for footstep sounds)
     int m_armtick = 0; // arm swing (when clicking)
+    int m_footstepwait = 0; // ticks to wait until next footstep sound
 
     bool lmb = false, rmb = false, mmb = false; // mouse buttons
     int lmb_tick = 0;

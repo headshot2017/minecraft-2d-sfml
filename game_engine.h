@@ -4,16 +4,8 @@
 #include <SFML/Graphics.hpp>
 #include <vector>
 #include "bass.h"
-
-
-enum
-{
-    BLOCK_AIR,
-    BLOCK_GRASS,
-    BLOCK_DIRT,
-    BLOCK_STONE,
-    BLOCK_BEDROCK
-};
+#include "sound.h"
+#include "game/block.h"
 
 
 class GameState;
@@ -33,6 +25,7 @@ public:
     void popState(); // destroy the current state and resume the paused one.
 
     bool isRunning() {return m_running;}
+    SoundEngine* Sound() {return m_sound;}
 
     sf::Texture m_blocks;
 
@@ -42,8 +35,6 @@ public:
     sf::Sprite button;
     sf::Sprite button_hover;
 
-    HSTREAM snd_button_click;
-
     long int m_ticks = 0;
 
 private:
@@ -51,6 +42,7 @@ private:
     std::vector<GameState*> states;
     sf::Texture m_button;
     sf::Texture m_button_hover;
+    SoundEngine *m_sound;
 };
 
 #endif // GAME_ENGINE_H_INCLUDED

@@ -7,7 +7,8 @@ enum
     BLOCK_GRASS,
     BLOCK_DIRT,
     BLOCK_STONE,
-    BLOCK_BEDROCK
+    BLOCK_BEDROCK,
+    BLOCK_TOTAL
 };
 
 #endif // BLOCK_H_INCLUDED

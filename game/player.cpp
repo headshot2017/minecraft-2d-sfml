@@ -13,10 +13,11 @@ Player::Player(World& world, GameEngine *engine)
 {
     hspeed = vspeed = gravity = new_x = new_y = x_acc = m_angle = 0.0f;
     m_world = world;
+    m_engine = engine;
 
     m_skinvertex.resize(6*4);
     m_skinvertex.setPrimitiveType(sf::Quads);
-    move((WORLD_W*32)/2, 32.0f);
+    move((WORLD_W*32)/1.25, 32.0f);
     moveToGround();
     setSkin("steve");
 }
@@ -82,7 +83,7 @@ void Player::adjustSkinDir()
     sf:: Transform arm1, arm2, leg1, leg2;
     float armswing = (hspeed > 5) ? 5 : hspeed;
     float maxangle = armswing*9.0f;
-    float angle = sin((m_ticks/60.0f)) * maxangle;
+    float angle = sin((m_footstepticks/60.0f)) * maxangle;
     arm1.rotate(angle + (((m_armtick/10.0f)*(6.0f))*-m_dir), x-4, y-48);
     arm2.rotate(-angle, x+4, y-48);
     leg1.rotate(angle, x, y-24);
@@ -270,8 +271,23 @@ void Player::update(GameEngine *engine)
 
     if (hspeed != 0)
     {
-        float armswing = (hspeed > 5) ? 5 : hspeed;
-        m_ticks += (armswing*2.5f);
+        m_ticks++;
+        float armswing = abs(hspeed);
+        if (hspeed > 5)
+            armswing = 5;
+        m_footstepticks += (armswing*2.5f);
+
+        float maxangle = armswing*9.0f;
+        float angle = sin((m_footstepticks/60.0f)) * maxangle;
+        if (angle < 6 and angle > -6 and not m_footstepwait and blockCollide(x/32, y/32))
+        {
+            int block = m_world.getBlock(x/32, y/32);
+            sf::Vector2f view = engine->app.getView().getCenter();
+            engine->Sound()->playFootstepSound(x, y, view.x, view.y, block);
+            m_footstepwait = 25 - (armswing*2);
+        }
+
+        if (m_footstepwait) m_footstepwait--;
     }
 
     if (m_armtick)

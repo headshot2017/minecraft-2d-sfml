@@ -59,7 +59,7 @@ bool Button::update()
         m_sprite = engine->button_hover;
         m_text.setFillColor(sf::Color(255, 255, 128));
         if (clicked)
-            BASS_ChannelPlay(engine->snd_button_click, true);
+            engine->Sound()->playClickSound();
     }
     else
     {

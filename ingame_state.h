@@ -24,12 +24,16 @@ public:
 
 private:
     static IngameState m_Instance;
+
     World m_world;
-    Player m_player;
+    Player m_player; // will later be changed to pointers for multiplayer
     GameEngine *m_engine;
+
     sf::RectangleShape m_sky;
     sf::Text text_cam_pos;
+
     float cam_x, cam_y;
+    int m_currblock = 1;
 
 protected:
     IngameState() {}

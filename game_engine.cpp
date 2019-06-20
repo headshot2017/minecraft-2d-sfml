@@ -1,7 +1,6 @@
 #include "game_engine.h"
 #include "game_state.h"
 #include <SFML/Graphics.hpp>
-#include "bass.h"
 #include <stdio.h>
 #include <string.h>
 #include <fstream>
@@ -15,8 +14,9 @@ void GameEngine::init()
 
     mc_font.loadFromFile("data/font/Minecraftia.ttf");
 
-    if (not BASS_Init(-1, 44100, 0, 0, 0))
-        printf("bass could not start. error code: %d\n", BASS_ErrorGetCode());
+    m_sound = new SoundEngine;
+    m_sound->init();
+    m_sound->loadTheme("default");
 
     sf::Image widgets;
     widgets.loadFromFile("data/gui/widgets.png");
@@ -27,8 +27,6 @@ void GameEngine::init()
     button_hover.setTexture(m_button_hover);
     button.setScale(2.0f, 2.0f);
     button_hover.setScale(2.0f, 2.0f);
-
-    snd_button_click = BASS_StreamCreateFile(false, "data/sounds/click.wav", 0, 0, 0);
 }
 
 void GameEngine::cleanup()
@@ -38,8 +36,8 @@ void GameEngine::cleanup()
         states.back()->destroy();
         states.pop_back();
     }
-    BASS_StreamFree(snd_button_click);
-    BASS_Free();
+    m_sound->cleanup();
+    delete m_sound;
 }
 
 void GameEngine::update()

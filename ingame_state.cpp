@@ -54,6 +54,17 @@ void IngameState::process_input(GameEngine *engine)
             if (event.key.code == sf::Keyboard::R)
                 cam_x = cam_y = 0.f;
         }
+
+        else if (event.type == sf::Event::MouseWheelScrolled)
+        {
+            if (event.mouseWheelScroll.wheel == sf::Mouse::VerticalWheel)
+                m_currblock -= event.mouseWheelScroll.delta;
+
+            if (m_currblock < 1)
+                m_currblock = 1;
+            if (m_currblock > BLOCK_TOTAL-1)
+                m_currblock = BLOCK_TOTAL-1;
+        }
     }
 
     sf::Vector2f pos = m_player.getPos();
@@ -65,7 +76,7 @@ void IngameState::process_input(GameEngine *engine)
     float cam_y_dist = ((pos.y - old_cam_y)-240)/16.0f;
 
     cam_x += cam_x_dist + (spd.x*2.0f);
-    if (spd.y == 0 or (cam_y_dist > 360 or cam_y_dist < -360))
+    if (spd.y == 0 or (cam_y_dist > 48 or cam_y_dist < -48))
         cam_y += cam_y_dist;
 
     m_player.process_input(engine);
@@ -91,16 +102,29 @@ void IngameState::draw(GameEngine *engine)
 
     engine->app.draw(m_world.getBlocksFromPoint(xx-CHUNK_W, yy-CHUNK_H), &engine->m_blocks);
     engine->app.draw(m_world.getBlocksFromPoint(xx, yy-CHUNK_H), &engine->m_blocks);
-    engine->app.draw(m_world.getBlocksFromPoint(xx+CHUNK_W, yy-CHUNK_H), &engine->m_blocks);
+    if ((xx+CHUNK_W)/CHUNK_W < CHUNK_W-2)
+        engine->app.draw(m_world.getBlocksFromPoint(xx+CHUNK_W, yy-CHUNK_H), &engine->m_blocks);
 
     if ((yy+CHUNK_H)/CHUNK_H < CHUNK_H-2)
     {
         engine->app.draw(m_world.getBlocksFromPoint(xx-CHUNK_W, yy+CHUNK_H), &engine->m_blocks);
         engine->app.draw(m_world.getBlocksFromPoint(xx, yy+CHUNK_H), &engine->m_blocks);
-        engine->app.draw(m_world.getBlocksFromPoint(xx+CHUNK_W, yy+CHUNK_H), &engine->m_blocks);
+        if ((xx+CHUNK_W)/CHUNK_W < CHUNK_W-1)
+            engine->app.draw(m_world.getBlocksFromPoint(xx+CHUNK_W, yy+CHUNK_H), &engine->m_blocks);
     }
 
     m_player.draw(engine);
+
+    sf::Vertex vert[4];
+    vert[0].position = sf::Vector2f(cam_x+800-48, cam_y+16);
+    vert[1].position = sf::Vector2f(cam_x+800-16, cam_y+16);
+    vert[2].position = sf::Vector2f(cam_x+800-16, cam_y+48);
+    vert[3].position = sf::Vector2f(cam_x+800-48, cam_y+48);
+    vert[0].texCoords = sf::Vector2f(m_currblock*32, 0);
+    vert[1].texCoords = sf::Vector2f(m_currblock*32+32, 0);
+    vert[2].texCoords = sf::Vector2f(m_currblock*32+32, 32);
+    vert[3].texCoords = sf::Vector2f(m_currblock*32, 32);
+    engine->app.draw(vert, 4, sf::Quads, &engine->m_blocks);
 
     char aBuf[192];
     sprintf(aBuf, "%.1f,%.1f", cam_x/32, cam_y/32);
