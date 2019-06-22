@@ -18,11 +18,12 @@ class Player
 {
 public:
     Player();
-    Player(World& world, GameEngine* engine);
+    Player(World* world, GameEngine* engine);
     ~Player();
     void setSkin(const char *name);
 
     void update(GameEngine* engine);
+    void event_input(GameEngine* engine, sf::Event &event);
     void process_input(GameEngine* engine);
     void draw(GameEngine* engine);
     void moveToGround();
@@ -33,18 +34,21 @@ public:
     bool isPlayer() {return m_isPlayer;}
     bool blockCollide(int x, int y);
 
+    bool canBuild(int x, int y);
     void placeBlock(int x, int y, int block);
+    void destroyBlock(int x, int y);
 
     sf::VertexArray& getSkinVertex() {return m_skinvertex;}
     sf::Vector2f getPos() const {return sf::Vector2f(x,y);}
     sf::Vector2f getSpeed() const {return sf::Vector2f(hspeed,vspeed);}
+    sf::Vector2f getMouse() {return mousepos;}
 
 private:
     sf::Texture m_skin;
     sf::VertexArray m_skinvertex;
     sf::Vector2f mousepos;
 
-    World m_world;
+    World *m_world;
 
     float x, y, new_x, new_y, hspeed, vspeed, x_acc, gravity, m_angle;
     int m_dir = 1;
@@ -56,6 +60,8 @@ private:
 
     bool lmb = false, rmb = false, mmb = false; // mouse buttons
     int lmb_tick = 0;
+
+    int m_currblock = 1;
 
     GameEngine *m_engine;
 

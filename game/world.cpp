@@ -44,7 +44,11 @@ void World::setBlock(int x, int y, int block)
 
 int World::getBlock(int x, int y)
 {
-    //int ind = (y * WORLD_W + x)*4;
+    if (x < 0) x = 0;
+    if (y < 0) y = 0;
+    if (x >= WORLD_W) x = WORLD_W-1;
+    if (y >= WORLD_H) y = WORLD_H-1;
+
     int x_ind = x/CHUNK_W;
     int y_ind = y/CHUNK_H;
     int x_block_chunk = x % CHUNK_W;
@@ -60,6 +64,8 @@ sf::VertexArray& World::getBlocksFromPoint(int x, int y)
     int x_ind = x/CHUNK_W;
     int y_ind = y/CHUNK_H;
 
+    if (x_ind > WORLD_W/CHUNK_W) x_ind = WORLD_W/CHUNK_W;
+    if (y_ind > WORLD_H/CHUNK_H) y_ind = WORLD_H/CHUNK_H;
     return m_blocks2[y_ind][x_ind];
 }
 
@@ -80,7 +86,6 @@ void World::generateWorld(unsigned int seed, const char *name)
         dirtLevel = alternateHeight + 32*randomDirtLevel[rand() % 4];
         stoneLevel = WORLD_H*32;
 
-        printf("set block at %d,%d\n", xx/32, alternateHeight/32);
         setBlock(xx/32, alternateHeight/32, BLOCK_GRASS);
 
         for(int yy=alternateHeight; yy<dirtLevel; yy+=32)

@@ -9,6 +9,7 @@ void GameEngine::init()
 {
     app.create(sf::VideoMode(800, 480), "minecrap clone test");
     app.setFramerateLimit(60);
+    m_window.create(app.getSize().x, app.getSize().y);
 
     m_blocks.loadFromFile("data/blocks.png");
 
@@ -53,7 +54,10 @@ void GameEngine::process_input()
 void GameEngine::draw()
 {
     app.clear();
+    m_window.clear();
     states.back()->draw(this);
+    m_window.display();
+    app.draw(sf::Sprite(m_window.getTexture()));
     app.display();
 }
 

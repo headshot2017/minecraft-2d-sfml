@@ -77,6 +77,6 @@ bool Button::update()
 
 void Button::draw()
 {
-    engine->app.draw(m_sprite);
-    engine->app.draw(m_text);
+    engine->m_window.draw(m_sprite);
+    engine->m_window.draw(m_text);
 }

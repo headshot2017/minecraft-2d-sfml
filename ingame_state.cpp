@@ -3,6 +3,7 @@
 #include "ingame_state.h"
 #include <SFML/Graphics.hpp>
 #include <direct.h>
+#include <math.h>
 
 IngameState IngameState::m_Instance;
 
@@ -24,6 +25,11 @@ void IngameState::init(GameEngine *engine)
     m_sky = sf::RectangleShape(sf::Vector2f(800, 480));
     m_sky.setFillColor(sf::Color(154, 190, 255));
 
+    m_blockoutline.setSize(sf::Vector2f(31, 31));
+    m_blockoutline.setFillColor(sf::Color::Transparent);
+    m_blockoutline.setOutlineColor(sf::Color::Black);
+    m_blockoutline.setOutlineThickness(1);
+
     text_cam_pos.setFont(engine->mc_font);
     text_cam_pos.setScale(0.16667f, 0.16667f);
     text_cam_pos.setCharacterSize(96);
@@ -33,7 +39,7 @@ void IngameState::init(GameEngine *engine)
 
 void IngameState::destroy()
 {
-    //m_engine->app.setView(m_engine->app.getDefaultView());
+    //m_engine->m_window.setView(m_engine->m_window.getDefaultView());
 }
 
 void IngameState::update(GameEngine *engine)
@@ -46,6 +52,8 @@ void IngameState::process_input(GameEngine *engine)
     sf::Event event;
     while (engine->app.pollEvent(event))
     {
+        m_player.event_input(engine, event);
+
         if (event.type == sf::Event::Closed)
             engine->quit();
 
@@ -53,19 +61,22 @@ void IngameState::process_input(GameEngine *engine)
         {
             if (event.key.code == sf::Keyboard::R)
                 cam_x = cam_y = 0.f;
-        }
+            else if (event.key.code == sf::Keyboard::F2)
+            {
+                char aFile[96];
+                time_t atime = time(0);
+                std::tm* now = localtime(&atime);
+                sprintf(aFile, "%.2d-%.2d-%d %.2d.%.2d.%.2d.png", now->tm_mday, now->tm_mon+1, now->tm_year+1900, now->tm_sec, now->tm_min, now->tm_hour);
 
-        else if (event.type == sf::Event::MouseWheelScrolled)
-        {
-            if (event.mouseWheelScroll.wheel == sf::Mouse::VerticalWheel)
-                m_currblock -= event.mouseWheelScroll.delta;
-
-            if (m_currblock < 1)
-                m_currblock = 1;
-            if (m_currblock > BLOCK_TOTAL-1)
-                m_currblock = BLOCK_TOTAL-1;
+                engine->takeScreenshot().copyToImage().saveToFile(aFile);
+                printf("screenshot saved as '%s'\n", aFile);
+            }
+            else if (event.key.code == sf::Keyboard::Escape)
+                m_world.saveWorld();
         }
     }
+
+    m_player.process_input(engine);
 
     sf::Vector2f pos = m_player.getPos();
     sf::Vector2f spd = m_player.getSpeed();
@@ -76,61 +87,60 @@ void IngameState::process_input(GameEngine *engine)
     float cam_y_dist = ((pos.y - old_cam_y)-240)/16.0f;
 
     cam_x += cam_x_dist + (spd.x*2.0f);
-    if (spd.y == 0 or (cam_y_dist > 48 or cam_y_dist < -48))
+    if (m_player.blockCollide(pos.x/32, pos.y/32) or (cam_y_dist > 48 or cam_y_dist < -48))
         cam_y += cam_y_dist;
-
-    m_player.process_input(engine);
 
     cam_x = numwrap(cam_x, 0.0f, WORLD_W*32-800.f);
     cam_y = numwrap(cam_y, 0.0f, WORLD_H*32-480.f);
+
+    sf::Vector2f m_mousepos = m_player.getMouse();
+    m_blockoutline.setPosition(floor(m_mousepos.x/32)*32, floor((m_mousepos.y-56)/32)*32);
 }
 
 void IngameState::draw(GameEngine *engine)
 {
     sf::View m_view(sf::FloatRect(cam_x, cam_y, 800, 480));
-    engine->app.setView(m_view);
+    engine->m_window.setView(m_view);
 
     m_sky.setPosition(cam_x, cam_y);
-    engine->app.draw(m_sky);
+    engine->m_window.draw(m_sky);
 
     int xx = (cam_x+400)/32;
     int yy = (cam_y+240)/32;
 
-    engine->app.draw(m_world.getBlocksFromPoint(xx, yy), &engine->m_blocks);
-    engine->app.draw(m_world.getBlocksFromPoint(xx+CHUNK_W, yy), &engine->m_blocks);
-    engine->app.draw(m_world.getBlocksFromPoint(xx-CHUNK_W, yy), &engine->m_blocks);
+    engine->m_window.draw(m_world.getBlocksFromPoint(xx-CHUNK_W, yy), &engine->m_blocks);
+    engine->m_window.draw(m_world.getBlocksFromPoint(xx, yy), &engine->m_blocks);
+    if ((xx+CHUNK_W)/CHUNK_W < WORLD_W/CHUNK_W+1)
+        engine->m_window.draw(m_world.getBlocksFromPoint(xx+CHUNK_W, yy), &engine->m_blocks);
 
-    engine->app.draw(m_world.getBlocksFromPoint(xx-CHUNK_W, yy-CHUNK_H), &engine->m_blocks);
-    engine->app.draw(m_world.getBlocksFromPoint(xx, yy-CHUNK_H), &engine->m_blocks);
-    if ((xx+CHUNK_W)/CHUNK_W < CHUNK_W-2)
-        engine->app.draw(m_world.getBlocksFromPoint(xx+CHUNK_W, yy-CHUNK_H), &engine->m_blocks);
+    engine->m_window.draw(m_world.getBlocksFromPoint(xx-CHUNK_W, yy-CHUNK_H), &engine->m_blocks);
+    engine->m_window.draw(m_world.getBlocksFromPoint(xx, yy-CHUNK_H), &engine->m_blocks);
+    if ((xx+CHUNK_W)/CHUNK_W < WORLD_W/CHUNK_W+1)
+        engine->m_window.draw(m_world.getBlocksFromPoint(xx+CHUNK_W, yy-CHUNK_H), &engine->m_blocks);
 
     if ((yy+CHUNK_H)/CHUNK_H < CHUNK_H-2)
     {
-        engine->app.draw(m_world.getBlocksFromPoint(xx-CHUNK_W, yy+CHUNK_H), &engine->m_blocks);
-        engine->app.draw(m_world.getBlocksFromPoint(xx, yy+CHUNK_H), &engine->m_blocks);
-        if ((xx+CHUNK_W)/CHUNK_W < CHUNK_W-1)
-            engine->app.draw(m_world.getBlocksFromPoint(xx+CHUNK_W, yy+CHUNK_H), &engine->m_blocks);
+        engine->m_window.draw(m_world.getBlocksFromPoint(xx-CHUNK_W, yy+CHUNK_H), &engine->m_blocks);
+        engine->m_window.draw(m_world.getBlocksFromPoint(xx, yy+CHUNK_H), &engine->m_blocks);
+        if ((xx+CHUNK_W)/CHUNK_W < WORLD_W/CHUNK_W-2)
+            engine->m_window.draw(m_world.getBlocksFromPoint(xx+CHUNK_W, yy+CHUNK_H), &engine->m_blocks);
     }
 
     m_player.draw(engine);
 
-    sf::Vertex vert[4];
-    vert[0].position = sf::Vector2f(cam_x+800-48, cam_y+16);
-    vert[1].position = sf::Vector2f(cam_x+800-16, cam_y+16);
-    vert[2].position = sf::Vector2f(cam_x+800-16, cam_y+48);
-    vert[3].position = sf::Vector2f(cam_x+800-48, cam_y+48);
-    vert[0].texCoords = sf::Vector2f(m_currblock*32, 0);
-    vert[1].texCoords = sf::Vector2f(m_currblock*32+32, 0);
-    vert[2].texCoords = sf::Vector2f(m_currblock*32+32, 32);
-    vert[3].texCoords = sf::Vector2f(m_currblock*32, 32);
-    engine->app.draw(vert, 4, sf::Quads, &engine->m_blocks);
+    sf::Vector2f outlinepos = m_blockoutline.getPosition();
+    if (m_world.getBlock((outlinepos.x+00)/32, (outlinepos.y+00)/32) or
+        m_world.getBlock((outlinepos.x+32)/32, (outlinepos.y+00)/32) or
+        m_world.getBlock((outlinepos.x-32)/32, (outlinepos.y+00)/32) or
+        m_world.getBlock((outlinepos.x+00)/32, (outlinepos.y+32)/32) or
+        m_world.getBlock((outlinepos.x+00)/32, (outlinepos.y-32)/32))
+        engine->m_window.draw(m_blockoutline);
 
     char aBuf[192];
     sprintf(aBuf, "%.1f,%.1f", cam_x/32, cam_y/32);
     text_cam_pos.setString(sf::String(aBuf));
     text_cam_pos.setPosition(cam_x, cam_y);
-    engine->app.draw(text_cam_pos);
+    engine->m_window.draw(text_cam_pos);
 }
 
 void IngameState::pause()
@@ -163,7 +173,7 @@ void IngameState::loadWorld(const char *worldName)
         m_world.loadWorld(worldName);
     }
 
-    m_player = Player(m_world, m_engine);
+    m_player = Player(&m_world, m_engine);
     m_player.setPlayer(true);
 
     printf("starting\n");

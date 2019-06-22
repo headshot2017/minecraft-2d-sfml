@@ -71,6 +71,18 @@ void SoundEngine::playClickSound()
     BASS_ChannelPlay(m_sounds[SOUND_CLICK], true);
 }
 
+void SoundEngine::playDigSound(float player_x, float player_y, float x, float y, int type)
+{
+    int blocktype = SOUND_STONE_DIG;
+
+    if (type == BLOCK_GRASS)
+        blocktype = SOUND_GRASS_DIG;
+    else if (type == BLOCK_DIRT)
+        blocktype = SOUND_DIRT_DIG;
+
+    playGameSound(player_x, player_y, x, y, blocktype);
+}
+
 void SoundEngine::playFootstepSound(float player_x, float player_y, float x, float y, int type)
 {
     int blocktype = SOUND_STONE_STEP;
@@ -93,7 +105,7 @@ void SoundEngine::playGameSound(float player_x, float player_y, float x, float y
     else
         vol = 0;
 
-    pan = (x - player_x) / 20.0f;
+    pan = (-x + player_x) / 500.0f;
     printf("volume %.2f, pan %.2f\n", vol, pan);
 
     int ind = rand() % 4;

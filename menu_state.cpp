@@ -152,10 +152,10 @@ void MenuState::process_input(GameEngine* engine)
 
 void MenuState::draw(GameEngine* engine)
 {
-    engine->app.draw(dirt_tile);
+    engine->m_window.draw(dirt_tile);
     if (m_submenu == MENU_MAINMENU)
     {
-        engine->app.draw(minecraft_logo);
+        engine->m_window.draw(minecraft_logo);
         b_singleplayer.draw();
         b_multiplayer.draw();
         b_options.draw();

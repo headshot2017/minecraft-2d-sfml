@@ -24,8 +24,12 @@ public:
     void pushState(GameState* state); // pause the current state and load this new one.
     void popState(); // destroy the current state and resume the paused one.
 
+    const sf::Texture& takeScreenshot() {return m_window.getTexture();}
+
     bool isRunning() {return m_running;}
     SoundEngine* Sound() {return m_sound;}
+
+    sf::RenderTexture m_window;
 
     sf::Texture m_blocks;
 

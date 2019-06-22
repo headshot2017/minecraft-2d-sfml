@@ -9,7 +9,7 @@ Player::Player()
     x = y = hspeed = vspeed = gravity = new_x = new_y = x_acc = m_angle = 0.0f;
 }
 
-Player::Player(World& world, GameEngine *engine)
+Player::Player(World* world, GameEngine *engine)
 {
     hspeed = vspeed = gravity = new_x = new_y = x_acc = m_angle = 0.0f;
     m_world = world;
@@ -17,7 +17,7 @@ Player::Player(World& world, GameEngine *engine)
 
     m_skinvertex.resize(6*4);
     m_skinvertex.setPrimitiveType(sf::Quads);
-    move((WORLD_W*32)/1.25, 32.0f);
+    move((WORLD_W*32)/1.125, 32.0f);
     moveToGround();
     setSkin("steve");
 }
@@ -70,7 +70,18 @@ void Player::moveToGround()
 
 bool Player::blockCollide(int x, int y)
 {
-    return m_world.getBlock(x, y) != BLOCK_AIR;
+    return m_world->getBlock(x, y) != BLOCK_AIR;
+}
+
+bool Player::canBuild(int x, int y)
+{
+    if (m_world->getBlock(x+0, y+0) or
+        m_world->getBlock(x+1, y+0) or
+        m_world->getBlock(x-1, y+0) or
+        m_world->getBlock(x+0, y+3) or
+        m_world->getBlock(x+0, y-3))
+        return true;
+    return false;
 }
 
 void Player::adjustSkinDir()
@@ -222,9 +233,30 @@ void Player::adjustSkinDir()
     }
 }
 
-void Player::placeBlock(int x, int y, int block)
+void Player::placeBlock(int xx, int yy, int block)
 {
+    int block2 = m_world->getBlock(xx, yy);
+    //if (block2 != BLOCK_AIR) return;
+
+    printf("set block at %d,%d with ind %d to %d\n", xx, yy, block2, block);
+    sf::Vector2f view = m_engine->m_window.getView().getCenter();
+
     m_armtick = 150;
+    m_world->setBlock(xx, yy, block);
+    m_engine->Sound()->playDigSound(xx*32, yy*32, view.x, view.y, block);
+}
+
+void Player::destroyBlock(int xx, int yy)
+{
+    int block2 = m_world->getBlock(xx, yy);
+
+    m_armtick = 150;
+    //if (block2 == BLOCK_AIR) return;
+
+    printf("set block at %d,%d with ind %d to 0\n", xx, yy, block2);
+    sf::Vector2f view = m_engine->m_window.getView().getCenter();
+    m_engine->Sound()->playDigSound(xx*32, yy*32, view.x, view.y, m_world->getBlock(xx, yy));
+    m_world->setBlock(xx, yy, BLOCK_AIR);
 }
 
 void Player::update(GameEngine *engine)
@@ -261,7 +293,7 @@ void Player::update(GameEngine *engine)
 
     if (m_isPlayer)
     {
-        mousepos = engine->app.mapPixelToCoords(sf::Mouse::getPosition(engine->app), engine->app.getView());
+        mousepos = engine->m_window.mapPixelToCoords(sf::Mouse::getPosition(engine->app), engine->m_window.getView());
         mousepos.y += 56.0f;
         if (mousepos.x >= x)
             m_dir = 1;
@@ -281,8 +313,8 @@ void Player::update(GameEngine *engine)
         float angle = sin((m_footstepticks/60.0f)) * maxangle;
         if (angle < 6 and angle > -6 and not m_footstepwait and blockCollide(x/32, y/32))
         {
-            int block = m_world.getBlock(x/32, y/32);
-            sf::Vector2f view = engine->app.getView().getCenter();
+            int block = m_world->getBlock(x/32, y/32);
+            sf::Vector2f view = engine->m_window.getView().getCenter();
             engine->Sound()->playFootstepSound(x, y, view.x, view.y, block);
             m_footstepwait = 25 - (armswing*2);
         }
@@ -294,6 +326,22 @@ void Player::update(GameEngine *engine)
         m_armtick-=10;
 }
 
+void Player::event_input(GameEngine *engine, sf::Event &event)
+{
+    if (not m_isPlayer or not can_move) return;
+
+    if (event.type == sf::Event::MouseWheelScrolled)
+    {
+        if (event.mouseWheelScroll.wheel == sf::Mouse::VerticalWheel)
+            m_currblock -= event.mouseWheelScroll.delta;
+
+        if (m_currblock < 1)
+            m_currblock = 1;
+        if (m_currblock > BLOCK_TOTAL-1)
+            m_currblock = BLOCK_TOTAL-1;
+    }
+}
+
 void Player::process_input(GameEngine *engine)
 {
     if (not m_isPlayer or not can_move) return;
@@ -301,7 +349,8 @@ void Player::process_input(GameEngine *engine)
     // mouse
     if (sf::Mouse::isButtonPressed(sf::Mouse::Right) and not rmb)
     {
-        placeBlock(0, 0, 0);
+        //if (canBuild(mousepos.x/32, (mousepos.y-56)/32))
+            placeBlock(mousepos.x/32, (mousepos.y-56)/32, m_currblock);
         rmb = true;
     }
     else if (not sf::Mouse::isButtonPressed(sf::Mouse::Right) and rmb)
@@ -311,7 +360,7 @@ void Player::process_input(GameEngine *engine)
     {
         if (not lmb_tick)
         {
-            placeBlock(0, 0, 0);
+            destroyBlock(mousepos.x/32, (mousepos.y-56)/32);
             lmb_tick = 60 * 0.22;
         }
         else
@@ -356,5 +405,20 @@ void Player::draw(GameEngine *engine)
     sf::RenderStates state;
     state.texture = &m_skin;
 
-    engine->app.draw(m_skinvertex, state);
+    engine->m_window.draw(m_skinvertex, state);
+
+    if (m_isPlayer)
+    {
+        sf::Vector2f cam = engine->m_window.getView().getCenter();
+        sf::Vertex vert[4];
+        vert[0].position = sf::Vector2f(cam.x+400-48, cam.y-240+16);
+        vert[1].position = sf::Vector2f(cam.x+400-16, cam.y-240+16);
+        vert[2].position = sf::Vector2f(cam.x+400-16, cam.y-240+48);
+        vert[3].position = sf::Vector2f(cam.x+400-48, cam.y-240+48);
+        vert[0].texCoords = sf::Vector2f(m_currblock*32, 0);
+        vert[1].texCoords = sf::Vector2f(m_currblock*32+32, 0);
+        vert[2].texCoords = sf::Vector2f(m_currblock*32+32, 32);
+        vert[3].texCoords = sf::Vector2f(m_currblock*32, 32);
+        engine->m_window.draw(vert, 4, sf::Quads, &engine->m_blocks);
+    }
 }

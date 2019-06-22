@@ -30,10 +30,10 @@ private:
     GameEngine *m_engine;
 
     sf::RectangleShape m_sky;
+    sf::RectangleShape m_blockoutline;
     sf::Text text_cam_pos;
 
     float cam_x, cam_y;
-    int m_currblock = 1;
 
 protected:
     IngameState() {}

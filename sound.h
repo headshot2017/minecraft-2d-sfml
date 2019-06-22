@@ -32,6 +32,7 @@ public:
     bool loadTheme(const char *theme);
     bool unloadTheme();
 
+    void playDigSound(float player_x, float player_y, float x, float y, int type);
     void playFootstepSound(float player_x, float player_y, float x, float y, int type);
     void playGameSound(float player_x, float player_y, float x, float y, int type);
     void playClickSound();

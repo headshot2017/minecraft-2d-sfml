@@ -138,8 +138,8 @@ void TextInput::process_input(sf::Event& event)
 
 void TextInput::draw()
 {
-    m_engine->app.draw(m_rect);
-    m_engine->app.draw(m_text);
+    m_engine->m_window.draw(m_rect);
+    m_engine->m_window.draw(m_text);
     if (active)
-        m_engine->app.draw(m_caretline);
+        m_engine->m_window.draw(m_caretline);
 }
