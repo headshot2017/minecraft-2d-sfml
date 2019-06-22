@@ -87,7 +87,10 @@ void IngameState::process_input(GameEngine *engine)
     float cam_y_dist = ((pos.y - old_cam_y)-240)/16.0f;
 
     cam_x += cam_x_dist + (spd.x*2.0f);
-    if (m_player.blockCollide(pos.x/32, pos.y/32) or (cam_y_dist > 48 or cam_y_dist < -48))
+    if (m_player.blockCollide(pos.x/32, pos.y/32) or
+        m_player.blockCollide((pos.x-4)/32, pos.y/32) or
+        m_player.blockCollide((pos.x+4)/32, pos.y/32) or
+        (cam_y_dist > 8 or cam_y_dist < -8))
         cam_y += cam_y_dist;
 
     cam_x = numwrap(cam_x, 0.0f, WORLD_W*32-800.f);

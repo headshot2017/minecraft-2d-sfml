@@ -48,9 +48,9 @@ void Player::moveToGround()
 {
     int yy = y/32;
 
-    if (blockCollide(x/32, yy))
+    if (blockCollide(x/32, yy) or blockCollide((x-4)/32, yy) or blockCollide((x+4)/32, yy))
     {
-        while (blockCollide(x/32, yy))
+        while (blockCollide(x/32, yy) or blockCollide((x-4)/32, yy) or blockCollide((x+4)/32, yy))
         {
             y-=1.f;
             yy = y/32;
@@ -58,7 +58,7 @@ void Player::moveToGround()
     }
     else
     {
-        while (not blockCollide(x/32, yy))
+        while (not blockCollide(x/32, yy) and not blockCollide((x-4)/32, yy) and not blockCollide((x+4)/32, yy))
         {
             y+=1.f;
             yy = y/32;
@@ -236,9 +236,8 @@ void Player::adjustSkinDir()
 void Player::placeBlock(int xx, int yy, int block)
 {
     int block2 = m_world->getBlock(xx, yy);
-    //if (block2 != BLOCK_AIR) return;
+    if (block2 != BLOCK_AIR) return;
 
-    printf("set block at %d,%d with ind %d to %d\n", xx, yy, block2, block);
     sf::Vector2f view = m_engine->m_window.getView().getCenter();
 
     m_armtick = 150;
@@ -251,9 +250,8 @@ void Player::destroyBlock(int xx, int yy)
     int block2 = m_world->getBlock(xx, yy);
 
     m_armtick = 150;
-    //if (block2 == BLOCK_AIR) return;
+    if (block2 == BLOCK_AIR) return;
 
-    printf("set block at %d,%d with ind %d to 0\n", xx, yy, block2);
     sf::Vector2f view = m_engine->m_window.getView().getCenter();
     m_engine->Sound()->playDigSound(xx*32, yy*32, view.x, view.y, m_world->getBlock(xx, yy));
     m_world->setBlock(xx, yy, BLOCK_AIR);
@@ -261,7 +259,9 @@ void Player::destroyBlock(int xx, int yy)
 
 void Player::update(GameEngine *engine)
 {
-    if (blockCollide(x/32, (y+vspeed)/32) or blockCollide(x/32, (y+vspeed-64)/32)) // gravity.
+    if (blockCollide(x/32, (y+vspeed)/32) or blockCollide(x/32, (y+vspeed-32)/32) or blockCollide(x/32, (y+vspeed-64)/32) or
+        blockCollide((x-4)/32, (y+vspeed)/32) or blockCollide((x-4)/32, (y+vspeed-32)/32) or blockCollide((x-4)/32, (y+vspeed-64)/32) or
+        blockCollide((x+4)/32, (y+vspeed)/32) or blockCollide((x+4)/32, (y+vspeed-32)/32) or blockCollide((x+4)/32, (y+vspeed-64)/32)) // gravity.
     {
         if (vspeed > 0)
         {
@@ -270,8 +270,7 @@ void Player::update(GameEngine *engine)
             vspeed = 0.f;
         }
         else if (vspeed < 0)
-            if (not sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
-                vspeed = 0.f;
+            vspeed = 0.f;
     }
     else
         gravity = 0.25f;
@@ -281,11 +280,15 @@ void Player::update(GameEngine *engine)
 
     if (hspeed != 0)
     {
-        if (blockCollide((x+hspeed+(4*m_dir))/32, (y-32)/32) or
+        if (blockCollide((x+hspeed+(4*m_dir))/32, (y-1)/32) or
+            blockCollide((x+hspeed+(-4*m_dir))/32, (y-1)/32) or
+            blockCollide((x+hspeed+(4*m_dir))/32, (y-32)/32) or
             blockCollide((x+hspeed+(-4*m_dir))/32, (y-32)/32) or
             blockCollide((x+hspeed+(4*m_dir))/32, (y-64)/32) or
             blockCollide((x+hspeed+(-4*m_dir))/32, (y-64)/32)) // horizontal collisions
+        {
             hspeed = x_acc = 0;
+        }
     }
 
     x += hspeed;
@@ -394,7 +397,10 @@ void Player::process_input(GameEngine *engine)
     if (hspeed < -spd)
         hspeed = -spd;
 
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) and blockCollide(x/32, y/32))
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) and
+        (blockCollide(x/32, y/32) or
+        blockCollide((x-4)/32, y/32) or
+        blockCollide((x+4)/32, y/32)))
         vspeed = -4.5f;
 }
 
