@@ -18,6 +18,8 @@ Button::Button(GameEngine* _engine, sf::String text, sf::Vector2f pos)
     m_text.setFont(engine->mc_font);
     m_text.setScale(0.25f, 0.25f);
     m_text.setCharacterSize(96);
+    m_text.setPosition(m_pos.x + 200 - (m_text.getGlobalBounds().width/2.0f),
+                       m_pos.y + 17 - (m_text.getGlobalBounds().height/2.0f));
 
     m_sprite = engine->button;
     m_sprite.setPosition(m_pos);
@@ -32,6 +34,8 @@ Button::Button(GameEngine* _engine, sf::String text, float X, float Y)
     m_text.setFont(engine->mc_font);
     m_text.setScale(0.16667f, 0.16667f);
     m_text.setCharacterSize(96);
+    m_text.setPosition(m_pos.x + 200 - (m_text.getGlobalBounds().width/2.0f),
+                       m_pos.y + 17 - (m_text.getGlobalBounds().height/2.0f));
 
     m_sprite = engine->button;
     m_sprite.setPosition(m_pos);
@@ -39,6 +43,7 @@ Button::Button(GameEngine* _engine, sf::String text, float X, float Y)
 
 void Button::process_input(sf::Event& event)
 {
+    clicked = false;
     if (event.type == sf::Event::MouseButtonPressed)
     {
         if (event.mouseButton.x > m_pos.x and

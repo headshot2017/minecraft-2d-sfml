@@ -7,6 +7,8 @@ MenuState MenuState::m_Instance;
 
 void MenuState::init(GameEngine* engine)
 {
+    m_submenu = MENU_MAINMENU;
+
     m_dirt_tile.loadFromFile("data/gui/options_background.png");
     m_dirt_tile.setRepeated(true);
 

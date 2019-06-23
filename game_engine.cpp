@@ -97,3 +97,13 @@ void GameEngine::popState()
     states.pop_back();
     states.back()->resume();
 }
+
+const sf::Texture& GameEngine::takeScreenshot(bool saveTexture)
+{
+    if (saveTexture)
+    {
+        m_screenshot = m_window.getTexture();
+        return m_screenshot;
+    }
+    return m_window.getTexture();
+}

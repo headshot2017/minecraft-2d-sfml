@@ -19,17 +19,20 @@ public:
     void process_input();
     void draw();
     void quit(); // rq
+    void leaveGame(bool setting=true) {m_leavegame = setting;}
+    bool leavingGame() {return m_leavegame;}
 
     void changeState(GameState* state);
     void pushState(GameState* state); // pause the current state and load this new one.
     void popState(); // destroy the current state and resume the paused one.
 
-    const sf::Texture& takeScreenshot() {return m_window.getTexture();}
+    const sf::Texture& takeScreenshot(bool saveTexture=false);
 
     bool isRunning() {return m_running;}
     SoundEngine* Sound() {return m_sound;}
 
     sf::RenderTexture m_window;
+    sf::Texture m_screenshot;
 
     sf::Texture m_blocks;
 
@@ -43,6 +46,7 @@ public:
 
 private:
     bool m_running = true;
+    bool m_leavegame = false;
     std::vector<GameState*> states;
     sf::Texture m_button;
     sf::Texture m_button_hover;

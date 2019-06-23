@@ -1,6 +1,8 @@
 #include "game_state.h"
 #include "game_engine.h"
 #include "ingame_state.h"
+#include "menu_state.h"
+#include "paused_state.h"
 #include <SFML/Graphics.hpp>
 #include <direct.h>
 #include <math.h>
@@ -39,11 +41,17 @@ void IngameState::init(GameEngine *engine)
 
 void IngameState::destroy()
 {
-    //m_engine->m_window.setView(m_engine->m_window.getDefaultView());
+    m_engine->m_window.setView(m_engine->m_window.getDefaultView());
 }
 
 void IngameState::update(GameEngine *engine)
 {
+    if (engine->leavingGame())
+    {
+        engine->leaveGame(false);
+        m_world.saveWorld();
+        engine->changeState(MenuState::Instance());
+    }
     m_player.update(engine);
 }
 
@@ -55,7 +63,10 @@ void IngameState::process_input(GameEngine *engine)
         m_player.event_input(engine, event);
 
         if (event.type == sf::Event::Closed)
+        {
+            m_world.saveWorld();
             engine->quit();
+        }
 
         else if (event.type == sf::Event::KeyPressed)
         {
@@ -66,13 +77,13 @@ void IngameState::process_input(GameEngine *engine)
                 char aFile[96];
                 time_t atime = time(0);
                 std::tm* now = localtime(&atime);
-                sprintf(aFile, "%.2d-%.2d-%d %.2d.%.2d.%.2d.png", now->tm_mday, now->tm_mon+1, now->tm_year+1900, now->tm_sec, now->tm_min, now->tm_hour);
+                sprintf(aFile, "%.2d-%.2d-%d %.2d.%.2d.%.2d.png", now->tm_mday, now->tm_mon+1, now->tm_year+1900, now->tm_hour, now->tm_min, now->tm_sec);
 
                 engine->takeScreenshot().copyToImage().saveToFile(aFile);
                 printf("screenshot saved as '%s'\n", aFile);
             }
             else if (event.key.code == sf::Keyboard::Escape)
-                m_world.saveWorld();
+                engine->pushState(PausedState::Instance());
         }
     }
 
@@ -125,7 +136,7 @@ void IngameState::draw(GameEngine *engine)
     {
         engine->m_window.draw(m_world.getBlocksFromPoint(xx-CHUNK_W, yy+CHUNK_H), &engine->m_blocks);
         engine->m_window.draw(m_world.getBlocksFromPoint(xx, yy+CHUNK_H), &engine->m_blocks);
-        if ((xx+CHUNK_W)/CHUNK_W < WORLD_W/CHUNK_W-2)
+        if ((xx+CHUNK_W)/CHUNK_W < WORLD_W/CHUNK_W+1)
             engine->m_window.draw(m_world.getBlocksFromPoint(xx+CHUNK_W, yy+CHUNK_H), &engine->m_blocks);
     }
 
@@ -148,7 +159,8 @@ void IngameState::draw(GameEngine *engine)
 
 void IngameState::pause()
 {
-
+    m_engine->takeScreenshot(true);
+    m_engine->m_window.setView(m_engine->m_window.getDefaultView());
 }
 
 void IngameState::resume()
