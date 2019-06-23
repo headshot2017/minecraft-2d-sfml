@@ -48,9 +48,14 @@ void IngameState::update(GameEngine *engine)
 {
     if (engine->leavingGame())
     {
-        engine->leaveGame(false);
+        int leave_type = engine->leavingGame();
+        engine->leaveGame(0);
         m_world.saveWorld();
-        engine->changeState(MenuState::Instance());
+
+        if (leave_type == 1) // return to main menu
+            engine->changeState(MenuState::Instance());
+        else if (leave_type == 2) // leave game entirely
+            engine->quit();
     }
     m_player.update(engine);
 }

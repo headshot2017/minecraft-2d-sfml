@@ -18,7 +18,7 @@ void PausedState::init(GameEngine* engine)
     m_gamescreen[3].color = sf::Color(128, 128, 128);
 
     b_resume = Button(engine, sf::String("Back to Game"), 400-200, 240-48);
-    b_quit = Button(engine, sf::String("Save and quit to title"), 400-200, 240);
+    b_quit = Button(engine, sf::String("Save and Quit to title"), 400-200, 240);
 }
 
 void PausedState::destroy()
@@ -37,7 +37,10 @@ void PausedState::process_input(GameEngine* engine)
     while (engine->app.pollEvent(event))
     {
         if (event.type == sf::Event::Closed)
+        {
+            engine->leaveGame(2);
             engine->popState();
+        }
         else if (event.type == sf::Event::KeyPressed)
         {
             if (event.key.code == sf::Keyboard::Escape)
@@ -51,7 +54,7 @@ void PausedState::process_input(GameEngine* engine)
             engine->popState();
         if (b_quit.update())
         {
-            engine->leaveGame(true);
+            engine->leaveGame(1);
             engine->popState();
         }
     }

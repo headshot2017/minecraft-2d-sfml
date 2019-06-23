@@ -19,7 +19,7 @@ public:
     void process_input();
     void draw();
     void quit(); // rq
-    void leaveGame(bool setting=true) {m_leavegame = setting;}
+    void leaveGame(int setting=1) {m_leavegame = setting;}
     bool leavingGame() {return m_leavegame;}
 
     void changeState(GameState* state);
@@ -46,7 +46,7 @@ public:
 
 private:
     bool m_running = true;
-    bool m_leavegame = false;
+    int m_leavegame = 0;
     std::vector<GameState*> states;
     sf::Texture m_button;
     sf::Texture m_button_hover;
