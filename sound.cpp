@@ -36,6 +36,8 @@ bool SoundEngine::loadTheme(const char *theme)
         m_sounds[SOUND_SAND_STEP+i] = BASS_StreamCreateFile(false, aFile, 0, 0, 0);
         sprintf(aFile, "data/sounds/%s/step/wood%d.wav", theme, i+1);
         m_sounds[SOUND_WOOD_STEP+i] = BASS_StreamCreateFile(false, aFile, 0, 0, 0);
+        sprintf(aFile, "data/sounds/%s/step/wool%d.wav", theme, i+1);
+        m_sounds[SOUND_WOOL_STEP+i] = BASS_StreamCreateFile(false, aFile, 0, 0, 0);
 
         sprintf(aFile, "data/sounds/%s/dig/grass%d.wav", theme, i+1);
         m_sounds[SOUND_GRASS_DIG+i] = BASS_StreamCreateFile(false, aFile, 0, 0, 0);
@@ -47,6 +49,8 @@ bool SoundEngine::loadTheme(const char *theme)
         m_sounds[SOUND_SAND_DIG+i] = BASS_StreamCreateFile(false, aFile, 0, 0, 0);
         sprintf(aFile, "data/sounds/%s/dig/wood%d.wav", theme, i+1);
         m_sounds[SOUND_WOOD_DIG+i] = BASS_StreamCreateFile(false, aFile, 0, 0, 0);
+        sprintf(aFile, "data/sounds/%s/step/wool%d.wav", theme, i+1);
+        m_sounds[SOUND_WOOL_DIG+i] = BASS_StreamCreateFile(false, aFile, 0, 0, 0);
     }
 
     theme_loaded = true;
@@ -75,10 +79,14 @@ void SoundEngine::playDigSound(float player_x, float player_y, float x, float y,
 {
     int blocktype = SOUND_STONE_DIG;
 
-    if (type == BLOCK_GRASS)
+    if (type == BLOCK_GRASS or type == BLOCK_OAK_LEAVES)
         blocktype = SOUND_GRASS_DIG;
-    else if (type == BLOCK_DIRT)
+    else if (type == BLOCK_DIRT or type == BLOCK_GRAVEL)
         blocktype = SOUND_DIRT_DIG;
+    else if (type == BLOCK_OAK_WOOD or type == BLOCK_OAK_PLANKS)
+        blocktype = SOUND_WOOD_DIG;
+    else if (type == BLOCK_SAND)
+        blocktype = SOUND_SAND_DIG;
 
     playGameSound(player_x, player_y, x, y, blocktype);
 }
@@ -87,10 +95,14 @@ void SoundEngine::playFootstepSound(float player_x, float player_y, float x, flo
 {
     int blocktype = SOUND_STONE_STEP;
 
-    if (type == BLOCK_GRASS)
+    if (type == BLOCK_GRASS or type == BLOCK_OAK_LEAVES)
         blocktype = SOUND_GRASS_STEP;
-    else if (type == BLOCK_DIRT)
+    else if (type == BLOCK_DIRT or type == BLOCK_GRAVEL)
         blocktype = SOUND_DIRT_STEP;
+    else if (type == BLOCK_OAK_WOOD or type == BLOCK_OAK_PLANKS)
+        blocktype = SOUND_WOOD_STEP;
+    else if (type == BLOCK_SAND)
+        blocktype = SOUND_SAND_STEP;
 
     playGameSound(player_x, player_y, x, y, blocktype);
 }

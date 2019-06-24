@@ -35,7 +35,7 @@ public:
     bool blockCollide(int x, int y);
 
     bool canBuild(int x, int y);
-    void placeBlock(int x, int y, int block);
+    void placeBlock(int x, int y, int block, int layer);
     void destroyBlock(int x, int y);
 
     sf::VertexArray& getSkinVertex() {return m_skinvertex;}

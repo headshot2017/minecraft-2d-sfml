@@ -7,18 +7,15 @@ World::World()
 {
     for(int yy=0; yy < WORLD_H/CHUNK_H+1; yy++)
     {
-        m_blocks2.push_back(std::vector<sf::VertexArray>());
+        m_blocks2.push_back(std::vector<Chunk>());
         for (int xx=0; xx < WORLD_W/CHUNK_W+1; xx++)
         {
-            m_blocks2.back().push_back(sf::VertexArray(sf::Quads, CHUNK_W*CHUNK_H*4));
+            m_blocks2.back().push_back(Chunk());
         }
     }
-
-    //m_blocks2.resize(WORLD_W*WORLD_H*4);
-    //m_blocks2.setPrimitiveType(sf::Quads);
 }
 
-void World::setBlock(int x, int y, int block)
+void World::setBlock(int x, int y, int block, int layer)
 {
     //int ind = (y * WORLD_W + x)*4;
     int x_ind = x/CHUNK_W;
@@ -31,15 +28,7 @@ void World::setBlock(int x, int y, int block)
 
     //printf("set block at %d,%d with ind %d to %d\n", x, y, ind, block);
 
-    m_blocks2[y_ind][x_ind][ind+0].position = sf::Vector2f((x+0)*32, (y+0)*32);
-    m_blocks2[y_ind][x_ind][ind+1].position = sf::Vector2f((x+1)*32, (y+0)*32);
-    m_blocks2[y_ind][x_ind][ind+2].position = sf::Vector2f((x+1)*32, (y+1)*32);
-    m_blocks2[y_ind][x_ind][ind+3].position = sf::Vector2f((x+0)*32, (y+1)*32);
-
-    m_blocks2[y_ind][x_ind][ind+0].texCoords = sf::Vector2f(block*32,0);
-    m_blocks2[y_ind][x_ind][ind+1].texCoords = sf::Vector2f(block*32+32,0);
-    m_blocks2[y_ind][x_ind][ind+2].texCoords = sf::Vector2f(block*32+32,32);
-    m_blocks2[y_ind][x_ind][ind+3].texCoords = sf::Vector2f(block*32,32);
+    m_blocks2[y_ind][x_ind].setBlock(x, y, ind, block, layer);
 }
 
 int World::getBlock(int x, int y)
@@ -54,8 +43,25 @@ int World::getBlock(int x, int y)
     int x_block_chunk = x % CHUNK_W;
     int y_block_chunk = y % CHUNK_H;
     int ind = (y_block_chunk * CHUNK_W + x_block_chunk)*4;
-    int block = m_blocks2[y_ind][x_ind][ind].texCoords.x / 32;
 
+    int block = m_blocks2[y_ind][x_ind].getBlock(ind);
+    return block;
+}
+
+int World::getBlockLayer(int x, int y)
+{
+    if (x < 0) x = 0;
+    if (y < 0) y = 0;
+    if (x >= WORLD_W) x = WORLD_W-1;
+    if (y >= WORLD_H) y = WORLD_H-1;
+
+    int x_ind = x/CHUNK_W;
+    int y_ind = y/CHUNK_H;
+    int x_block_chunk = x % CHUNK_W;
+    int y_block_chunk = y % CHUNK_H;
+    int ind = (y_block_chunk * CHUNK_W + x_block_chunk)*4;
+
+    int block = m_blocks2[y_ind][x_ind].getBlockLayer(ind);
     return block;
 }
 
@@ -66,7 +72,7 @@ sf::VertexArray& World::getBlocksFromPoint(int x, int y)
 
     if (x_ind > WORLD_W/CHUNK_W) x_ind = WORLD_W/CHUNK_W;
     if (y_ind > WORLD_H/CHUNK_H) y_ind = WORLD_H/CHUNK_H;
-    return m_blocks2[y_ind][x_ind];
+    return m_blocks2[y_ind][x_ind].getVertex();
 }
 
 void World::generateWorld(unsigned int seed, const char *name)
@@ -134,10 +140,12 @@ void World::saveWorld()
         int y = i / width;
         if (x < 0 or x >= width or y < 0 or y >= height) continue;
         int block = getBlock(x,y);
+        int layer = getBlockLayer(x,y);
 
         file.write((char*)&x, sizeof(x));
         file.write((char*)&y, sizeof(x));
         file.write((char*)&block, sizeof(block));
+        file.write((char*)&layer, sizeof(layer));
     }
     file.close();
     printf("world saved to %s\n", fileName);
@@ -152,7 +160,7 @@ void World::loadWorld(const char *worldName)
 
     printf("loading world %s...\n", fileName);
 
-    int width, height, pos_x, pos_y, block_type;
+    int width, height, pos_x, pos_y, block_type, block_layer;
 
     file.read((char*)&width, sizeof(width));
     file.read((char*)&height, sizeof(height));
@@ -160,10 +168,10 @@ void World::loadWorld(const char *worldName)
 
     for(int yy=0; yy < height/CHUNK_H+1; yy++)
     {
-        m_blocks2.push_back(std::vector<sf::VertexArray>());
+        m_blocks2.push_back(std::vector<Chunk>());
         for (int xx=0; xx < width/CHUNK_W+1; xx++)
         {
-            m_blocks2.back().push_back(sf::VertexArray(sf::Quads, CHUNK_W*CHUNK_H*4));
+            m_blocks2.back().push_back(Chunk());
         }
     }
 
@@ -173,8 +181,9 @@ void World::loadWorld(const char *worldName)
         file.read((char*)&pos_x, sizeof(pos_x));
         file.read((char*)&pos_y, sizeof(pos_y));
         file.read((char*)&block_type, sizeof(block_type));
+        file.read((char*)&block_layer, sizeof(block_layer));
 
-        setBlock(pos_x, pos_y, block_type);
+        setBlock(pos_x, pos_y, block_type, block_layer);
     }
     printf("world loaded!\n");
 }

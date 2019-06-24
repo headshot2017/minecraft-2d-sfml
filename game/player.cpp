@@ -70,7 +70,7 @@ void Player::moveToGround()
 
 bool Player::blockCollide(int x, int y)
 {
-    return m_world->getBlock(x, y) != BLOCK_AIR;
+    return m_world->getBlock(x, y) != BLOCK_AIR and m_world->getBlockLayer(x, y) == LAYER_BUILD;
 }
 
 bool Player::canBuild(int x, int y)
@@ -233,7 +233,7 @@ void Player::adjustSkinDir()
     }
 }
 
-void Player::placeBlock(int xx, int yy, int block)
+void Player::placeBlock(int xx, int yy, int block, int layer)
 {
     int block2 = m_world->getBlock(xx, yy);
     if (block2 != BLOCK_AIR) return;
@@ -241,7 +241,7 @@ void Player::placeBlock(int xx, int yy, int block)
     sf::Vector2f view = m_engine->m_window.getView().getCenter();
 
     m_armtick = 150;
-    m_world->setBlock(xx, yy, block);
+    m_world->setBlock(xx, yy, block, layer);
     m_engine->Sound()->playDigSound(xx*32, yy*32, view.x, view.y, block);
 }
 
@@ -352,8 +352,9 @@ void Player::process_input(GameEngine *engine)
     // mouse
     if (sf::Mouse::isButtonPressed(sf::Mouse::Right) and not rmb)
     {
+        int layer = (sf::Keyboard::isKeyPressed(sf::Keyboard::LAlt)) ? LAYER_DECORATION : LAYER_BUILD;
         //if (canBuild(mousepos.x/32, (mousepos.y-56)/32))
-            placeBlock(mousepos.x/32, (mousepos.y-56)/32, m_currblock);
+            placeBlock(mousepos.x/32, (mousepos.y-56)/32, m_currblock, layer);
         rmb = true;
     }
     else if (not sf::Mouse::isButtonPressed(sf::Mouse::Right) and rmb)

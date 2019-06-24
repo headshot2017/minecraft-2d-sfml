@@ -19,8 +19,8 @@ public:
     void process_input();
     void draw();
     void quit(); // rq
-    void leaveGame(int setting=1) {m_leavegame = setting;}
-    bool leavingGame() {return m_leavegame;}
+    void leaveGame(int setting) {m_leavegame = setting;}
+    int leavingGame() {return m_leavegame;}
 
     void changeState(GameState* state);
     void pushState(GameState* state); // pause the current state and load this new one.

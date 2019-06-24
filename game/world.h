@@ -8,16 +8,19 @@
 
 #include <SFML/Graphics.hpp>
 #include "../game_engine.h"
-#include <fstream>
+#include "chunk.h"
 #include <vector>
+
+class Chunk;
 
 class World
 {
 public:
     World();
 
-    void setBlock(int x, int y, int block);
+    void setBlock(int x, int y, int block, int layer=LAYER_BUILD);
     int getBlock(int x, int y);
+    int getBlockLayer(int x, int y);
 
     void generateWorld(unsigned int seed, const char *name);
     void loadWorld(const char *worldName);
@@ -27,7 +30,8 @@ public:
 
 private:
     char fileName[96];
-    std::vector<std::vector<sf::VertexArray>> m_blocks2;
+    //std::vector<std::vector<sf::VertexArray>> m_blocks2;
+    std::vector<std::vector<Chunk>> m_blocks2;
 };
 
 #endif // WORLD_H_INCLUDED
