@@ -17,6 +17,8 @@ class World
 {
 public:
     World();
+    World(GameEngine *engine);
+    ~World();
 
     void setBlock(int x, int y, int block, int layer=LAYER_BUILD);
     int getBlock(int x, int y);
@@ -30,7 +32,7 @@ public:
 
 private:
     char fileName[96];
-    //std::vector<std::vector<sf::VertexArray>> m_blocks2;
+    GameEngine *m_engine;
     std::vector<std::vector<Chunk>> m_blocks2;
 };
 

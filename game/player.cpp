@@ -350,17 +350,17 @@ void Player::process_input(GameEngine *engine)
     if (not m_isPlayer or not can_move) return;
 
     // mouse
-    if (sf::Mouse::isButtonPressed(sf::Mouse::Right) and not rmb)
+    if (engine->Settings()->controls()->Pressed("place") and not rmb)
     {
-        int layer = (sf::Keyboard::isKeyPressed(sf::Keyboard::LAlt)) ? LAYER_DECORATION : LAYER_BUILD;
+        int layer = (engine->Settings()->controls()->Pressed("layerswap")) ? LAYER_DECORATION : LAYER_BUILD;
         //if (canBuild(mousepos.x/32, (mousepos.y-56)/32))
             placeBlock(mousepos.x/32, (mousepos.y-56)/32, m_currblock, layer);
         rmb = true;
     }
-    else if (not sf::Mouse::isButtonPressed(sf::Mouse::Right) and rmb)
+    else if (not engine->Settings()->controls()->Pressed("place") and rmb)
         rmb = false;
 
-    if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
+    if (engine->Settings()->controls()->Pressed("destroy"))
     {
         if (not lmb_tick)
         {
@@ -378,11 +378,11 @@ void Player::process_input(GameEngine *engine)
     }
 
     // keyboard
-    int spd = (sf::Keyboard::isKeyPressed(sf::Keyboard::LControl)) ? 4 : 3;
+    int spd = (engine->Settings()->controls()->Pressed("run")) ? 4 : 3;
 
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+    if (engine->Settings()->controls()->Pressed("left"))
         x_acc = (hspeed > 0) ? -0.5f : -0.25f;
-    else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+    else if (engine->Settings()->controls()->Pressed("right"))
         x_acc = (hspeed < 0) ? 0.5f : 0.25f;
     else
     {
@@ -398,7 +398,7 @@ void Player::process_input(GameEngine *engine)
     if (hspeed < -spd)
         hspeed = -spd;
 
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) and
+    if (engine->Settings()->controls()->Pressed("jump") and
         (blockCollide(x/32, y/32) or
         blockCollide((x-4)/32, y/32) or
         blockCollide((x+4)/32, y/32)))

@@ -7,7 +7,10 @@ MenuState MenuState::m_Instance;
 
 void MenuState::init(GameEngine* engine)
 {
-    m_submenu = MENU_MAINMENU;
+    if (not engine->isPaused())
+        m_submenu = MENU_MAINMENU;
+    else
+        m_submenu = MENU_OPTIONS;
 
     m_dirt_tile.loadFromFile("data/gui/options_background.png");
     m_dirt_tile.setRepeated(true);
@@ -31,6 +34,7 @@ void MenuState::init(GameEngine* engine)
     minecraft_logo.setScale(2.0f, 2.0f);
 
     b_back = Button(engine, sf::String("Back"), 400-200, 480-48);
+    b_back_options = Button(engine, sf::String("Back"), 400-200, 480-48);
 
     b_singleplayer = Button(engine, sf::String("Singleplayer"), 400 - 200, 192);
     b_multiplayer = Button(engine, sf::String("Multiplayer"), 400 - 200, b_singleplayer.getPos().y + 64);
@@ -45,7 +49,10 @@ void MenuState::init(GameEngine* engine)
 
     b_connect = Button(engine, sf::String("Connect"), 400-200, 96+64);
 
-    input_test = TextInput(engine, "test", sf::Vector2f(400-200, 96));
+    b_options_graphics = Button(engine, sf::String("Graphics..."), 400-200, 128);
+    b_options_controls = Button(engine, sf::String("Controls..."), 400-200, 128+48);
+
+    b_layerlighting = Button(engine, "Background layer lighting: ON", 16, 96);
 }
 
 void MenuState::destroy()
@@ -55,7 +62,10 @@ void MenuState::destroy()
 
 void MenuState::update(GameEngine* engine)
 {
-    input_test.update();
+    if (engine->Settings()->m_layerlighting)
+        b_layerlighting.setText("Background layer lighting: ON");
+    else
+        b_layerlighting.setText("Background layer lighting: OFF");
 }
 
 void MenuState::process_input(GameEngine* engine)
@@ -90,7 +100,17 @@ void MenuState::process_input(GameEngine* engine)
         else if (m_submenu == MENU_OPTIONS)
         {
             b_back.process_input(event);
-            input_test.process_input(event);
+            b_options_controls.process_input(event);
+            b_options_graphics.process_input(event);
+        }
+        else if (m_submenu == MENU_OPTIONS_GRAPHICS)
+        {
+            b_back_options.process_input(event);
+            b_layerlighting.process_input(event);
+        }
+        else if (m_submenu == MENU_OPTIONS_CONTROLS)
+        {
+            b_back_options.process_input(event);
         }
     }
 
@@ -135,8 +155,6 @@ void MenuState::process_input(GameEngine* engine)
                 state->loadWorld("world 4");
             if (world == 5)
                 state->loadWorld("world 5");
-            printf("leaving menu state\n");
-            return;
         }
     }
     else if (m_submenu == MENU_MULTIPLAYER)
@@ -148,7 +166,28 @@ void MenuState::process_input(GameEngine* engine)
     else if (m_submenu == MENU_OPTIONS)
     {
         if (b_back.update())
-            m_submenu = MENU_MAINMENU;
+        {
+            if (not engine->isPaused())
+                m_submenu = MENU_MAINMENU;
+            else
+                engine->popState();
+        }
+        if (b_options_controls.update())
+            m_submenu = MENU_OPTIONS_CONTROLS;
+        if (b_options_graphics.update())
+            m_submenu = MENU_OPTIONS_GRAPHICS;
+    }
+    else if (m_submenu == MENU_OPTIONS_GRAPHICS)
+    {
+        if (b_layerlighting.update())
+            engine->Settings()->m_layerlighting = not engine->Settings()->m_layerlighting;
+        if (b_back_options.update())
+            m_submenu = MENU_OPTIONS;
+    }
+    else if (m_submenu == MENU_OPTIONS_CONTROLS)
+    {
+        if (b_back_options.update())
+            m_submenu = MENU_OPTIONS;
     }
 }
 
@@ -179,8 +218,18 @@ void MenuState::draw(GameEngine* engine)
     }
     else if (m_submenu == MENU_OPTIONS)
     {
-        input_test.draw();
+        b_options_graphics.draw();
+        b_options_controls.draw();
         b_back.draw();
+    }
+    else if (m_submenu == MENU_OPTIONS_GRAPHICS)
+    {
+        b_layerlighting.draw();
+        b_back_options.draw();
+    }
+    else if (m_submenu == MENU_OPTIONS_CONTROLS)
+    {
+        b_back_options.draw();
     }
 }
 

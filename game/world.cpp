@@ -5,6 +5,7 @@
 
 World::World()
 {
+    m_blocks2.clear();
     for(int yy=0; yy < WORLD_H/CHUNK_H+1; yy++)
     {
         m_blocks2.push_back(std::vector<Chunk>());
@@ -15,20 +16,36 @@ World::World()
     }
 }
 
+World::World(GameEngine *engine)
+{
+    m_engine = engine;
+    m_blocks2.clear();
+    for(int yy=0; yy < WORLD_H/CHUNK_H+1; yy++)
+    {
+        m_blocks2.push_back(std::vector<Chunk>());
+        for (int xx=0; xx < WORLD_W/CHUNK_W+1; xx++)
+        {
+            m_blocks2.back().push_back(Chunk());
+        }
+    }
+}
+
+World::~World()
+{
+    m_blocks2.clear();
+}
+
 void World::setBlock(int x, int y, int block, int layer)
 {
     //int ind = (y * WORLD_W + x)*4;
     int x_ind = x/CHUNK_W;
     int y_ind = y/CHUNK_H;
-    int x_block_chunk = x % CHUNK_W;
-    int y_block_chunk = y % CHUNK_H;
-    int ind = (y_block_chunk * CHUNK_W + x_block_chunk)*4;
 
     if (x < 0 or x >= WORLD_W or y < 0 or y >= WORLD_H) return;
 
     //printf("set block at %d,%d with ind %d to %d\n", x, y, ind, block);
 
-    m_blocks2[y_ind][x_ind].setBlock(x, y, ind, block, layer);
+    m_blocks2[y_ind][x_ind].setBlock(x, y, block, layer);
 }
 
 int World::getBlock(int x, int y)
@@ -42,9 +59,8 @@ int World::getBlock(int x, int y)
     int y_ind = y/CHUNK_H;
     int x_block_chunk = x % CHUNK_W;
     int y_block_chunk = y % CHUNK_H;
-    int ind = (y_block_chunk * CHUNK_W + x_block_chunk)*4;
 
-    int block = m_blocks2[y_ind][x_ind].getBlock(ind);
+    int block = m_blocks2[y_ind][x_ind].getBlock(x_block_chunk, y_block_chunk);
     return block;
 }
 
@@ -59,9 +75,8 @@ int World::getBlockLayer(int x, int y)
     int y_ind = y/CHUNK_H;
     int x_block_chunk = x % CHUNK_W;
     int y_block_chunk = y % CHUNK_H;
-    int ind = (y_block_chunk * CHUNK_W + x_block_chunk)*4;
 
-    int block = m_blocks2[y_ind][x_ind].getBlockLayer(ind);
+    int block = m_blocks2[y_ind][x_ind].getBlockLayer(x_block_chunk, y_block_chunk);
     return block;
 }
 
@@ -171,7 +186,7 @@ void World::loadWorld(const char *worldName)
         m_blocks2.push_back(std::vector<Chunk>());
         for (int xx=0; xx < width/CHUNK_W+1; xx++)
         {
-            m_blocks2.back().push_back(Chunk());
+            m_blocks2.back().push_back(Chunk(m_engine));
         }
     }
 

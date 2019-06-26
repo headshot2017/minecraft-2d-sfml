@@ -23,6 +23,7 @@ void IngameState::init(GameEngine *engine)
     cam_x = 0;
     cam_y = 0;
     m_engine = engine;
+    m_world = World(engine);
 
     m_sky = sf::RectangleShape(sf::Vector2f(800, 480));
     m_sky.setFillColor(sf::Color(154, 190, 255));
@@ -90,6 +91,9 @@ void IngameState::process_input(GameEngine *engine)
             else if (event.key.code == sf::Keyboard::Escape)
                 engine->pushState(PausedState::Instance());
         }
+
+        else if (event.type == sf::Event::LostFocus)
+            engine->pushState(PausedState::Instance());
     }
 
     m_player.process_input(engine);
@@ -156,7 +160,7 @@ void IngameState::draw(GameEngine *engine)
         engine->m_window.draw(m_blockoutline);
 
     char aBuf[192];
-    sprintf(aBuf, "%.1f,%.1f", cam_x/32, cam_y/32);
+    sprintf(aBuf, "%.1f,%.1f\nChunk position: %d,%d", cam_x/32, cam_y/32, xx/CHUNK_W, yy/CHUNK_H);
     text_cam_pos.setString(sf::String(aBuf));
     text_cam_pos.setPosition(cam_x, cam_y);
     engine->m_window.draw(text_cam_pos);
@@ -164,13 +168,14 @@ void IngameState::draw(GameEngine *engine)
 
 void IngameState::pause()
 {
+    m_engine->setPaused(true);
     m_engine->takeScreenshot(true);
     m_engine->m_window.setView(m_engine->m_window.getDefaultView());
 }
 
 void IngameState::resume()
 {
-
+    m_engine->setPaused(false);
 }
 
 void IngameState::loadWorld(const char *worldName)

@@ -6,6 +6,7 @@
 #include "bass.h"
 #include "sound.h"
 #include "game/block.h"
+#include "settings_manager.h"
 
 
 class GameState;
@@ -19,8 +20,11 @@ public:
     void process_input();
     void draw();
     void quit(); // rq
+
     void leaveGame(int setting) {m_leavegame = setting;}
     int leavingGame() {return m_leavegame;}
+    void setPaused(bool paused) {m_paused = paused;}
+    bool isPaused() {return m_paused;}
 
     void changeState(GameState* state);
     void pushState(GameState* state); // pause the current state and load this new one.
@@ -30,6 +34,7 @@ public:
 
     bool isRunning() {return m_running;}
     SoundEngine* Sound() {return m_sound;}
+    SettingsManager* Settings() {return &m_settings;}
 
     sf::RenderTexture m_window;
     sf::Texture m_screenshot;
@@ -46,11 +51,13 @@ public:
 
 private:
     bool m_running = true;
+    bool m_paused = false;
     int m_leavegame = 0;
     std::vector<GameState*> states;
     sf::Texture m_button;
     sf::Texture m_button_hover;
     SoundEngine *m_sound;
+    SettingsManager m_settings;
 };
 
 #endif // GAME_ENGINE_H_INCLUDED

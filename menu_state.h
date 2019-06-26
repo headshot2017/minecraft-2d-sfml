@@ -10,7 +10,10 @@ typedef enum
     MENU_MAINMENU,
     MENU_LOADWORLD,
     MENU_MULTIPLAYER,
-    MENU_OPTIONS
+    MENU_OPTIONS,
+
+    MENU_OPTIONS_GRAPHICS,
+    MENU_OPTIONS_CONTROLS
 } SUB_MENUS;
 
 class MenuState : public GameState
@@ -38,6 +41,7 @@ private:
 
     // general buttons
     Button b_back;
+    Button b_back_options;
 
     // main menu
     Button b_singleplayer;
@@ -56,7 +60,13 @@ private:
     Button b_connect;
 
     // options menu
-    TextInput input_test;
+    Button b_options_graphics;
+    Button b_options_controls;
+
+    // video options menu
+    Button b_layerlighting;
+
+    // controls options menu
 
 
 protected:

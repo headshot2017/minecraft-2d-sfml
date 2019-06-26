@@ -1,4 +1,5 @@
 #include "paused_state.h"
+#include "menu_state.h"
 
 PausedState PausedState::m_Instance;
 
@@ -17,8 +18,9 @@ void PausedState::init(GameEngine* engine)
     m_gamescreen[2].color = sf::Color(128, 128, 128);
     m_gamescreen[3].color = sf::Color(128, 128, 128);
 
-    b_resume = Button(engine, sf::String("Back to Game"), 400-200, 240-48);
-    b_quit = Button(engine, sf::String("Save and Quit to title"), 400-200, 240);
+    b_resume = Button(engine, sf::String("Back to Game"), 400-200, 240-96);
+    b_options = Button(engine, sf::String("Options"), 400-200, 240);
+    b_quit = Button(engine, sf::String("Save and Quit to title"), 400-200, 240+48);
 }
 
 void PausedState::destroy()
@@ -28,7 +30,15 @@ void PausedState::destroy()
 
 void PausedState::update(GameEngine* engine)
 {
-
+    if (b_resume.update())
+        engine->popState();
+    if (b_options.update())
+        engine->pushState(MenuState::Instance());
+    if (b_quit.update())
+    {
+        engine->leaveGame(1);
+        engine->popState();
+    }
 }
 
 void PausedState::process_input(GameEngine* engine)
@@ -48,15 +58,8 @@ void PausedState::process_input(GameEngine* engine)
         }
 
         b_resume.process_input(event);
+        b_options.process_input(event);
         b_quit.process_input(event);
-
-        if (b_resume.update())
-            engine->popState();
-        if (b_quit.update())
-        {
-            engine->leaveGame(1);
-            engine->popState();
-        }
     }
 }
 
@@ -64,6 +67,7 @@ void PausedState::draw(GameEngine* engine)
 {
     engine->m_window.draw(m_gamescreen, &engine->m_screenshot);
     b_resume.draw();
+    b_options.draw();
     b_quit.draw();
 }
 

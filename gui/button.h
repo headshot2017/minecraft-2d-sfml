@@ -9,9 +9,13 @@ class Button
 public:
     Button();
     Button(GameEngine* _engine, sf::String text, float X, float Y);
+    Button(GameEngine* _engine, const char* text, float X, float Y);
     Button(GameEngine* _engine, sf::String text, sf::Vector2f pos);
+    Button(GameEngine* _engine, const char* text, sf::Vector2f pos);
 
     sf::Vector2f getPos() {return m_pos;}
+    void setText(const char *text);
+    void setText(sf::String text);
     bool update();
     void process_input(sf::Event& event);
     void draw();

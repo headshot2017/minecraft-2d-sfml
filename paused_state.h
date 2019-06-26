@@ -24,6 +24,7 @@ private:
 
     sf::VertexArray m_gamescreen;
     Button b_resume;
+    Button b_options;
     Button b_quit;
 
 protected:
