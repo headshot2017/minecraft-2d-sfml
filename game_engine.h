@@ -44,8 +44,8 @@ public:
     sf::RenderWindow app;
     sf::Font mc_font;
 
-    sf::Sprite button;
-    sf::Sprite button_hover;
+    sf::Texture m_button;
+    sf::Texture m_button_hover;
 
     long int m_ticks = 0;
 
@@ -54,8 +54,6 @@ private:
     bool m_paused = false;
     int m_leavegame = 0;
     std::vector<GameState*> states;
-    sf::Texture m_button;
-    sf::Texture m_button_hover;
     SoundEngine *m_sound;
     SettingsManager m_settings;
 };

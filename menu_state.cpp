@@ -51,8 +51,6 @@ void MenuState::init(GameEngine* engine)
 
     b_options_graphics = Button(engine, sf::String("Graphics..."), 400-200, 128);
     b_options_controls = Button(engine, sf::String("Controls..."), 400-200, 128+48);
-
-    b_layerlighting = Button(engine, "Background layer lighting: ON", 16, 96);
 }
 
 void MenuState::destroy()
@@ -62,10 +60,7 @@ void MenuState::destroy()
 
 void MenuState::update(GameEngine* engine)
 {
-    if (engine->Settings()->m_layerlighting)
-        b_layerlighting.setText("Background layer lighting: ON");
-    else
-        b_layerlighting.setText("Background layer lighting: OFF");
+
 }
 
 void MenuState::process_input(GameEngine* engine)
@@ -74,7 +69,18 @@ void MenuState::process_input(GameEngine* engine)
     while (engine->app.pollEvent(event))
     {
         if (event.type == sf::Event::Closed)
-            engine->quit();
+        {
+            if (engine->isPaused())
+            {
+                engine->leaveGame(2);
+                engine->popState();
+                engine->popState();
+            }
+            else
+            {
+                engine->quit();
+            }
+        }
 
         if (m_submenu == MENU_MAINMENU)
         {
@@ -106,7 +112,6 @@ void MenuState::process_input(GameEngine* engine)
         else if (m_submenu == MENU_OPTIONS_GRAPHICS)
         {
             b_back_options.process_input(event);
-            b_layerlighting.process_input(event);
         }
         else if (m_submenu == MENU_OPTIONS_CONTROLS)
         {
@@ -179,8 +184,6 @@ void MenuState::process_input(GameEngine* engine)
     }
     else if (m_submenu == MENU_OPTIONS_GRAPHICS)
     {
-        if (b_layerlighting.update())
-            engine->Settings()->m_layerlighting = not engine->Settings()->m_layerlighting;
         if (b_back_options.update())
             m_submenu = MENU_OPTIONS;
     }
@@ -224,7 +227,6 @@ void MenuState::draw(GameEngine* engine)
     }
     else if (m_submenu == MENU_OPTIONS_GRAPHICS)
     {
-        b_layerlighting.draw();
         b_back_options.draw();
     }
     else if (m_submenu == MENU_OPTIONS_CONTROLS)

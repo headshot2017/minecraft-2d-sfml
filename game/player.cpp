@@ -17,7 +17,7 @@ Player::Player(World* world, GameEngine *engine)
 
     m_skinvertex.resize(6*4);
     m_skinvertex.setPrimitiveType(sf::Quads);
-    move((WORLD_W*32)/1.125, 32.0f);
+    move((WORLD_W*32)/2, 32.0f);
     moveToGround();
     setSkin("steve");
 }

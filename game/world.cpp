@@ -25,7 +25,7 @@ World::World(GameEngine *engine)
         m_blocks2.push_back(std::vector<Chunk>());
         for (int xx=0; xx < WORLD_W/CHUNK_W+1; xx++)
         {
-            m_blocks2.back().push_back(Chunk());
+            m_blocks2.back().push_back(Chunk(engine));
         }
     }
 }
@@ -37,15 +37,21 @@ World::~World()
 
 void World::setBlock(int x, int y, int block, int layer)
 {
-    //int ind = (y * WORLD_W + x)*4;
     int x_ind = x/CHUNK_W;
     int y_ind = y/CHUNK_H;
+    int x_block_chunk = x % CHUNK_W;
+    int y_block_chunk = y % CHUNK_H;
+    int ind = (y_block_chunk * CHUNK_W + x_block_chunk)*4;
 
     if (x < 0 or x >= WORLD_W or y < 0 or y >= WORLD_H) return;
 
-    //printf("set block at %d,%d with ind %d to %d\n", x, y, ind, block);
-
     m_blocks2[y_ind][x_ind].setBlock(x, y, block, layer);
+    sf::VertexArray& m_blocks = getBlocksFromPoint(x, y);
+
+    m_blocks[ind+0].color = (layer != LAYER_DECORATION) ? sf::Color(255, 255, 255) : sf::Color(192, 192, 192);
+    m_blocks[ind+1].color = (layer != LAYER_DECORATION) ? sf::Color(255, 255, 255) : sf::Color(192, 192, 192);
+    m_blocks[ind+2].color = (layer != LAYER_DECORATION) ? sf::Color(255, 255, 255) : sf::Color(192, 192, 192);
+    m_blocks[ind+3].color = (layer != LAYER_DECORATION) ? sf::Color(255, 255, 255) : sf::Color(192, 192, 192);
 }
 
 int World::getBlock(int x, int y)
@@ -95,6 +101,9 @@ void World::generateWorld(unsigned int seed, const char *name)
     srand(seed);
     sprintf(fileName, "worlds/%s.dat", name);
 
+    bool lighting = m_engine->Settings()->m_layerlighting;
+    m_engine->Settings()->m_layerlighting = false;
+
     double pi = 3.141592653589793;
     int heights[] = {58,59,60,61,62,63,64,65,66,67,68,69,70};
     int randomDirtLevel[] = {2,3,3,3};
@@ -138,6 +147,7 @@ void World::generateWorld(unsigned int seed, const char *name)
     }
 
     saveWorld();
+    m_engine->Settings()->m_layerlighting = lighting;
     printf("completed!\n");
 }
 

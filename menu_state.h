@@ -64,9 +64,9 @@ private:
     Button b_options_controls;
 
     // video options menu
-    Button b_layerlighting;
 
     // controls options menu
+    //Button b_
 
 
 protected:

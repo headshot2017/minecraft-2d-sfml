@@ -7,7 +7,7 @@
 
 void GameEngine::init()
 {
-    app.create(sf::VideoMode(800, 480), "minecrap clone test");
+    app.create(sf::VideoMode(800, 480), "Minecraft 2D");
     app.setFramerateLimit(60);
     m_window.create(app.getSize().x, app.getSize().y);
 
@@ -24,10 +24,6 @@ void GameEngine::init()
 
     m_button.loadFromImage(widgets, sf::IntRect(0, 66, 200, 20));
     m_button_hover.loadFromImage(widgets, sf::IntRect(0, 86, 200, 20));
-    button.setTexture(m_button);
-    button_hover.setTexture(m_button_hover);
-    button.setScale(2.0f, 2.0f);
-    button_hover.setScale(2.0f, 2.0f);
 }
 
 void GameEngine::cleanup()
