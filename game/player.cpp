@@ -64,8 +64,29 @@ void Player::moveToGround()
             yy = y/32;
         }
     }
+}
 
-    //y -= 1.f;
+void Player::moveToRoof()
+{
+    int yy = (y-64)/32;
+
+    if (blockCollide(x/32, yy) or blockCollide((x-4)/32, yy) or blockCollide((x+4)/32, yy))
+    {
+        while (blockCollide(x/32, yy) or blockCollide((x-4)/32, yy) or blockCollide((x+4)/32, yy))
+        {
+            y+=1.f;
+            yy = (y-64)/32;
+        }
+    }
+    else
+    {
+        while (not blockCollide(x/32, yy) and not blockCollide((x-4)/32, yy) and not blockCollide((x+4)/32, yy))
+        {
+            y-=1.f;
+            yy = (y-64)/32;
+        }
+    }
+    y+=1.f;
 }
 
 bool Player::blockCollide(int x, int y)
@@ -265,12 +286,17 @@ void Player::update(GameEngine *engine)
     {
         if (vspeed > 0)
         {
+            printf("move to ground\n");
             moveToGround();
             gravity = 0.f;
             vspeed = 0.f;
         }
         else if (vspeed < 0)
+        {
+            printf("move to roof\n");
+            moveToRoof(); // move up
             vspeed = 0.f;
+        }
     }
     else
         gravity = 0.25f;

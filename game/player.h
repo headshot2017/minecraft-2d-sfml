@@ -27,6 +27,7 @@ public:
     void process_input(GameEngine* engine);
     void draw(GameEngine* engine);
     void moveToGround();
+    void moveToRoof(); // move up until head collides with block
     void adjustSkinDir();
     void move(float _x, float _y) {x = _x; y = _y;}
 

@@ -118,7 +118,6 @@ void SoundEngine::playGameSound(float player_x, float player_y, float x, float y
         vol = 0;
 
     pan = (-x + player_x) / 500.0f;
-    printf("volume %.2f, pan %.2f\n", vol, pan);
 
     int ind = rand() % 4;
     BASS_ChannelSetAttribute(m_sounds[type+ind], BASS_ATTRIB_VOL, vol);
