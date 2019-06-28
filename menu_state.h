@@ -66,7 +66,15 @@ private:
     // video options menu
 
     // controls options menu
-    //Button b_
+    Button b_moveleft;
+    Button b_moveright;
+    Button b_jump;
+    Button b_sneak;
+    Button b_run;
+    Button b_layerswap;
+    Button b_place;
+    Button b_destroy;
+    Button b_pick;
 
 
 protected:

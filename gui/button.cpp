@@ -124,7 +124,8 @@ void Button::setText(sf::String text)
 
 void Button::process_input(sf::Event& event)
 {
-    if (event.type == sf::Event::MouseButtonPressed and not clicked)
+    clicked = false;
+    if (event.type == sf::Event::MouseButtonPressed)
     {
         if (event.mouseButton.x > m_pos.x and
             event.mouseButton.y > m_pos.y and
@@ -133,8 +134,6 @@ void Button::process_input(sf::Event& event)
             event.mouseButton.button == sf::Mouse::Left)
             clicked = true;
     }
-    else
-        clicked = false;
 }
 
 bool Button::update()

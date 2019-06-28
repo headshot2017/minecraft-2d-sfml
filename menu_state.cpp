@@ -51,6 +51,16 @@ void MenuState::init(GameEngine* engine)
 
     b_options_graphics = Button(engine, sf::String("Graphics..."), 400-200, 128);
     b_options_controls = Button(engine, sf::String("Controls..."), 400-200, 128+48);
+
+    b_moveleft = Button(engine, "Move left: ", 96, 64, 300);
+    b_moveright = Button(engine, "Move right: ", 96, 64+48, 300);
+    b_jump = Button(engine, "Jump: ", 96, 64+(48*2), 300);
+    b_sneak = Button(engine, "Sneak: ", 96, 64+(48*3), 300);
+    b_run = Button(engine, "Run: ", 96, 64+(48*4), 300);
+    b_layerswap = Button(engine, "Swap layers: ", 96, 64+(48*5), 300);
+    b_place = Button(engine, "Place block: ", 400+16, 64+(48*0), 300);
+    b_destroy = Button(engine, "Destroy block: ", 400+16, 64+(48*1), 300);
+    b_pick = Button(engine, "Pick block: ", 400+16, 64+(48*2), 300);
 }
 
 void MenuState::destroy()
@@ -60,7 +70,15 @@ void MenuState::destroy()
 
 void MenuState::update(GameEngine* engine)
 {
-
+    b_moveleft.setText(sf::String("Move left: ") + engine->Settings()->controls()->getKeyName("left"));
+    b_moveright.setText(sf::String("Move right: ") + engine->Settings()->controls()->getKeyName("right"));
+    b_jump.setText(sf::String("Jump: ") + engine->Settings()->controls()->getKeyName("jump"));
+    b_sneak.setText(sf::String("Sneak: ") + engine->Settings()->controls()->getKeyName("sneak"));
+    b_run.setText(sf::String("Run: ") + engine->Settings()->controls()->getKeyName("run"));
+    b_layerswap.setText(sf::String("Swap layers: ") + engine->Settings()->controls()->getKeyName("layerswap"));
+    b_place.setText(sf::String("Place block: ") + engine->Settings()->controls()->getKeyName("place"));
+    b_destroy.setText(sf::String("Destroy block: ") + engine->Settings()->controls()->getKeyName("destroy"));
+    b_pick.setText(sf::String("Pick block: ") + engine->Settings()->controls()->getKeyName("pick"));
 }
 
 void MenuState::process_input(GameEngine* engine)
@@ -115,6 +133,15 @@ void MenuState::process_input(GameEngine* engine)
         }
         else if (m_submenu == MENU_OPTIONS_CONTROLS)
         {
+            b_moveleft.process_input(event);
+            b_moveright.process_input(event);
+            b_jump.process_input(event);
+            b_sneak.process_input(event);
+            b_run.process_input(event);
+            b_layerswap.process_input(event);
+            b_place.process_input(event);
+            b_destroy.process_input(event);
+            b_pick.process_input(event);
             b_back_options.process_input(event);
         }
     }
@@ -189,6 +216,15 @@ void MenuState::process_input(GameEngine* engine)
     }
     else if (m_submenu == MENU_OPTIONS_CONTROLS)
     {
+        b_moveleft.update();
+        b_moveright.update();
+        b_jump.update();
+        b_sneak.update();
+        b_run.update();
+        b_layerswap.update();
+        b_place.update();
+        b_destroy.update();
+        b_pick.update();
         if (b_back_options.update())
             m_submenu = MENU_OPTIONS;
     }
@@ -231,6 +267,15 @@ void MenuState::draw(GameEngine* engine)
     }
     else if (m_submenu == MENU_OPTIONS_CONTROLS)
     {
+        b_moveleft.draw();
+        b_moveright.draw();
+        b_jump.draw();
+        b_sneak.draw();
+        b_run.draw();
+        b_layerswap.draw();
+        b_place.draw();
+        b_destroy.draw();
+        b_pick.draw();
         b_back_options.draw();
     }
 }

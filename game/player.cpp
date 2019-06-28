@@ -314,7 +314,7 @@ void Player::update(GameEngine *engine)
 
         float maxangle = armswing*9.0f;
         float angle = sin((m_footstepticks/60.0f)) * maxangle;
-        if (angle < 6 and angle > -6 and not m_footstepwait and blockCollide(x/32, y/32))
+        if (angle < 6 and angle > -6 and not m_footstepwait and not m_sneak and blockCollide(x/32, y/32))
         {
             int block = m_world->getBlock(x/32, y/32);
             sf::Vector2f view = engine->m_window.getView().getCenter();
@@ -378,7 +378,12 @@ void Player::process_input(GameEngine *engine)
     }
 
     // keyboard
-    int spd = (engine->Settings()->controls()->Pressed("run")) ? 4 : 3;
+    m_sneak = engine->Settings()->controls()->Pressed("sneak");
+    float spd;
+    if (not m_sneak)
+        spd = (engine->Settings()->controls()->Pressed("run")) ? 4 : 3;
+    else
+        spd = 1.5f;
 
     if (engine->Settings()->controls()->Pressed("left"))
         x_acc = (hspeed > 0) ? -0.5f : -0.25f;
