@@ -371,6 +371,12 @@ void Player::event_input(GameEngine *engine, sf::Event &event)
 {
     if (not m_isPlayer or not can_move) return;
 
+    if (engine->Settings()->controls()->PressedEvent("layerswap", event))
+    {
+        m_layer++;
+        if (m_layer > LAYER_DECORATION) m_layer = 0;
+    }
+
     if (event.type == sf::Event::MouseWheelScrolled)
     {
         if (event.mouseWheelScroll.wheel == sf::Mouse::VerticalWheel)
@@ -390,9 +396,8 @@ void Player::process_input(GameEngine *engine)
     // mouse
     if (engine->Settings()->controls()->Pressed("place") and not rmb)
     {
-        int layer = (engine->Settings()->controls()->Pressed("layerswap")) ? LAYER_DECORATION : LAYER_BUILD;
         //if (canBuild(mousepos.x/32, (mousepos.y-56)/32))
-            placeBlock(mousepos.x/32, (mousepos.y-56)/32, m_currblock, layer);
+            placeBlock(mousepos.x/32, (mousepos.y-56)/32, m_currblock, m_layer);
         rmb = true;
     }
     else if (not engine->Settings()->controls()->Pressed("place") and rmb)

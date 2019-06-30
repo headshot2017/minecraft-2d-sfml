@@ -44,6 +44,7 @@ public:
     sf::Vector2f getPos() const {return sf::Vector2f(x,y);}
     sf::Vector2f getSpeed() const {return sf::Vector2f(hspeed,vspeed);}
     sf::Vector2f getMouse() {return mousepos;}
+    int getBuildLayer() {return m_layer;}
 
 private:
     sf::Texture m_skin;
@@ -54,6 +55,7 @@ private:
 
     float x, y, new_x, new_y, hspeed, vspeed, x_acc, gravity, m_angle;
     int m_dir = 1;
+    int m_layer = LAYER_BUILD;
     bool m_sneak = false;
 
     bool m_isPlayer = false, can_move = true;

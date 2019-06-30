@@ -21,6 +21,7 @@ enum
 enum
 {
     LAYER_BUILD,
+    LAYER_NONSOLID,
     LAYER_DECORATION
 };
 

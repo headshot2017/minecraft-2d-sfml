@@ -160,7 +160,7 @@ void IngameState::draw(GameEngine *engine)
         engine->m_window.draw(m_blockoutline);
 
     char aBuf[192];
-    sprintf(aBuf, "%.1f,%.1f\nChunk position: %d,%d", cam_x/32, cam_y/32, xx/CHUNK_W, yy/CHUNK_H);
+    sprintf(aBuf, "%.1f,%.1f\nChunk position: %d,%d\nBuilding layer: %d\n", cam_x/32, cam_y/32, xx/CHUNK_W, yy/CHUNK_H, m_player.getBuildLayer());
     text_cam_pos.setString(sf::String(aBuf));
     text_cam_pos.setPosition(cam_x, cam_y);
     engine->m_window.draw(text_cam_pos);
