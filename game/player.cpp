@@ -94,6 +94,13 @@ bool Player::blockCollide(int x, int y)
     return m_world->getBlock(x, y) != BLOCK_AIR and m_world->getBlockLayer(x, y) == LAYER_BUILD;
 }
 
+bool Player::groundCollide()
+{
+    return (blockCollide(x/32, (y+vspeed)/32) or blockCollide(x/32, (y+vspeed-32)/32) or blockCollide(x/32, (y+vspeed-64)/32) or
+            blockCollide((x-4)/32, (y+vspeed)/32) or blockCollide((x-4)/32, (y+vspeed-32)/32) or blockCollide((x-4)/32, (y+vspeed-64)/32) or
+            blockCollide((x+4)/32, (y+vspeed)/32) or blockCollide((x+4)/32, (y+vspeed-32)/32) or blockCollide((x+4)/32, (y+vspeed-64)/32));
+}
+
 bool Player::canBuild(int x, int y)
 {
     if (m_world->getBlock(x+0, y+0) or
@@ -112,10 +119,10 @@ void Player::adjustSkinDir()
 
     int sneakangle = (m_sneak) ? 20*m_dir : 0;
     int x_sneak = (m_sneak) ? 8*(-m_dir) : 0;
-    int y_sneak = (m_sneak) ? 4 : 0;
+    int y_sneak = (m_sneak) ? 6 : 0;
     float armswing = (hspeed > 5) ? 5 : hspeed;
     float maxangle = armswing*9.0f;
-    float angle = sin((m_footstepticks/60.0f)) * maxangle;
+    float angle = sin(m_footstepticks/60.0f) * maxangle;
 
     sf:: Transform arm1, arm2, leg1, leg2, body, head;
     head.rotate((m_dir > 0) ? m_angle : m_angle+180, x, y-48+y_sneak);
@@ -278,15 +285,13 @@ void Player::destroyBlock(int xx, int yy)
     if (block2 == BLOCK_AIR) return;
 
     sf::Vector2f view = m_engine->m_window.getView().getCenter();
-    m_engine->Sound()->playDigSound(xx*32, yy*32, view.x, view.y, m_world->getBlock(xx, yy));
+    m_engine->Sound()->playDigSound(xx*32, yy*32, view.x, view.y, block2);
     m_world->setBlock(xx, yy, BLOCK_AIR);
 }
 
 void Player::update(GameEngine *engine)
 {
-    if (blockCollide(x/32, (y+vspeed)/32) or blockCollide(x/32, (y+vspeed-32)/32) or blockCollide(x/32, (y+vspeed-64)/32) or
-        blockCollide((x-4)/32, (y+vspeed)/32) or blockCollide((x-4)/32, (y+vspeed-32)/32) or blockCollide((x-4)/32, (y+vspeed-64)/32) or
-        blockCollide((x+4)/32, (y+vspeed)/32) or blockCollide((x+4)/32, (y+vspeed-32)/32) or blockCollide((x+4)/32, (y+vspeed-64)/32)) // gravity.
+    if (groundCollide()) // gravity.
     {
         if (vspeed > 0)
         {
@@ -318,6 +323,11 @@ void Player::update(GameEngine *engine)
             hspeed = x_acc = 0;
         }
     }
+
+    if (m_sneak and hspeed != 0 and groundCollide() and
+        (not blockCollide((x+hspeed+(4*m_dir))/32, y/32) or
+        not blockCollide((x+hspeed+(-4*m_dir))/32, y/32))) // prevent from falling off edges while sneaking
+        hspeed = 0;
 
     x += hspeed;
     y += vspeed;

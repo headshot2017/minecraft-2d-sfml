@@ -34,6 +34,7 @@ public:
     void setPlayer(bool t) {m_isPlayer = t;}
     bool isPlayer() {return m_isPlayer;}
     bool blockCollide(int x, int y);
+    bool groundCollide();
 
     bool canBuild(int x, int y);
     void placeBlock(int x, int y, int block, int layer);
