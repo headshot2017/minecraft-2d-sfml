@@ -19,6 +19,8 @@ void GameEngine::init()
     m_sound->init();
     m_sound->loadTheme("default");
 
+    m_settings.loadSettings();
+
     sf::Image widgets;
     widgets.loadFromFile("data/gui/widgets.png");
 
@@ -34,6 +36,7 @@ void GameEngine::cleanup()
         states.pop_back();
     }
     m_sound->cleanup();
+    m_settings.saveSettings();
     delete m_sound;
 }
 

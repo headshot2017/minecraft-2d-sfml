@@ -200,6 +200,7 @@ void IngameState::loadWorld(const char *worldName)
 
     m_player = Player(&m_world, m_engine);
     m_player.setPlayer(true);
+    m_player.setSkin(m_engine->Settings()->m_playerskin);
 
     printf("starting\n");
 }

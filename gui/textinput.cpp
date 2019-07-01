@@ -6,10 +6,11 @@ TextInput::TextInput()
     m_caret = 0;
 }
 
-TextInput::TextInput(GameEngine *engine, sf::Vector2f pos)
+TextInput::TextInput(GameEngine *engine, sf::Vector2f pos, std::size_t length)
 {
     m_engine = engine;
     m_pos = pos;
+    m_length = length;
 
     m_rect.setPosition(m_pos);
     m_rect.setFillColor(sf::Color::Black);
@@ -30,11 +31,12 @@ TextInput::TextInput(GameEngine *engine, sf::Vector2f pos)
     m_textcaret.setCharacterSize(96);
 }
 
-TextInput::TextInput(GameEngine *engine, sf::String text, sf::Vector2f pos)
+TextInput::TextInput(GameEngine *engine, sf::String text, sf::Vector2f pos, std::size_t length)
 {
     m_engine = engine;
     m_pos = pos;
     m_str = text;
+    m_length = length;
 
     m_rect.setPosition(m_pos);
     m_rect.setFillColor(sf::Color::Black);
@@ -55,11 +57,12 @@ TextInput::TextInput(GameEngine *engine, sf::String text, sf::Vector2f pos)
     m_textcaret.setCharacterSize(96);
 }
 
-TextInput::TextInput(GameEngine *engine, const char *text, sf::Vector2f pos)
+TextInput::TextInput(GameEngine *engine, const char *text, sf::Vector2f pos, std::size_t length)
 {
     m_engine = engine;
     m_pos = pos;
     m_str = sf::String(text);
+    m_length = length;
 
     m_rect.setPosition(m_pos);
     m_rect.setFillColor(sf::Color::Black);
@@ -82,13 +85,17 @@ TextInput::TextInput(GameEngine *engine, const char *text, sf::Vector2f pos)
 
 void TextInput::update()
 {
+    if (m_caret > m_str.getSize())
+        m_caret = m_str.getSize();
     m_text.setString(m_str);
     m_textcaret.setString(m_str.substring(0, m_caret));
     m_caretline.setPosition(m_textcaret.getGlobalBounds().width+m_pos.x+4, m_pos.y+10);
 }
 
-void TextInput::process_input(sf::Event& event)
+int TextInput::process_input(sf::Event& event)
 {
+    int typed = 0;
+
     if (event.type == sf::Event::MouseButtonPressed)
     {
         if (event.mouseButton.x >= m_pos.x and
@@ -100,8 +107,9 @@ void TextInput::process_input(sf::Event& event)
             active = false;
     }
 
-    else if (event.type == sf::Event::TextEntered)
+    else if (event.type == sf::Event::TextEntered and active)
     {
+        typed = 1;
         if (event.text.unicode == '\b')
         {
             if (m_caret > 0)
@@ -112,12 +120,15 @@ void TextInput::process_input(sf::Event& event)
         }
         else
         {
-            m_str.insert(m_caret, event.text.unicode);
-            m_caret++;
+            if (event.text.unicode != '\r' and event.text.unicode != '\n' and (m_length > 0 and m_str.getSize() < m_length))
+            {
+                m_str.insert(m_caret, event.text.unicode);
+                m_caret++;
+            }
         }
     }
 
-    else if (event.type == sf::Event::KeyPressed)
+    else if (event.type == sf::Event::KeyPressed and active)
     {
         if (event.key.code == sf::Keyboard::Left)
         {
@@ -133,7 +144,14 @@ void TextInput::process_input(sf::Event& event)
             m_caret = m_str.getSize();
         else if (event.key.code == sf::Keyboard::Home)
             m_caret = 0;
+        else if (event.key.code == sf::Keyboard::Enter)
+        {
+            active = false;
+            typed = 2;
+        }
     }
+
+    return typed;
 }
 
 void TextInput::draw()

@@ -49,8 +49,17 @@ void MenuState::init(GameEngine* engine)
 
     b_connect = Button(engine, sf::String("Connect"), 400-200, 96+64);
 
-    b_options_graphics = Button(engine, sf::String("Graphics..."), 400-200, 128);
-    b_options_controls = Button(engine, sf::String("Controls..."), 400-200, 128+48);
+    b_options_player = Button(engine, "Player", 400-200, 128);
+    b_options_graphics = Button(engine, "Graphics", 400-200, 128+48);
+    b_options_controls = Button(engine, "Controls", 400-200, 128+96);
+
+    label_playername = Label(engine, "Player name", 400-200, 96);
+    input_playername = TextInput(engine, engine->Settings()->m_playername, sf::Vector2f(400-200, 96+24), sizeof(engine->Settings()->m_playername));
+    label_playerskin = Label(engine, "Player skin", 400-200, 96+88);
+    input_playerskin = TextInput(engine, engine->Settings()->m_playerskin, sf::Vector2f(400-200, 96+112), sizeof(engine->Settings()->m_playerskin));
+    char skin[64];
+    sprintf(skin, "data/skins/%s.png", input_playerskin.getString().toAnsiString().c_str());
+    txt_playerskin.loadFromFile(skin);
 
     b_moveleft = Button(engine, "Move left: ", 96, 64, 300);
     b_moveright = Button(engine, "Move right: ", 96, 64+48, 300);
@@ -124,8 +133,25 @@ void MenuState::process_input(GameEngine* engine)
         else if (m_submenu == MENU_OPTIONS)
         {
             b_back.process_input(event);
+            b_options_player.process_input(event);
             b_options_controls.process_input(event);
             b_options_graphics.process_input(event);
+        }
+        else if (m_submenu == MENU_OPTIONS_PLAYER)
+        {
+            if (input_playername.process_input(event) == 1) // character typed
+                sprintf(engine->Settings()->m_playername, "%s", input_playername.getString().toAnsiString().c_str());
+            if (input_playerskin.process_input(event) == 2) // enter key
+            {
+                const char *newskin = input_playerskin.getString().toAnsiString().c_str();
+                char skin[64];
+                sprintf(skin, "data/skins/%s.png", newskin);
+                if (txt_playerskin.loadFromFile(skin)) //success
+                    sprintf(engine->Settings()->m_playerskin, "%s", newskin);
+                else
+                    input_playerskin.setText(engine->Settings()->m_playerskin);
+            }
+            b_back_options.process_input(event);
         }
         else if (m_submenu == MENU_OPTIONS_GRAPHICS)
         {
@@ -204,10 +230,19 @@ void MenuState::process_input(GameEngine* engine)
             else
                 engine->popState();
         }
+        if (b_options_player.update())
+            m_submenu = MENU_OPTIONS_PLAYER;
         if (b_options_controls.update())
             m_submenu = MENU_OPTIONS_CONTROLS;
         if (b_options_graphics.update())
             m_submenu = MENU_OPTIONS_GRAPHICS;
+    }
+    else if (m_submenu == MENU_OPTIONS_PLAYER)
+    {
+        input_playername.update();
+        input_playerskin.update();
+        if (b_back_options.update())
+            m_submenu = MENU_OPTIONS;
     }
     else if (m_submenu == MENU_OPTIONS_GRAPHICS)
     {
@@ -257,9 +292,23 @@ void MenuState::draw(GameEngine* engine)
     }
     else if (m_submenu == MENU_OPTIONS)
     {
+        b_options_player.draw();
         b_options_graphics.draw();
         b_options_controls.draw();
         b_back.draw();
+    }
+    else if (m_submenu == MENU_OPTIONS_PLAYER)
+    {
+        sf::Sprite skin(txt_playerskin);
+        skin.setPosition(400-128, 96+112+48);
+        skin.setScale(4, 4);
+
+        label_playername.draw();
+        input_playername.draw();
+        label_playerskin.draw();
+        input_playerskin.draw();
+        engine->m_window.draw(skin);
+        b_back_options.draw();
     }
     else if (m_submenu == MENU_OPTIONS_GRAPHICS)
     {

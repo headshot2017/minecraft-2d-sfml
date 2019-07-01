@@ -4,6 +4,7 @@
 #include "game_state.h"
 #include "gui/button.h"
 #include "gui/textinput.h"
+#include "gui/label.h"
 
 typedef enum
 {
@@ -13,7 +14,8 @@ typedef enum
     MENU_OPTIONS,
 
     MENU_OPTIONS_GRAPHICS,
-    MENU_OPTIONS_CONTROLS
+    MENU_OPTIONS_CONTROLS,
+    MENU_OPTIONS_PLAYER
 } SUB_MENUS;
 
 class MenuState : public GameState
@@ -60,8 +62,16 @@ private:
     Button b_connect;
 
     // options menu
+    Button b_options_player;
     Button b_options_graphics;
     Button b_options_controls;
+
+    // player options menu
+    Label label_playername;
+    Label label_playerskin;
+    TextInput input_playername;
+    TextInput input_playerskin;
+    sf::Texture txt_playerskin;
 
     // video options menu
 

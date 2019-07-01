@@ -8,12 +8,17 @@ class TextInput
 {
 public:
     TextInput();
-    TextInput(GameEngine *engine, sf::Vector2f pos);
-    TextInput(GameEngine *engine, sf::String text, sf::Vector2f pos);
-    TextInput(GameEngine *engine, const char *text, sf::Vector2f pos);
+    TextInput(GameEngine *engine, sf::Vector2f pos, std::size_t length=0);
+    TextInput(GameEngine *engine, sf::String text, sf::Vector2f pos, std::size_t length=0);
+    TextInput(GameEngine *engine, const char *text, sf::Vector2f pos, std::size_t length=0);
+
+    void setText(const char *text) {m_str = sf::String(text);}
+    void setText(sf::String text) {m_str = text;}
+
+    sf::String getString() {return m_str;}
 
     void update();
-    void process_input(sf::Event& event);
+    int process_input(sf::Event& event);
     void draw();
 
 private:
@@ -25,6 +30,7 @@ private:
     sf::RectangleShape m_caretline;
 
     std::size_t m_caret = 0;
+    std::size_t m_length;
     bool active = false;
     GameEngine *m_engine;
 };
