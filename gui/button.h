@@ -17,6 +17,8 @@ public:
     sf::Vector2f getPos() {return m_pos;}
     void setText(const char *text);
     void setText(sf::String text);
+    void setPosition(sf::Vector2f pos) {m_pos = pos;}
+    void setPosition(float x, float y) {m_pos = sf::Vector2f(x,y);}
     bool update();
     void process_input(sf::Event& event);
     void draw();

@@ -13,7 +13,8 @@ public:
     void saveSettings();
     Controls* controls() {return &m_controls;}
 
-    bool m_layerlighting = true;
+    bool m_layerlighting = true; // not used
+    bool m_fullscreen = false;
     char m_playername[16];
     char m_playerskin[32];
 

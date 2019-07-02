@@ -6,21 +6,22 @@ PausedState PausedState::m_Instance;
 void PausedState::init(GameEngine* engine)
 {
     m_engine = engine;
+    sf::Vector2u res = engine->app.getSize();
 
     m_gamescreen.resize(4);
     m_gamescreen.setPrimitiveType(sf::Quads);
     m_gamescreen[0].position = m_gamescreen[0].texCoords = sf::Vector2f(0, 0);
-    m_gamescreen[1].position = m_gamescreen[1].texCoords = sf::Vector2f(800, 0);
-    m_gamescreen[2].position = m_gamescreen[2].texCoords = sf::Vector2f(800, 480);
-    m_gamescreen[3].position = m_gamescreen[3].texCoords = sf::Vector2f(0, 480);
+    m_gamescreen[1].position = m_gamescreen[1].texCoords = sf::Vector2f(res.x, 0);
+    m_gamescreen[2].position = m_gamescreen[2].texCoords = sf::Vector2f(res.x, res.y);
+    m_gamescreen[3].position = m_gamescreen[3].texCoords = sf::Vector2f(0, res.y);
     m_gamescreen[0].color = sf::Color(128, 128, 128);
     m_gamescreen[1].color = sf::Color(128, 128, 128);
     m_gamescreen[2].color = sf::Color(128, 128, 128);
     m_gamescreen[3].color = sf::Color(128, 128, 128);
 
-    b_resume = Button(engine, sf::String("Back to Game"), 400-200, 240-96);
-    b_options = Button(engine, sf::String("Options"), 400-200, 240);
-    b_quit = Button(engine, sf::String("Save and Quit to title"), 400-200, 240+48);
+    b_resume = Button(engine, sf::String("Back to Game"), res.x/2-200, res.y/2-96);
+    b_options = Button(engine, sf::String("Options"), res.x/2-200, res.y/2);
+    b_quit = Button(engine, sf::String("Save and Quit to title"), res.x/2-200, res.y/2+48);
 }
 
 void PausedState::destroy()
@@ -78,5 +79,13 @@ void PausedState::pause()
 
 void PausedState::resume()
 {
+    sf::Vector2u res = m_engine->app.getSize();
 
+    m_gamescreen[0].position = m_gamescreen[0].texCoords = sf::Vector2f(0, 0);
+    m_gamescreen[1].position = m_gamescreen[1].texCoords = sf::Vector2f(res.x, 0);
+    m_gamescreen[2].position = m_gamescreen[2].texCoords = sf::Vector2f(res.x, res.y);
+    m_gamescreen[3].position = m_gamescreen[3].texCoords = sf::Vector2f(0, res.y);
+    b_resume.setPosition(res.x/2-200, res.y/2-96);
+    b_options.setPosition(res.x/2-200, res.y/2);
+    b_quit.setPosition(res.x/2-200, res.y/2+48);
 }

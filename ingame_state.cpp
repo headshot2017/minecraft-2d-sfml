@@ -88,8 +88,26 @@ void IngameState::process_input(GameEngine *engine)
                 engine->takeScreenshot().copyToImage().saveToFile(aFile);
                 printf("screenshot saved as '%s'\n", aFile);
             }
+            else if (event.key.code == sf::Keyboard::F11)
+            {
+                if (engine->Settings()->m_fullscreen)
+                    engine->setResolution(sf::Vector2u(800,480));
+                else
+                {
+                    sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
+                    engine->setResolution(sf::Vector2u(desktop.width, desktop.height), sf::Style::Fullscreen);
+                }
+                engine->Settings()->m_fullscreen = not engine->Settings()->m_fullscreen;
+            }
             else if (event.key.code == sf::Keyboard::Escape)
                 engine->pushState(PausedState::Instance());
+        }
+
+        else if (event.type == sf::Event::Resized and not engine->Settings()->m_fullscreen)
+        {
+            unsigned int width = (event.size.width > 640) ? event.size.width : 640;
+            unsigned int height = (event.size.height > 480) ? event.size.height : 480;
+            engine->setResolution(sf::Vector2u(width, height));
         }
 
         else if (event.type == sf::Event::LostFocus)
@@ -100,11 +118,12 @@ void IngameState::process_input(GameEngine *engine)
 
     sf::Vector2f pos = m_player.getPos();
     sf::Vector2f spd = m_player.getSpeed();
+    sf::Vector2u res = engine->app.getSize();
     float old_cam_x = cam_x;
     float old_cam_y = cam_y;
 
-    float cam_x_dist = ((pos.x - old_cam_x)-400)/16.0f;
-    float cam_y_dist = ((pos.y - old_cam_y)-240)/16.0f;
+    float cam_x_dist = ((pos.x - old_cam_x)-(res.x/2))/16.0f;
+    float cam_y_dist = ((pos.y - old_cam_y)-(res.y/2))/16.0f;
 
     cam_x += cam_x_dist + (spd.x*2.0f);
     if (m_player.blockCollide(pos.x/32, pos.y/32) or
@@ -113,8 +132,8 @@ void IngameState::process_input(GameEngine *engine)
         (cam_y_dist > 8 or cam_y_dist < -8))
         cam_y += cam_y_dist;
 
-    cam_x = numwrap(cam_x, 0.0f, WORLD_W*32-800.f);
-    cam_y = numwrap(cam_y, 0.0f, WORLD_H*32-480.f);
+    cam_x = numwrap(cam_x, 0.0f, WORLD_W*32-(res.x));
+    cam_y = numwrap(cam_y, 0.0f, WORLD_H*32-(res.y));
 
     sf::Vector2f m_mousepos = m_player.getMouse();
     m_blockoutline.setPosition(floor(m_mousepos.x/32)*32, floor((m_mousepos.y-56)/32)*32);
@@ -122,9 +141,10 @@ void IngameState::process_input(GameEngine *engine)
 
 void IngameState::draw(GameEngine *engine)
 {
-    sf::View m_view(sf::FloatRect(cam_x, cam_y, 800, 480));
+    sf::View m_view(sf::FloatRect(cam_x, cam_y, engine->app.getSize().x, engine->app.getSize().y));
     engine->m_window.setView(m_view);
 
+    m_sky.setSize(sf::Vector2f(engine->app.getSize().x, engine->app.getSize().y));
     m_sky.setPosition(cam_x, cam_y);
     engine->m_window.draw(m_sky);
 

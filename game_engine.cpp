@@ -7,9 +7,14 @@
 
 void GameEngine::init()
 {
-    app.create(sf::VideoMode(800, 480), "Minecraft 2D");
-    app.setFramerateLimit(60);
-    m_window.create(app.getSize().x, app.getSize().y);
+    m_settings.loadSettings();
+    if (m_settings.m_fullscreen)
+    {
+        sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
+        setResolution(sf::Vector2u(desktop.width, desktop.height), sf::Style::Fullscreen);
+    }
+    else
+        setResolution(sf::Vector2u(800, 480));
 
     m_blocks.loadFromFile("data/blocks.png");
 
@@ -18,8 +23,6 @@ void GameEngine::init()
     m_sound = new SoundEngine;
     m_sound->init();
     m_sound->loadTheme("default");
-
-    m_settings.loadSettings();
 
     sf::Image widgets;
     widgets.loadFromFile("data/gui/widgets.png");
@@ -105,4 +108,12 @@ const sf::Texture& GameEngine::takeScreenshot(bool saveTexture)
         return m_screenshot;
     }
     return m_window.getTexture();
+}
+
+void GameEngine::setResolution(sf::Vector2u res, sf::Uint32 flags)
+{
+    app.create(sf::VideoMode(res.x, res.y), "Minecraft 2D", flags);
+    m_window.create(res.x, res.y);
+    app.setSize(res);
+    app.setFramerateLimit(60);
 }

@@ -12,6 +12,8 @@ void MenuState::init(GameEngine* engine)
     else
         m_submenu = MENU_OPTIONS;
 
+    sf::Vector2u windowsize = engine->app.getSize();
+
     m_dirt_tile.loadFromFile("data/gui/options_background.png");
     m_dirt_tile.setRepeated(true);
 
@@ -26,55 +28,103 @@ void MenuState::init(GameEngine* engine)
     dirt_tile.setTexture(m_dirt_tile);
     dirt_tile.setScale(2.0f, 2.0f);
     dirt_tile.setColor(sf::Color(128, 128, 128));
-    dirt_tile.setTextureRect(sf::IntRect(0, 0, 400, 240));
 
     m_minecraft_logo.loadFromImage(m_minecraft_logo_final);
     minecraft_logo.setTexture(m_minecraft_logo);
-    minecraft_logo.setPosition((800.0f/2.0f) - (274.0f/1.0f), 48.0f);
+    minecraft_logo.setPosition((windowsize.x/2) - 274.0f, (windowsize.y/4)-64);
     minecraft_logo.setScale(2.0f, 2.0f);
 
-    b_back = Button(engine, sf::String("Back"), 400-200, 480-48);
-    b_back_options = Button(engine, sf::String("Back"), 400-200, 480-48);
+    b_back = Button(engine, sf::String("Back"), (windowsize.x/2)-200, windowsize.y-48);
+    b_back_options = Button(engine, sf::String("Back"), (windowsize.x/2)-200, windowsize.y-48);
 
-    b_singleplayer = Button(engine, sf::String("Singleplayer"), 400 - 200, 192);
-    b_multiplayer = Button(engine, sf::String("Multiplayer"), 400 - 200, b_singleplayer.getPos().y + 64);
-    b_options = Button(engine, sf::String("Options"), 400 - 200, b_multiplayer.getPos().y + 64);
-    b_quit = Button(engine, sf::String("Quit"), 400 - 200, b_options.getPos().y + 64);
+    b_singleplayer = Button(engine, sf::String("Singleplayer"), (windowsize.x/2)-200, windowsize.y/4+64);
+    b_multiplayer = Button(engine, sf::String("Multiplayer"), (windowsize.x/2)-200, b_singleplayer.getPos().y + 64);
+    b_options = Button(engine, sf::String("Options"), (windowsize.x/2)-200, b_multiplayer.getPos().y + 64);
+    b_quit = Button(engine, sf::String("Quit"), (windowsize.x/2)-200, b_options.getPos().y + 64);
 
-    b_world1 = Button(engine, sf::String("World 1"), 400 - 200, 96);
-    b_world2 = Button(engine, sf::String("World 2"), 400 - 200, 96+48);
-    b_world3 = Button(engine, sf::String("World 3"), 400 - 200, 96+(48*2));
-    b_world4 = Button(engine, sf::String("World 4"), 400 - 200, 96+(48*3));
-    b_world5 = Button(engine, sf::String("World 5"), 400 - 200, 96+(48*4));
+    b_world1 = Button(engine, sf::String("World 1"), (windowsize.x/2)-200, (windowsize.y/4)-32);
+    b_world2 = Button(engine, sf::String("World 2"), (windowsize.x/2)-200, (windowsize.y/4)-32+48);
+    b_world3 = Button(engine, sf::String("World 3"), (windowsize.x/2)-200, (windowsize.y/4)-32+(48*2));
+    b_world4 = Button(engine, sf::String("World 4"), (windowsize.x/2)-200, (windowsize.y/4)-32+(48*3));
+    b_world5 = Button(engine, sf::String("World 5"), (windowsize.x/2)-200, (windowsize.y/4)-32+(48*4));
 
-    b_connect = Button(engine, sf::String("Connect"), 400-200, 96+64);
+    b_connect = Button(engine, sf::String("Connect"), (windowsize.x/2)-200, (windowsize.y/4)-32+64);
 
-    b_options_player = Button(engine, "Player", 400-200, 128);
-    b_options_graphics = Button(engine, "Graphics", 400-200, 128+48);
-    b_options_controls = Button(engine, "Controls", 400-200, 128+96);
+    b_options_player = Button(engine, "Player", (windowsize.x/2)-200, 128);
+    b_options_graphics = Button(engine, "Graphics", (windowsize.x/2)-200, 128+48);
+    b_options_controls = Button(engine, "Controls", (windowsize.x/2)-200, 128+96);
 
-    label_playername = Label(engine, "Player name", 400-200, 96);
-    input_playername = TextInput(engine, engine->Settings()->m_playername, sf::Vector2f(400-200, 96+24), sizeof(engine->Settings()->m_playername));
-    label_playerskin = Label(engine, "Player skin", 400-200, 96+88);
-    input_playerskin = TextInput(engine, engine->Settings()->m_playerskin, sf::Vector2f(400-200, 96+112), sizeof(engine->Settings()->m_playerskin));
+    label_playername = Label(engine, "Player name", (windowsize.x/2)-200, 96);
+    input_playername = TextInput(engine, engine->Settings()->m_playername, sf::Vector2f((windowsize.x/2)-200, 96+24), sizeof(engine->Settings()->m_playername));
+    label_playerskin = Label(engine, "Player skin", (windowsize.x/2)-200, 96+88);
+    input_playerskin = TextInput(engine, engine->Settings()->m_playerskin, sf::Vector2f((windowsize.x/2)-200, 96+112), sizeof(engine->Settings()->m_playerskin));
     char skin[64];
     sprintf(skin, "data/skins/%s.png", input_playerskin.getString().toAnsiString().c_str());
     txt_playerskin.loadFromFile(skin);
 
-    b_moveleft = Button(engine, "Move left: ", 96, 64, 300);
-    b_moveright = Button(engine, "Move right: ", 96, 64+48, 300);
-    b_jump = Button(engine, "Jump: ", 96, 64+(48*2), 300);
-    b_sneak = Button(engine, "Sneak: ", 96, 64+(48*3), 300);
-    b_run = Button(engine, "Run: ", 96, 64+(48*4), 300);
-    b_layerswap = Button(engine, "Swap layers: ", 96, 64+(48*5), 300);
-    b_place = Button(engine, "Place block: ", 400+16, 64+(48*0), 300);
-    b_destroy = Button(engine, "Destroy block: ", 400+16, 64+(48*1), 300);
-    b_pick = Button(engine, "Pick block: ", 400+16, 64+(48*2), 300);
+    b_moveleft = Button(engine, "Move left: ", (windowsize.x/2)-300-8, 64, 300);
+    b_moveright = Button(engine, "Move right: ", (windowsize.x/2)-300-8, 64+48, 300);
+    b_jump = Button(engine, "Jump: ", (windowsize.x/2)-300-8, 64+(48*2), 300);
+    b_sneak = Button(engine, "Sneak: ", (windowsize.x/2)-300-8, 64+(48*3), 300);
+    b_run = Button(engine, "Run: ", (windowsize.x/2)-300-8, 64+(48*4), 300);
+    b_layerswap = Button(engine, "Swap layers: ", (windowsize.x/2)-300-8, 64+(48*5), 300);
+    b_place = Button(engine, "Place block: ", (windowsize.x/2)+8, 64+(48*0), 300);
+    b_destroy = Button(engine, "Destroy block: ", (windowsize.x/2)+8, 64+(48*1), 300);
+    b_pick = Button(engine, "Pick block: ", (windowsize.x/2)+8, 64+(48*2), 300);
+
+    l_pressakey = Label(engine, "", windowsize.x/2, windowsize.y/2-48, 1);
+
+    setAllPositions(engine);
 }
 
 void MenuState::destroy()
 {
 
+}
+
+void MenuState::setAllPositions(GameEngine* engine)
+{
+    sf::Vector2u windowsize = engine->app.getSize();
+
+    dirt_tile.setTextureRect(sf::IntRect(0, 0, windowsize.x/2, windowsize.y/2));
+    minecraft_logo.setPosition((windowsize.x/2) - 274.0f, (windowsize.y/4)-64);
+
+    b_back.setPosition((windowsize.x/2)-200, windowsize.y-48);
+    b_back_options.setPosition((windowsize.x/2)-200, windowsize.y-48);
+
+    b_singleplayer.setPosition((windowsize.x/2)-200, windowsize.y/4+64);
+    b_multiplayer.setPosition((windowsize.x/2)-200, b_singleplayer.getPos().y + 64);
+    b_options.setPosition((windowsize.x/2)-200, b_multiplayer.getPos().y + 64);
+    b_quit.setPosition((windowsize.x/2)-200, b_options.getPos().y + 64);
+
+    b_world1.setPosition((windowsize.x/2)-200, (windowsize.y/4)-32);
+    b_world2.setPosition((windowsize.x/2)-200, (windowsize.y/4)-32+48);
+    b_world3.setPosition((windowsize.x/2)-200, (windowsize.y/4)-32+(48*2));
+    b_world4.setPosition((windowsize.x/2)-200, (windowsize.y/4)-32+(48*3));
+    b_world5.setPosition((windowsize.x/2)-200, (windowsize.y/4)-32+(48*4));
+
+    b_connect.setPosition((windowsize.x/2)-200, (windowsize.y/4)-32+64);
+
+    b_options_player.setPosition((windowsize.x/2)-200, 128);
+    b_options_graphics.setPosition((windowsize.x/2)-200, 128+48);
+    b_options_controls.setPosition((windowsize.x/2)-200, 128+96);
+
+    label_playername.setPosition((windowsize.x/2)-200, 96);
+    input_playername.setPosition((windowsize.x/2)-200, 96+24);
+    label_playerskin.setPosition((windowsize.x/2)-200, 96+88);
+    input_playerskin.setPosition((windowsize.x/2)-200, 96+112);
+
+    b_moveleft.setPosition((windowsize.x/2)-300-8, 64);
+    b_moveright.setPosition((windowsize.x/2)-300-8, 64+48);
+    b_jump.setPosition((windowsize.x/2)-300-8, 64+(48*2));
+    b_sneak.setPosition((windowsize.x/2)-300-8, 64+(48*3));
+    b_run.setPosition((windowsize.x/2)-300-8, 64+(48*4));
+    b_layerswap.setPosition((windowsize.x/2)-300-8, 64+(48*5));
+    b_place.setPosition((windowsize.x/2)+8, 64+(48*0));
+    b_destroy.setPosition((windowsize.x/2)+8, 64+(48*1));
+    b_pick.setPosition((windowsize.x/2)+8, 64+(48*2));
+
+    l_pressakey.setPosition(windowsize.x/2, windowsize.y/2-48);
 }
 
 void MenuState::update(GameEngine* engine)
@@ -106,6 +156,35 @@ void MenuState::process_input(GameEngine* engine)
             else
             {
                 engine->quit();
+            }
+        }
+        else if (event.type == sf::Event::Resized and not engine->Settings()->m_fullscreen)
+        {
+            unsigned int width = (event.size.width > 640) ? event.size.width : 640;
+            unsigned int height = (event.size.height > 480) ? event.size.height : 480;
+            engine->setResolution(sf::Vector2u(width, height));
+            setAllPositions(engine);
+        }
+        else if (event.type == sf::Event::KeyPressed)
+        {
+            if (event.key.code == sf::Keyboard::Escape and m_submenu != MENU_OPTIONS_CONTROLS_CHANGE)
+            {
+                if (engine->isPaused())
+                    engine->popState();
+                else
+                    m_submenu = MENU_MAINMENU;
+            }
+
+            if (event.key.code == sf::Keyboard::F11)
+            {
+                if (engine->Settings()->m_fullscreen)
+                    engine->setResolution(sf::Vector2u(800,480));
+                else
+                {
+                    sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
+                    engine->setResolution(sf::Vector2u(desktop.width, desktop.height), sf::Style::Fullscreen);
+                }
+                engine->Settings()->m_fullscreen = not engine->Settings()->m_fullscreen;
             }
         }
 
@@ -169,6 +248,20 @@ void MenuState::process_input(GameEngine* engine)
             b_destroy.process_input(event);
             b_pick.process_input(event);
             b_back_options.process_input(event);
+        }
+        else if (m_submenu == MENU_OPTIONS_CONTROLS_CHANGE)
+        {
+            if (event.type == sf::Event::KeyPressed)
+            {
+                if (event.key.code != sf::Keyboard::Escape)
+                    engine->Settings()->controls()->setKeyBind(m_changingControl, event.key.code);
+                m_submenu = MENU_OPTIONS_CONTROLS;
+            }
+            else if (event.type == sf::Event::MouseButtonPressed)
+            {
+                engine->Settings()->controls()->setMouseBind(m_changingControl, event.mouseButton.button);
+                m_submenu = MENU_OPTIONS_CONTROLS;
+            }
         }
     }
 
@@ -251,15 +344,24 @@ void MenuState::process_input(GameEngine* engine)
     }
     else if (m_submenu == MENU_OPTIONS_CONTROLS)
     {
-        b_moveleft.update();
-        b_moveright.update();
-        b_jump.update();
-        b_sneak.update();
-        b_run.update();
-        b_layerswap.update();
-        b_place.update();
-        b_destroy.update();
-        b_pick.update();
+        if (b_moveleft.update())
+            changeBind("left");
+        if (b_moveright.update())
+            changeBind("right");
+        if (b_jump.update())
+            changeBind("jump");
+        if (b_sneak.update())
+            changeBind("sneak");
+        if (b_run.update())
+            changeBind("run");
+        if (b_layerswap.update())
+            changeBind("layerswap");
+        if (b_place.update())
+            changeBind("place");
+        if (b_destroy.update())
+            changeBind("destroy");
+        if (b_pick.update())
+            changeBind("pick");
         if (b_back_options.update())
             m_submenu = MENU_OPTIONS;
     }
@@ -300,7 +402,7 @@ void MenuState::draw(GameEngine* engine)
     else if (m_submenu == MENU_OPTIONS_PLAYER)
     {
         sf::Sprite skin(txt_playerskin);
-        skin.setPosition(400-128, 96+112+48);
+        skin.setPosition((engine->app.getSize().x/2)-128, 96+112+48);
         skin.setScale(4, 4);
 
         label_playername.draw();
@@ -327,6 +429,8 @@ void MenuState::draw(GameEngine* engine)
         b_pick.draw();
         b_back_options.draw();
     }
+    else if (m_submenu == MENU_OPTIONS_CONTROLS_CHANGE)
+        l_pressakey.draw();
 }
 
 void MenuState::pause()
@@ -337,4 +441,13 @@ void MenuState::pause()
 void MenuState::resume()
 {
 
+}
+
+void MenuState::changeBind(const char* keybind)
+{
+    char aBuf[192];
+    sprintf(m_changingControl, "%s", keybind);
+    sprintf(aBuf, "Press any key to change control \"%s\".\nPress ESC to cancel.", keybind);
+    l_pressakey.setText(aBuf);
+    m_submenu = MENU_OPTIONS_CONTROLS_CHANGE;
 }

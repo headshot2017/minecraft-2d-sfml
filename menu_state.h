@@ -15,7 +15,9 @@ typedef enum
 
     MENU_OPTIONS_GRAPHICS,
     MENU_OPTIONS_CONTROLS,
-    MENU_OPTIONS_PLAYER
+    MENU_OPTIONS_PLAYER,
+
+    MENU_OPTIONS_CONTROLS_CHANGE
 } SUB_MENUS;
 
 class MenuState : public GameState
@@ -28,6 +30,9 @@ public:
     void draw(GameEngine* engine);
     void pause();
     void resume();
+
+    void changeBind(const char *keybind);
+    void setAllPositions(GameEngine* engine);
 
     static MenuState* Instance() {return &m_Instance;}
 
@@ -85,6 +90,10 @@ private:
     Button b_place;
     Button b_destroy;
     Button b_pick;
+
+    // changing control menu
+    Label l_pressakey;
+    char m_changingControl[32];
 
 
 protected:

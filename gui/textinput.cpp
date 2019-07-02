@@ -60,11 +60,9 @@ TextInput::TextInput(GameEngine *engine, sf::String text, sf::Vector2f pos, std:
 TextInput::TextInput(GameEngine *engine, const char *text, sf::Vector2f pos, std::size_t length)
 {
     m_engine = engine;
-    m_pos = pos;
     m_str = sf::String(text);
     m_length = length;
 
-    m_rect.setPosition(m_pos);
     m_rect.setFillColor(sf::Color::Black);
     m_rect.setOutlineColor(sf::Color(128, 128, 128));
     m_rect.setOutlineThickness(2);
@@ -73,7 +71,6 @@ TextInput::TextInput(GameEngine *engine, const char *text, sf::Vector2f pos, std
     m_caretline.setFillColor(sf::Color::White);
     m_caretline.setSize(sf::Vector2f(2, 20));
 
-    m_text.setPosition(m_pos.x+4, m_pos.y+10);
     m_text.setFont(engine->mc_font);
     m_text.setScale(0.16667f, 0.16667f);
     m_text.setCharacterSize(96);
@@ -81,6 +78,15 @@ TextInput::TextInput(GameEngine *engine, const char *text, sf::Vector2f pos, std
     m_textcaret.setFont(engine->mc_font);
     m_textcaret.setScale(0.16667f, 0.16667f);
     m_textcaret.setCharacterSize(96);
+
+    setPosition(pos);
+}
+
+void TextInput::setPosition(sf::Vector2f pos)
+{
+    m_pos = pos;
+    m_rect.setPosition(m_pos);
+    m_text.setPosition(m_pos.x+4, m_pos.y+10);
 }
 
 void TextInput::update()

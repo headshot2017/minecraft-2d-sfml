@@ -12,6 +12,7 @@ void SettingsManager::generateSettings()
 {
     sprintf(m_playername, "Alexn't");
     sprintf(m_playerskin, "steve");
+    m_fullscreen = false;
     saveSettings();
 }
 
@@ -35,6 +36,8 @@ void SettingsManager::loadSettings()
                 sprintf(m_playername, "%s", value.c_str());
             else if (strcmp(name.c_str(), "player_skin") == 0)
                 sprintf(m_playerskin, "%s", value.c_str());
+            else if (strcmp(name.c_str(), "fullscreen") == 0)
+                m_fullscreen = std::atoi(value.c_str());
 
             printf("%s : %s\n", name.c_str(), value.c_str());
         }
@@ -51,5 +54,6 @@ void SettingsManager::saveSettings()
     std::ofstream configfile("options.txt");
     configfile << "player_name: " << m_playername << "\n";
     configfile << "player_skin: " << m_playerskin << "\n";
+    configfile << "fullscreen: " << ((m_fullscreen) ? "1" : "0") << "\n";
     printf("settings saved\n");
 }

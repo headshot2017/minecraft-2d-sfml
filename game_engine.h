@@ -31,6 +31,7 @@ public:
     void popState(); // destroy the current state and resume the paused one.
 
     const sf::Texture& takeScreenshot(bool saveTexture=false);
+    void setResolution(sf::Vector2u res, sf::Uint32 flags=sf::Style::Close);
 
     bool isRunning() {return m_running;}
     SoundEngine* Sound() {return m_sound;}

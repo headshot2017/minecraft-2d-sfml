@@ -14,6 +14,8 @@ public:
 
     void setText(const char *text) {m_str = sf::String(text);}
     void setText(sf::String text) {m_str = text;}
+    void setPosition(sf::Vector2f pos);
+    void setPosition(float x, float y) {setPosition(sf::Vector2f(x,y));}
 
     sf::String getString() {return m_str;}
 
