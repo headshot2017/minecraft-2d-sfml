@@ -31,6 +31,9 @@ void PausedState::destroy()
 
 void PausedState::update(GameEngine* engine)
 {
+    if (engine->leavingGame() == 2)
+        engine->popState();
+
     if (b_resume.update())
         engine->popState();
     if (b_options.update())
@@ -42,26 +45,17 @@ void PausedState::update(GameEngine* engine)
     }
 }
 
-void PausedState::process_input(GameEngine* engine)
+void PausedState::event_input(GameEngine* engine, sf::Event& event)
 {
-    sf::Event event;
-    while (engine->app.pollEvent(event))
+    if (event.type == sf::Event::KeyPressed)
     {
-        if (event.type == sf::Event::Closed)
-        {
-            engine->leaveGame(2);
+        if (event.key.code == sf::Keyboard::Escape)
             engine->popState();
-        }
-        else if (event.type == sf::Event::KeyPressed)
-        {
-            if (event.key.code == sf::Keyboard::Escape)
-                engine->popState();
-        }
-
-        b_resume.process_input(event);
-        b_options.process_input(event);
-        b_quit.process_input(event);
     }
+
+    b_resume.process_input(event);
+    b_options.process_input(event);
+    b_quit.process_input(event);
 }
 
 void PausedState::draw(GameEngine* engine)
@@ -79,8 +73,11 @@ void PausedState::pause()
 
 void PausedState::resume()
 {
-    sf::Vector2u res = m_engine->app.getSize();
+    onResolutionChange(m_engine->app.getSize());
+}
 
+void PausedState::onResolutionChange(sf::Vector2u res)
+{
     m_gamescreen[0].position = m_gamescreen[0].texCoords = sf::Vector2f(0, 0);
     m_gamescreen[1].position = m_gamescreen[1].texCoords = sf::Vector2f(res.x, 0);
     m_gamescreen[2].position = m_gamescreen[2].texCoords = sf::Vector2f(res.x, res.y);

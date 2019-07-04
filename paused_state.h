@@ -11,10 +11,12 @@ public:
     void init(GameEngine* engine);
     void destroy();
     void update(GameEngine* engine);
-    void process_input(GameEngine* engine);
+    void event_input(GameEngine* engine, sf::Event& event);
+    void process_input(GameEngine* engine) {}
     void draw(GameEngine* engine);
     void pause();
     void resume();
+    void onResolutionChange(sf::Vector2u res);
 
     static PausedState* Instance() {return &m_Instance;}
 

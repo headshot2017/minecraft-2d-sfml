@@ -34,6 +34,12 @@ Controls::Controls()
 
     key.key = sf::Keyboard::LAlt;
     m_keys["layerswap"] = key;
+
+    key.key = sf::Keyboard::F2;
+    m_keys["screenshot"] = key;
+
+    key.key = sf::Keyboard::F11;
+    m_keys["fullscreen"] = key;
 }
 
 const char* Controls::getKeyName(const char *action)

@@ -51,6 +51,42 @@ void GameEngine::update()
 void GameEngine::process_input()
 {
     states.back()->process_input(this);
+
+    sf::Event event;
+    while (app.pollEvent(event))
+    {
+        if (event.type == sf::Event::Closed)
+        {
+            if (isPaused())
+            {
+                leaveGame(2);
+                popState();
+            }
+        }
+        else if (m_settings.controls()->PressedEvent("fullscreen", event))
+        {
+            if (m_settings.m_fullscreen)
+                setResolution(sf::Vector2u(800,480));
+            else
+            {
+                sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
+                setResolution(sf::Vector2u(desktop.width, desktop.height), sf::Style::Fullscreen);
+            }
+            m_settings.m_fullscreen = not m_settings.m_fullscreen;
+        }
+        else if (m_settings.controls()->PressedEvent("screenshot", event))
+        {
+            char aFile[96];
+            time_t atime = time(0);
+            std::tm* now = localtime(&atime);
+            sprintf(aFile, "%.2d-%.2d-%d %.2d.%.2d.%.2d.png", now->tm_mday, now->tm_mon+1, now->tm_year+1900, now->tm_hour, now->tm_min, now->tm_sec);
+
+            takeScreenshot().copyToImage().saveToFile(aFile);
+            printf("screenshot saved as '%s'\n", aFile);
+        }
+
+        states.back()->event_input(this, event);
+    }
 }
 
 void GameEngine::draw()
@@ -114,6 +150,9 @@ void GameEngine::setResolution(sf::Vector2u res, sf::Uint32 flags)
 {
     app.create(sf::VideoMode(res.x, res.y), "Minecraft 2D", flags);
     m_window.create(res.x, res.y);
-    app.setSize(res);
+    //app.setSize(res);
     app.setFramerateLimit(60);
+
+    if (not states.empty())
+        states.back()->onResolutionChange(res);
 }

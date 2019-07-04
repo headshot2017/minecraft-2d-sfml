@@ -26,13 +26,15 @@ public:
     void init(GameEngine* engine);
     void destroy();
     void update(GameEngine* engine);
-    void process_input(GameEngine* engine);
+    void event_input(GameEngine* engine, sf::Event& event);
+    void process_input(GameEngine* engine) {}
     void draw(GameEngine* engine);
     void pause();
     void resume();
+    void onResolutionChange(sf::Vector2u res);
 
     void changeBind(const char *keybind);
-    void setAllPositions(GameEngine* engine);
+    void setAllPositions(sf::Vector2u& windowsize);
 
     static MenuState* Instance() {return &m_Instance;}
 
@@ -90,6 +92,8 @@ private:
     Button b_place;
     Button b_destroy;
     Button b_pick;
+    Button b_screenshot;
+    Button b_fullscreen;
 
     // changing control menu
     Label l_pressakey;

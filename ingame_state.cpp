@@ -61,59 +61,30 @@ void IngameState::update(GameEngine *engine)
     m_player.update(engine);
 }
 
-void IngameState::process_input(GameEngine *engine)
+void IngameState::event_input(GameEngine *engine, sf::Event& event)
 {
-    sf::Event event;
-    while (engine->app.pollEvent(event))
+    m_player.event_input(engine, event);
+
+    if (event.type == sf::Event::Closed)
     {
-        m_player.event_input(engine, event);
+        m_world.saveWorld();
+        engine->quit();
+    }
 
-        if (event.type == sf::Event::Closed)
-        {
-            m_world.saveWorld();
-            engine->quit();
-        }
-
-        else if (event.type == sf::Event::KeyPressed)
-        {
-            if (event.key.code == sf::Keyboard::R)
-                cam_x = cam_y = 0.f;
-            else if (event.key.code == sf::Keyboard::F2)
-            {
-                char aFile[96];
-                time_t atime = time(0);
-                std::tm* now = localtime(&atime);
-                sprintf(aFile, "%.2d-%.2d-%d %.2d.%.2d.%.2d.png", now->tm_mday, now->tm_mon+1, now->tm_year+1900, now->tm_hour, now->tm_min, now->tm_sec);
-
-                engine->takeScreenshot().copyToImage().saveToFile(aFile);
-                printf("screenshot saved as '%s'\n", aFile);
-            }
-            else if (event.key.code == sf::Keyboard::F11)
-            {
-                if (engine->Settings()->m_fullscreen)
-                    engine->setResolution(sf::Vector2u(800,480));
-                else
-                {
-                    sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
-                    engine->setResolution(sf::Vector2u(desktop.width, desktop.height), sf::Style::Fullscreen);
-                }
-                engine->Settings()->m_fullscreen = not engine->Settings()->m_fullscreen;
-            }
-            else if (event.key.code == sf::Keyboard::Escape)
-                engine->pushState(PausedState::Instance());
-        }
-
-        else if (event.type == sf::Event::Resized and not engine->Settings()->m_fullscreen)
-        {
-            unsigned int width = (event.size.width > 640) ? event.size.width : 640;
-            unsigned int height = (event.size.height > 480) ? event.size.height : 480;
-            engine->setResolution(sf::Vector2u(width, height));
-        }
-
-        else if (event.type == sf::Event::LostFocus)
+    else if (event.type == sf::Event::KeyPressed)
+    {
+        if (event.key.code == sf::Keyboard::R)
+            cam_x = cam_y = 0.f;
+        else if (event.key.code == sf::Keyboard::Escape)
             engine->pushState(PausedState::Instance());
     }
 
+    else if (event.type == sf::Event::LostFocus)
+        engine->pushState(PausedState::Instance());
+}
+
+void IngameState::process_input(GameEngine* engine)
+{
     m_player.process_input(engine);
 
     sf::Vector2f pos = m_player.getPos();

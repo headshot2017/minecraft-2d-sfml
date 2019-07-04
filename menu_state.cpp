@@ -71,10 +71,13 @@ void MenuState::init(GameEngine* engine)
     b_place = Button(engine, "Place block: ", (windowsize.x/2)+8, 64+(48*0), 300);
     b_destroy = Button(engine, "Destroy block: ", (windowsize.x/2)+8, 64+(48*1), 300);
     b_pick = Button(engine, "Pick block: ", (windowsize.x/2)+8, 64+(48*2), 300);
+    b_screenshot = Button(engine, "Screenshot: ", (windowsize.x/2)+8, 64+(48*3), 300);
+    b_fullscreen = Button(engine, "Fullscreen: ", (windowsize.x/2)+8, 64+(48*4), 300);
 
     l_pressakey = Label(engine, "", windowsize.x/2, windowsize.y/2-48, 1);
 
-    setAllPositions(engine);
+    sf::Vector2u res = engine->app.getSize();
+    setAllPositions(res);
 }
 
 void MenuState::destroy()
@@ -82,10 +85,8 @@ void MenuState::destroy()
 
 }
 
-void MenuState::setAllPositions(GameEngine* engine)
+void MenuState::setAllPositions(sf::Vector2u& windowsize)
 {
-    sf::Vector2u windowsize = engine->app.getSize();
-
     dirt_tile.setTextureRect(sf::IntRect(0, 0, windowsize.x/2, windowsize.y/2));
     minecraft_logo.setPosition((windowsize.x/2) - 274.0f, (windowsize.y/4)-64);
 
@@ -123,6 +124,8 @@ void MenuState::setAllPositions(GameEngine* engine)
     b_place.setPosition((windowsize.x/2)+8, 64+(48*0));
     b_destroy.setPosition((windowsize.x/2)+8, 64+(48*1));
     b_pick.setPosition((windowsize.x/2)+8, 64+(48*2));
+    b_screenshot.setPosition((windowsize.x/2)+8, 64+(48*3));
+    b_fullscreen.setPosition((windowsize.x/2)+8, 64+(48*4));
 
     l_pressakey.setPosition(windowsize.x/2, windowsize.y/2-48);
 }
@@ -138,133 +141,106 @@ void MenuState::update(GameEngine* engine)
     b_place.setText(sf::String("Place block: ") + engine->Settings()->controls()->getKeyName("place"));
     b_destroy.setText(sf::String("Destroy block: ") + engine->Settings()->controls()->getKeyName("destroy"));
     b_pick.setText(sf::String("Pick block: ") + engine->Settings()->controls()->getKeyName("pick"));
+    b_screenshot.setText(sf::String("Screenshot: ") + engine->Settings()->controls()->getKeyName("screenshot"));
+    b_fullscreen.setText(sf::String("Fullscreen: ") + engine->Settings()->controls()->getKeyName("fullscreen"));
 }
 
-void MenuState::process_input(GameEngine* engine)
+void MenuState::event_input(GameEngine* engine, sf::Event& event)
 {
-    sf::Event event;
-    while (engine->app.pollEvent(event))
+    if (event.type == sf::Event::Closed and not engine->isPaused())
     {
-        if (event.type == sf::Event::Closed)
+        engine->quit();
+    }
+    else if (event.type == sf::Event::KeyPressed)
+    {
+        if (event.key.code == sf::Keyboard::Escape and m_submenu != MENU_OPTIONS_CONTROLS_CHANGE)
         {
             if (engine->isPaused())
-            {
-                engine->leaveGame(2);
                 engine->popState();
-                engine->popState();
-            }
             else
-            {
-                engine->quit();
-            }
-        }
-        else if (event.type == sf::Event::Resized and not engine->Settings()->m_fullscreen)
-        {
-            unsigned int width = (event.size.width > 640) ? event.size.width : 640;
-            unsigned int height = (event.size.height > 480) ? event.size.height : 480;
-            engine->setResolution(sf::Vector2u(width, height));
-            setAllPositions(engine);
-        }
-        else if (event.type == sf::Event::KeyPressed)
-        {
-            if (event.key.code == sf::Keyboard::Escape and m_submenu != MENU_OPTIONS_CONTROLS_CHANGE)
-            {
-                if (engine->isPaused())
-                    engine->popState();
-                else
-                    m_submenu = MENU_MAINMENU;
-            }
-
-            if (event.key.code == sf::Keyboard::F11)
-            {
-                if (engine->Settings()->m_fullscreen)
-                    engine->setResolution(sf::Vector2u(800,480));
-                else
-                {
-                    sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
-                    engine->setResolution(sf::Vector2u(desktop.width, desktop.height), sf::Style::Fullscreen);
-                }
-                engine->Settings()->m_fullscreen = not engine->Settings()->m_fullscreen;
-            }
-        }
-
-        if (m_submenu == MENU_MAINMENU)
-        {
-            b_singleplayer.process_input(event);
-            b_multiplayer.process_input(event);
-            b_options.process_input(event);
-            b_quit.process_input(event);
-        }
-        else if (m_submenu == MENU_LOADWORLD)
-        {
-            b_back.process_input(event);
-            b_world1.process_input(event);
-            b_world2.process_input(event);
-            b_world3.process_input(event);
-            b_world4.process_input(event);
-            b_world5.process_input(event);
-        }
-        else if (m_submenu == MENU_MULTIPLAYER)
-        {
-            b_back.process_input(event);
-            b_connect.process_input(event);
-        }
-        else if (m_submenu == MENU_OPTIONS)
-        {
-            b_back.process_input(event);
-            b_options_player.process_input(event);
-            b_options_controls.process_input(event);
-            b_options_graphics.process_input(event);
-        }
-        else if (m_submenu == MENU_OPTIONS_PLAYER)
-        {
-            if (input_playername.process_input(event) == 1) // character typed
-                sprintf(engine->Settings()->m_playername, "%s", input_playername.getString().toAnsiString().c_str());
-            if (input_playerskin.process_input(event) == 2) // enter key
-            {
-                const char *newskin = input_playerskin.getString().toAnsiString().c_str();
-                char skin[64];
-                sprintf(skin, "data/skins/%s.png", newskin);
-                if (txt_playerskin.loadFromFile(skin)) //success
-                    sprintf(engine->Settings()->m_playerskin, "%s", newskin);
-                else
-                    input_playerskin.setText(engine->Settings()->m_playerskin);
-            }
-            b_back_options.process_input(event);
-        }
-        else if (m_submenu == MENU_OPTIONS_GRAPHICS)
-        {
-            b_back_options.process_input(event);
-        }
-        else if (m_submenu == MENU_OPTIONS_CONTROLS)
-        {
-            b_moveleft.process_input(event);
-            b_moveright.process_input(event);
-            b_jump.process_input(event);
-            b_sneak.process_input(event);
-            b_run.process_input(event);
-            b_layerswap.process_input(event);
-            b_place.process_input(event);
-            b_destroy.process_input(event);
-            b_pick.process_input(event);
-            b_back_options.process_input(event);
-        }
-        else if (m_submenu == MENU_OPTIONS_CONTROLS_CHANGE)
-        {
-            if (event.type == sf::Event::KeyPressed)
-            {
-                if (event.key.code != sf::Keyboard::Escape)
-                    engine->Settings()->controls()->setKeyBind(m_changingControl, event.key.code);
-                m_submenu = MENU_OPTIONS_CONTROLS;
-            }
-            else if (event.type == sf::Event::MouseButtonPressed)
-            {
-                engine->Settings()->controls()->setMouseBind(m_changingControl, event.mouseButton.button);
-                m_submenu = MENU_OPTIONS_CONTROLS;
-            }
+                m_submenu = MENU_MAINMENU;
         }
     }
 
+    if (m_submenu == MENU_MAINMENU)
+    {
+        b_singleplayer.process_input(event);
+        b_multiplayer.process_input(event);
+        b_options.process_input(event);
+        b_quit.process_input(event);
+    }
+    else if (m_submenu == MENU_LOADWORLD)
+    {
+        b_back.process_input(event);
+        b_world1.process_input(event);
+        b_world2.process_input(event);
+        b_world3.process_input(event);
+        b_world4.process_input(event);
+        b_world5.process_input(event);
+    }
+    else if (m_submenu == MENU_MULTIPLAYER)
+    {
+        b_back.process_input(event);
+        b_connect.process_input(event);
+    }
+    else if (m_submenu == MENU_OPTIONS)
+    {
+        b_back.process_input(event);
+        b_options_player.process_input(event);
+        b_options_controls.process_input(event);
+        b_options_graphics.process_input(event);
+    }
+    else if (m_submenu == MENU_OPTIONS_PLAYER)
+    {
+        if (input_playername.process_input(event) == 1) // character typed
+            sprintf(engine->Settings()->m_playername, "%s", input_playername.getString().toAnsiString().c_str());
+        if (input_playerskin.process_input(event) == 2) // enter key
+        {
+            const char *newskin = input_playerskin.getString().toAnsiString().c_str();
+            char skin[64];
+            sprintf(skin, "data/skins/%s.png", newskin);
+            if (txt_playerskin.loadFromFile(skin)) //success
+                sprintf(engine->Settings()->m_playerskin, "%s", newskin);
+            else
+                input_playerskin.setText(engine->Settings()->m_playerskin);
+        }
+        b_back_options.process_input(event);
+    }
+    else if (m_submenu == MENU_OPTIONS_GRAPHICS)
+    {
+        b_back_options.process_input(event);
+    }
+    else if (m_submenu == MENU_OPTIONS_CONTROLS)
+    {
+        b_moveleft.process_input(event);
+        b_moveright.process_input(event);
+        b_jump.process_input(event);
+        b_sneak.process_input(event);
+        b_run.process_input(event);
+        b_layerswap.process_input(event);
+        b_place.process_input(event);
+        b_destroy.process_input(event);
+        b_pick.process_input(event);
+        b_screenshot.process_input(event);
+        b_fullscreen.process_input(event);
+        b_back_options.process_input(event);
+    }
+    else if (m_submenu == MENU_OPTIONS_CONTROLS_CHANGE)
+    {
+        if (event.type == sf::Event::KeyPressed)
+        {
+            if (event.key.code != sf::Keyboard::Escape)
+                engine->Settings()->controls()->setKeyBind(m_changingControl, event.key.code);
+            m_submenu = MENU_OPTIONS_CONTROLS;
+        }
+        else if (event.type == sf::Event::MouseButtonPressed)
+        {
+            engine->Settings()->controls()->setMouseBind(m_changingControl, event.mouseButton.button);
+            m_submenu = MENU_OPTIONS_CONTROLS;
+        }
+    }
+
+    // check clicked
     if (m_submenu == MENU_MAINMENU)
     {
         if (b_singleplayer.update())
@@ -362,6 +338,10 @@ void MenuState::process_input(GameEngine* engine)
             changeBind("destroy");
         if (b_pick.update())
             changeBind("pick");
+        if (b_screenshot.update())
+            changeBind("screenshot");
+        if (b_fullscreen.update())
+            changeBind("fullscreen");
         if (b_back_options.update())
             m_submenu = MENU_OPTIONS;
     }
@@ -427,6 +407,8 @@ void MenuState::draw(GameEngine* engine)
         b_place.draw();
         b_destroy.draw();
         b_pick.draw();
+        b_screenshot.draw();
+        b_fullscreen.draw();
         b_back_options.draw();
     }
     else if (m_submenu == MENU_OPTIONS_CONTROLS_CHANGE)
@@ -441,6 +423,12 @@ void MenuState::pause()
 void MenuState::resume()
 {
 
+}
+
+void MenuState::onResolutionChange(sf::Vector2u res)
+{
+    printf("on resolution change %dx%d\n", res.x, res.y);
+    setAllPositions(res);
 }
 
 void MenuState::changeBind(const char* keybind)

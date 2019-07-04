@@ -13,10 +13,12 @@ public:
     void init(GameEngine* engine);
     void destroy();
     void update(GameEngine* engine);
+    void event_input(GameEngine* engine, sf::Event& event);
     void process_input(GameEngine* engine);
     void draw(GameEngine* engine);
     void pause();
     void resume();
+    void onResolutionChange(sf::Vector2u res) {}
     void generateWorld(unsigned int seed, const char *name) {m_world.generateWorld(seed, name);}
     void loadWorld(const char *worldName);
 

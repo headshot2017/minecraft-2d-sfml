@@ -108,18 +108,18 @@ void Button::setButtonWidth(int width)
     m_sprite[7].texCoords = sf::Vector2f(200-(width/4), 20);
 }
 
-void Button::setText(const char* text)
+void Button::setText(sf::String text)
 {
-    m_text.setString(sf::String(text));
+    m_text.setString(text);
     m_text.setPosition(m_pos.x + (m_width/2) - (m_text.getGlobalBounds().width/2.0f),
                        m_pos.y + 17 - (m_text.getGlobalBounds().height/2.0f));
 }
 
-void Button::setText(sf::String text)
+void Button::setPosition(sf::Vector2f pos)
 {
-    m_text.setString(sf::String(text));
-    m_text.setPosition(m_pos.x + (m_width/2) - (m_text.getGlobalBounds().width/2.0f),
-                       m_pos.y + 17 - (m_text.getGlobalBounds().height/2.0f));
+    m_pos = pos;
+    setText(m_text.getString());
+    setButtonWidth(m_width);
 }
 
 void Button::process_input(sf::Event& event)
