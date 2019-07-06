@@ -91,18 +91,18 @@ void Slider::setWidth(float width)
 
 void Slider::updateHandlePosition()
 {
-    int maxx = m_length - 16 - 2;
+    int maxx = m_length - 16 - 1;
     int x = maxx * m_value / 100 + 1;
 
     m_handle[0].position = sf::Vector2f(m_pos.x+x, m_pos.y);
-    m_handle[1].position = sf::Vector2f(m_pos.x+x+8, m_pos.y+40);
+    m_handle[1].position = sf::Vector2f(m_pos.x+x+8, m_pos.y);
     m_handle[2].position = sf::Vector2f(m_pos.x+x+8, m_pos.y+40);
-    m_handle[3].position = sf::Vector2f(m_pos.x+x, m_pos.y);
+    m_handle[3].position = sf::Vector2f(m_pos.x+x, m_pos.y+40);
 
     m_handle[4].position = sf::Vector2f(m_pos.x+x+8, m_pos.y);
-    m_handle[5].position = sf::Vector2f(m_pos.x+x+16, m_pos.y+40);
+    m_handle[5].position = sf::Vector2f(m_pos.x+x+16, m_pos.y);
     m_handle[6].position = sf::Vector2f(m_pos.x+x+16, m_pos.y+40);
-    m_handle[7].position = sf::Vector2f(m_pos.x+x+8, m_pos.y);
+    m_handle[7].position = sf::Vector2f(m_pos.x+x+8, m_pos.y+40);
 }
 
 void Slider::setQuantum(int quantum)
@@ -175,7 +175,7 @@ void Slider::process_input(sf::Event &event)
         m_holding = false;
         m_engine->Sound()->playClickSound();
     }
-    else if (event.type == sf::Event::MouseWheelScrolled)
+    else if (event.type == sf::Event::MouseWheelScrolled and in_bounds)
         onMouseWheelMoved(event.mouseWheelScroll.delta);
 }
 
