@@ -47,6 +47,7 @@ public:
 
     sf::Texture m_button;
     sf::Texture m_button_hover;
+    sf::Texture m_button_locked;
 
     long int m_ticks = 0;
 

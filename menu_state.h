@@ -3,6 +3,7 @@
 
 #include "game_state.h"
 #include "gui/button.h"
+#include "gui/slider.h"
 #include "gui/textinput.h"
 #include "gui/label.h"
 
@@ -81,6 +82,7 @@ private:
     sf::Texture txt_playerskin;
 
     // video options menu
+    Slider s_videores;
 
     // controls options menu
     Button b_moveleft;

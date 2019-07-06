@@ -76,6 +76,8 @@ void MenuState::init(GameEngine* engine)
 
     l_pressakey = Label(engine, "", windowsize.x/2, windowsize.y/2-48, 1);
 
+    s_videores = Slider(engine, (windowsize.x/2)-300-8, 64, 400);
+
     sf::Vector2u res = engine->app.getSize();
     setAllPositions(res);
 }
@@ -93,7 +95,7 @@ void MenuState::setAllPositions(sf::Vector2u& windowsize)
     b_back.setPosition((windowsize.x/2)-200, windowsize.y-48);
     b_back_options.setPosition((windowsize.x/2)-200, windowsize.y-48);
 
-    b_singleplayer.setPosition((windowsize.x/2)-200, windowsize.y/4+64);
+    b_singleplayer.setPosition((windowsize.x/2)-200, windowsize.y/4+96);
     b_multiplayer.setPosition((windowsize.x/2)-200, b_singleplayer.getPos().y + 64);
     b_options.setPosition((windowsize.x/2)-200, b_multiplayer.getPos().y + 64);
     b_quit.setPosition((windowsize.x/2)-200, b_options.getPos().y + 64);
@@ -208,6 +210,7 @@ void MenuState::event_input(GameEngine* engine, sf::Event& event)
     }
     else if (m_submenu == MENU_OPTIONS_GRAPHICS)
     {
+        s_videores.process_input(event);
         b_back_options.process_input(event);
     }
     else if (m_submenu == MENU_OPTIONS_CONTROLS)
@@ -315,6 +318,7 @@ void MenuState::event_input(GameEngine* engine, sf::Event& event)
     }
     else if (m_submenu == MENU_OPTIONS_GRAPHICS)
     {
+        s_videores.update();
         if (b_back_options.update())
             m_submenu = MENU_OPTIONS;
     }
@@ -394,6 +398,7 @@ void MenuState::draw(GameEngine* engine)
     }
     else if (m_submenu == MENU_OPTIONS_GRAPHICS)
     {
+        s_videores.draw();
         b_back_options.draw();
     }
     else if (m_submenu == MENU_OPTIONS_CONTROLS)
