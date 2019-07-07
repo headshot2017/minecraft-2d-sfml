@@ -77,14 +77,12 @@ void MenuState::init(GameEngine* engine)
 
     l_pressakey = Label(engine, "", windowsize.x/2, windowsize.y/2-48, 1);
 
-    std::vector<sf::VideoMode> modes = sf::VideoMode::getFullscreenModes();
-    for (unsigned int i=0; i<modes.size(); i++)
-        printf("%dx%d %d\n", modes[i].width, modes[i].height, modes[i].bitsPerPixel);
-    printf("%d\n", modes.size());
+    std::vector<sf::VideoMode> modes = engine->getResolutions();
 
     s_videores = Slider(engine, "Resolution:", (windowsize.x/2)-300-8, 64, 300);
-    s_videores.setMaxValue(modes.size());
+    s_videores.setMaxValue(modes.size()-1);
     s_videores.setFloatValue(false);
+    b_applyvideo = Button(engine, "Apply", (windowsize.x/2)-200, windowsize.y-112);
 
     sf::Vector2u res = engine->app.getSize();
     setAllPositions(res);
@@ -138,10 +136,15 @@ void MenuState::setAllPositions(sf::Vector2u& windowsize)
     b_fullscreen.setPosition((windowsize.x/2)+8, 64+(48*4));
 
     l_pressakey.setPosition(windowsize.x/2, windowsize.y/2-48);
+
+    s_videores.setPosition((windowsize.x/2)-300-8, 64);
+    b_applyvideo.setPosition((windowsize.x/2)-200, windowsize.y-112);
 }
 
 void MenuState::update(GameEngine* engine)
 {
+    char aBuf[128];
+
     b_moveleft.setText(sf::String("Move left: ") + engine->Settings()->controls()->getKeyName("left"));
     b_moveright.setText(sf::String("Move right: ") + engine->Settings()->controls()->getKeyName("right"));
     b_jump.setText(sf::String("Jump: ") + engine->Settings()->controls()->getKeyName("jump"));
@@ -153,6 +156,10 @@ void MenuState::update(GameEngine* engine)
     b_pick.setText(sf::String("Pick block: ") + engine->Settings()->controls()->getKeyName("pick"));
     b_screenshot.setText(sf::String("Screenshot: ") + engine->Settings()->controls()->getKeyName("screenshot"));
     b_fullscreen.setText(sf::String("Fullscreen: ") + engine->Settings()->controls()->getKeyName("fullscreen"));
+
+    sf::VideoMode mode = engine->getResolutions()[s_videores.getValue()];
+    sprintf(aBuf, "Resolution: %dx%d", mode.width, mode.height);
+    s_videores.setText(aBuf);
 }
 
 void MenuState::event_input(GameEngine* engine, sf::Event& event)
@@ -219,6 +226,7 @@ void MenuState::event_input(GameEngine* engine, sf::Event& event)
     else if (m_submenu == MENU_OPTIONS_GRAPHICS)
     {
         s_videores.process_input(event);
+        b_applyvideo.process_input(event);
         b_back_options.process_input(event);
     }
     else if (m_submenu == MENU_OPTIONS_CONTROLS)
@@ -327,6 +335,12 @@ void MenuState::event_input(GameEngine* engine, sf::Event& event)
     else if (m_submenu == MENU_OPTIONS_GRAPHICS)
     {
         s_videores.update();
+        if (b_applyvideo.update())
+        {
+            sf::VideoMode mode = engine->getResolutions()[s_videores.getValue()];
+            sf::Uint32 flags = (engine->Settings()->m_fullscreen) ? sf::Style::Fullscreen : sf::Style::Close;
+            engine->setResolution(sf::Vector2u(mode.width, mode.height), flags);
+        }
         if (b_back_options.update())
             m_submenu = MENU_OPTIONS;
     }
@@ -407,6 +421,7 @@ void MenuState::draw(GameEngine* engine)
     else if (m_submenu == MENU_OPTIONS_GRAPHICS)
     {
         s_videores.draw();
+        b_applyvideo.draw();
         b_back_options.draw();
     }
     else if (m_submenu == MENU_OPTIONS_CONTROLS)

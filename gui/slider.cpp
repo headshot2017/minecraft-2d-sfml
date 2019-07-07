@@ -209,6 +209,7 @@ void Slider::setText(sf::String text)
 {
     m_text = text;
     m_label.setText(text);
+    setWidth(m_length);
 }
 
 void Slider::onMousePressed(float x, float y)
@@ -237,12 +238,8 @@ void Slider::update()
 
     if (m_holding)
     {
-        onMousePressed(mouse.x-m_pos.x, mouse.y-m_pos.y);
+        onMousePressed(mouse.x+8-m_pos.x, mouse.y-m_pos.y);
     }
-
-    char aBuf[64];
-    sprintf(aBuf, "%s %.1f\n", m_text.toAnsiString().c_str(), m_value);
-    m_label.setText(aBuf);
 }
 
 void Slider::process_input(sf::Event &event)

@@ -32,6 +32,7 @@ public:
 
     const sf::Texture& takeScreenshot(bool saveTexture=false);
     void setResolution(sf::Vector2u res, sf::Uint32 flags=sf::Style::Close);
+    std::vector<sf::VideoMode>& getResolutions() {return m_videomodes;}
 
     bool isRunning() {return m_running;}
     SoundEngine* Sound() {return m_sound;}
@@ -55,6 +56,7 @@ private:
     bool m_running = true;
     bool m_paused = false;
     int m_leavegame = 0;
+    std::vector<sf::VideoMode> m_videomodes;
     std::vector<GameState*> states;
     SoundEngine *m_sound;
     SettingsManager m_settings;

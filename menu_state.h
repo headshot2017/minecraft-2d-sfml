@@ -82,6 +82,7 @@ private:
     sf::Texture txt_playerskin;
 
     // video options menu
+    Button b_applyvideo;
     Slider s_videores;
 
     // controls options menu

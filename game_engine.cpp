@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <fstream>
+#include <algorithm>
 
 void GameEngine::init()
 {
@@ -30,6 +31,27 @@ void GameEngine::init()
     m_button.loadFromImage(widgets, sf::IntRect(0, 66, 200, 20));
     m_button_hover.loadFromImage(widgets, sf::IntRect(0, 86, 200, 20));
     m_button_locked.loadFromImage(widgets, sf::IntRect(0, 46, 200, 20));
+
+    std::vector<sf::VideoMode> modes = sf::VideoMode::getFullscreenModes();
+    bool original_res = false;
+    for (unsigned int i=0; i<modes.size(); i++)
+    {
+        if (modes[i].bitsPerPixel == 32 and modes[i].width >= 640 and modes[i].height >= 480)
+        {
+            if (modes[i].width == 800 and modes[i].height == 480)
+                original_res = true;
+            m_videomodes.push_back(modes[i]);
+        }
+    }
+    std::reverse(m_videomodes.begin(), m_videomodes.end());
+
+    if (not original_res)
+    {
+        sf::VideoMode original(800, 480);
+        std::vector<sf::VideoMode>::iterator it = m_videomodes.begin();
+        it = m_videomodes.insert(it, original);
+        m_videomodes.insert(it, 0, original);
+    }
 }
 
 void GameEngine::cleanup()
@@ -41,6 +63,7 @@ void GameEngine::cleanup()
     }
     m_sound->cleanup();
     m_settings.saveSettings();
+    m_videomodes.clear();
     delete m_sound;
 }
 
