@@ -85,8 +85,8 @@ void GameEngine::process_input()
         }
         else if (m_settings.controls()->PressedEvent("fullscreen", event))
         {
-            bool fullscreen = m_settings.m_fullscreen;
-            m_settings.m_fullscreen = not fullscreen;
+            bool fullscreen = not m_settings.m_fullscreen;
+            m_settings.m_fullscreen = fullscreen;
 
             sf::Uint32 flags = fullscreen ? sf::Style::Fullscreen : sf::Style::Close;
             setResolution(sf::Vector2u(m_settings.m_screenwidth, m_settings.m_screenheight), flags);
