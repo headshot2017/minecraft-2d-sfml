@@ -78,15 +78,6 @@ void Player::moveToRoof()
             yy = (y-64)/32;
         }
     }
-    else
-    {
-        while (not blockCollide(x/32, yy) and not blockCollide((x-4)/32, yy) and not blockCollide((x+4)/32, yy))
-        {
-            y-=1.f;
-            yy = (y-64)/32;
-        }
-    }
-    y+=1.f;
 }
 
 bool Player::blockCollide(int x, int y)
