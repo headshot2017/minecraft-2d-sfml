@@ -9,13 +9,9 @@
 void GameEngine::init()
 {
     m_settings.loadSettings();
-    if (m_settings.m_fullscreen)
-    {
-        sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
-        setResolution(sf::Vector2u(desktop.width, desktop.height), sf::Style::Fullscreen);
-    }
-    else
-        setResolution(sf::Vector2u(800, 480));
+
+    sf::Uint32 flags = m_settings.m_fullscreen ? sf::Style::Fullscreen : sf::Style::Close;
+    setResolution(sf::Vector2u(m_settings.m_screenwidth, m_settings.m_screenheight), flags);
 
     m_blocks.loadFromFile("data/blocks.png");
 
@@ -91,13 +87,9 @@ void GameEngine::process_input()
         {
             bool fullscreen = m_settings.m_fullscreen;
             m_settings.m_fullscreen = not fullscreen;
-            if (fullscreen)
-                setResolution(sf::Vector2u(800,480));
-            else
-            {
-                sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
-                setResolution(sf::Vector2u(desktop.width, desktop.height), sf::Style::Fullscreen);
-            }
+
+            sf::Uint32 flags = fullscreen ? sf::Style::Fullscreen : sf::Style::Close;
+            setResolution(sf::Vector2u(m_settings.m_screenwidth, m_settings.m_screenheight), flags);
         }
         else if (m_settings.controls()->PressedEvent("screenshot", event))
         {
@@ -177,6 +169,9 @@ void GameEngine::setResolution(sf::Vector2u res, sf::Uint32 flags)
     m_window.create(res.x, res.y);
     //app.setSize(res);
     app.setFramerateLimit(60);
+
+    m_settings.m_screenwidth = res.x;
+    m_settings.m_screenheight = res.y;
 
     if (not states.empty())
         states.back()->onResolutionChange(res);

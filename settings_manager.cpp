@@ -13,6 +13,8 @@ void SettingsManager::generateSettings()
     sprintf(m_playername, "Alexn't");
     sprintf(m_playerskin, "steve");
     m_fullscreen = false;
+    m_screenwidth = 800;
+    m_screenheight = 480;
     saveSettings();
 }
 
@@ -38,6 +40,10 @@ void SettingsManager::loadSettings()
                 sprintf(m_playerskin, "%s", value.c_str());
             else if (strcmp(name.c_str(), "fullscreen") == 0)
                 m_fullscreen = std::atoi(value.c_str());
+            else if (strcmp(name.c_str(), "screen_width") == 0)
+                m_screenwidth = std::atoi(value.c_str());
+            else if (strcmp(name.c_str(), "screen_height") == 0)
+                m_screenheight = std::atoi(value.c_str());
 
             printf("%s : %s\n", name.c_str(), value.c_str());
         }
@@ -55,5 +61,7 @@ void SettingsManager::saveSettings()
     configfile << "player_name: " << m_playername << "\n";
     configfile << "player_skin: " << m_playerskin << "\n";
     configfile << "fullscreen: " << ((m_fullscreen) ? "1" : "0") << "\n";
+    configfile << "screen_width: " << m_screenwidth << "\n";
+    configfile << "screen_height: " << m_screenheight << "\n";
     printf("settings saved\n");
 }

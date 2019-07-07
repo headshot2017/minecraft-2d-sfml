@@ -15,6 +15,8 @@ public:
 
     bool m_layerlighting = true; // not used
     bool m_fullscreen = false;
+    unsigned int m_screenwidth = 800;
+    unsigned int m_screenheight = 480;
     char m_playername[16];
     char m_playerskin[32];
 
