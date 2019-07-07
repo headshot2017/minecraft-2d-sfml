@@ -2,6 +2,7 @@
 #include "game_engine.h"
 #include "menu_state.h"
 #include "ingame_state.h"
+#include <vector>
 
 MenuState MenuState::m_Instance;
 
@@ -76,7 +77,14 @@ void MenuState::init(GameEngine* engine)
 
     l_pressakey = Label(engine, "", windowsize.x/2, windowsize.y/2-48, 1);
 
-    s_videores = Slider(engine, (windowsize.x/2)-300-8, 64, 400);
+    std::vector<sf::VideoMode> modes = sf::VideoMode::getFullscreenModes();
+    for (unsigned int i=0; i<modes.size(); i++)
+        printf("%dx%d %d\n", modes[i].width, modes[i].height, modes[i].bitsPerPixel);
+    printf("%d\n", modes.size());
+
+    s_videores = Slider(engine, "Resolution:", (windowsize.x/2)-300-8, 64, 300);
+    s_videores.setMaxValue(modes.size());
+    s_videores.setFloatValue(false);
 
     sf::Vector2u res = engine->app.getSize();
     setAllPositions(res);
