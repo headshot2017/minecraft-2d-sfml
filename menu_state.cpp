@@ -8,6 +8,8 @@ MenuState MenuState::m_Instance;
 
 void MenuState::init(GameEngine* engine)
 {
+    m_engine = engine;
+
     if (not engine->isPaused())
         m_submenu = MENU_MAINMENU;
     else
@@ -73,15 +75,17 @@ void MenuState::init(GameEngine* engine)
     b_destroy = Button(engine, "Destroy block: ", (windowsize.x/2)+8, 64+(48*1), 300);
     b_pick = Button(engine, "Pick block: ", (windowsize.x/2)+8, 64+(48*2), 300);
     b_screenshot = Button(engine, "Screenshot: ", (windowsize.x/2)+8, 64+(48*3), 300);
-    b_fullscreen = Button(engine, "Fullscreen: ", (windowsize.x/2)+8, 64+(48*4), 300);
+    b_fullscreen_control = Button(engine, "Fullscreen: ", (windowsize.x/2)+8, 64+(48*4), 300);
 
     l_pressakey = Label(engine, "", windowsize.x/2, windowsize.y/2-48, 1);
 
     std::vector<sf::VideoMode> modes = engine->getResolutions();
 
-    s_videores = Slider(engine, "Resolution:", (windowsize.x/2)-300-8, 64, 300);
+    fullscreen = engine->Settings()->m_fullscreen;
+    s_videores = Slider(engine, "Resolution:", (windowsize.x/2)-300-8, 64+(48*0), 300);
     s_videores.setMaxValue(modes.size()-1);
     s_videores.setFloatValue(false);
+    b_fullscreen = Button(engine, "Fullscreen:", (windowsize.x/2)+8, 64+(48*0), 300);
     b_applyvideo = Button(engine, "Apply", (windowsize.x/2)-200, windowsize.y-112);
 
     sf::Vector2u res = engine->app.getSize();
@@ -133,11 +137,12 @@ void MenuState::setAllPositions(sf::Vector2u& windowsize)
     b_destroy.setPosition((windowsize.x/2)+8, 64+(48*1));
     b_pick.setPosition((windowsize.x/2)+8, 64+(48*2));
     b_screenshot.setPosition((windowsize.x/2)+8, 64+(48*3));
-    b_fullscreen.setPosition((windowsize.x/2)+8, 64+(48*4));
+    b_fullscreen_control.setPosition((windowsize.x/2)+8, 64+(48*4));
 
     l_pressakey.setPosition(windowsize.x/2, windowsize.y/2-48);
 
-    s_videores.setPosition((windowsize.x/2)-300-8, 64);
+    s_videores.setPosition((windowsize.x/2)-300-8, 64+(48*0));
+    b_fullscreen.setPosition((windowsize.x/2)+8, 64+(48*0));
     b_applyvideo.setPosition((windowsize.x/2)-200, windowsize.y-112);
 }
 
@@ -155,11 +160,14 @@ void MenuState::update(GameEngine* engine)
     b_destroy.setText(sf::String("Destroy block: ") + engine->Settings()->controls()->getKeyName("destroy"));
     b_pick.setText(sf::String("Pick block: ") + engine->Settings()->controls()->getKeyName("pick"));
     b_screenshot.setText(sf::String("Screenshot: ") + engine->Settings()->controls()->getKeyName("screenshot"));
-    b_fullscreen.setText(sf::String("Fullscreen: ") + engine->Settings()->controls()->getKeyName("fullscreen"));
+    b_fullscreen_control.setText(sf::String("Fullscreen: ") + engine->Settings()->controls()->getKeyName("fullscreen"));
 
     sf::VideoMode mode = engine->getResolutions()[s_videores.getValue()];
     sprintf(aBuf, "Resolution: %dx%d", mode.width, mode.height);
     s_videores.setText(aBuf);
+
+    sprintf(aBuf, "Fullscreen: %s", fullscreen ? "YES" : "NO");
+    b_fullscreen.setText(aBuf);
 }
 
 void MenuState::event_input(GameEngine* engine, sf::Event& event)
@@ -226,6 +234,7 @@ void MenuState::event_input(GameEngine* engine, sf::Event& event)
     else if (m_submenu == MENU_OPTIONS_GRAPHICS)
     {
         s_videores.process_input(event);
+        b_fullscreen.process_input(event);
         b_applyvideo.process_input(event);
         b_back_options.process_input(event);
     }
@@ -241,7 +250,7 @@ void MenuState::event_input(GameEngine* engine, sf::Event& event)
         b_destroy.process_input(event);
         b_pick.process_input(event);
         b_screenshot.process_input(event);
-        b_fullscreen.process_input(event);
+        b_fullscreen_control.process_input(event);
         b_back_options.process_input(event);
     }
     else if (m_submenu == MENU_OPTIONS_CONTROLS_CHANGE)
@@ -335,10 +344,12 @@ void MenuState::event_input(GameEngine* engine, sf::Event& event)
     else if (m_submenu == MENU_OPTIONS_GRAPHICS)
     {
         s_videores.update();
+        if (b_fullscreen.update())
+            fullscreen = not fullscreen;
         if (b_applyvideo.update())
         {
             sf::VideoMode mode = engine->getResolutions()[s_videores.getValue()];
-            sf::Uint32 flags = (engine->Settings()->m_fullscreen) ? sf::Style::Fullscreen : sf::Style::Close;
+            sf::Uint32 flags = (fullscreen) ? sf::Style::Fullscreen : sf::Style::Close;
             engine->setResolution(sf::Vector2u(mode.width, mode.height), flags);
         }
         if (b_back_options.update())
@@ -366,7 +377,7 @@ void MenuState::event_input(GameEngine* engine, sf::Event& event)
             changeBind("pick");
         if (b_screenshot.update())
             changeBind("screenshot");
-        if (b_fullscreen.update())
+        if (b_fullscreen_control.update())
             changeBind("fullscreen");
         if (b_back_options.update())
             m_submenu = MENU_OPTIONS;
@@ -421,6 +432,7 @@ void MenuState::draw(GameEngine* engine)
     else if (m_submenu == MENU_OPTIONS_GRAPHICS)
     {
         s_videores.draw();
+        b_fullscreen.draw();
         b_applyvideo.draw();
         b_back_options.draw();
     }
@@ -436,7 +448,7 @@ void MenuState::draw(GameEngine* engine)
         b_destroy.draw();
         b_pick.draw();
         b_screenshot.draw();
-        b_fullscreen.draw();
+        b_fullscreen_control.draw();
         b_back_options.draw();
     }
     else if (m_submenu == MENU_OPTIONS_CONTROLS_CHANGE)
@@ -455,7 +467,7 @@ void MenuState::resume()
 
 void MenuState::onResolutionChange(sf::Vector2u res)
 {
-    printf("on resolution change %dx%d\n", res.x, res.y);
+    fullscreen = m_engine->Settings()->m_fullscreen;
     setAllPositions(res);
 }
 

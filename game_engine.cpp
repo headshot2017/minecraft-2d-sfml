@@ -89,14 +89,15 @@ void GameEngine::process_input()
         }
         else if (m_settings.controls()->PressedEvent("fullscreen", event))
         {
-            if (m_settings.m_fullscreen)
+            bool fullscreen = m_settings.m_fullscreen;
+            m_settings.m_fullscreen = not fullscreen;
+            if (fullscreen)
                 setResolution(sf::Vector2u(800,480));
             else
             {
                 sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
                 setResolution(sf::Vector2u(desktop.width, desktop.height), sf::Style::Fullscreen);
             }
-            m_settings.m_fullscreen = not m_settings.m_fullscreen;
         }
         else if (m_settings.controls()->PressedEvent("screenshot", event))
         {

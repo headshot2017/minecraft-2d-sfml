@@ -42,6 +42,7 @@ public:
 private:
     static MenuState m_Instance;
     SUB_MENUS m_submenu = MENU_MAINMENU;
+    GameEngine *m_engine;
 
     sf::Sprite dirt_tile;
     sf::Sprite minecraft_logo;
@@ -82,7 +83,9 @@ private:
     sf::Texture txt_playerskin;
 
     // video options menu
+    bool fullscreen;
     Button b_applyvideo;
+    Button b_fullscreen;
     Slider s_videores;
 
     // controls options menu
@@ -96,7 +99,7 @@ private:
     Button b_destroy;
     Button b_pick;
     Button b_screenshot;
-    Button b_fullscreen;
+    Button b_fullscreen_control;
 
     // changing control menu
     Label l_pressakey;
