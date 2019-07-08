@@ -387,7 +387,7 @@ void Player::process_input(GameEngine *engine)
     // mouse
     if (engine->Settings()->controls()->Pressed("place") and not rmb)
     {
-        //if (canBuild(mousepos.x/32, (mousepos.y-56)/32))
+        if (canBuild(mousepos.x/32, (mousepos.y-56)/32))
             placeBlock(mousepos.x/32, (mousepos.y-56)/32, m_currblock, m_layer);
         rmb = true;
     }
