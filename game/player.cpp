@@ -92,13 +92,15 @@ bool Player::groundCollide()
             blockCollide((x+4)/32, (y+vspeed)/32) or blockCollide((x+4)/32, (y+vspeed-32)/32) or blockCollide((x+4)/32, (y+vspeed-64)/32));
 }
 
-bool Player::canBuild(int x, int y)
+bool Player::canBuild(int xx, int yy)
 {
-    if (m_world->getBlock(x+0, y+0) or
-        m_world->getBlock(x+1, y+0) or
-        m_world->getBlock(x-1, y+0) or
-        m_world->getBlock(x+0, y+3) or
-        m_world->getBlock(x+0, y-3))
+    if ((m_world->getBlock(xx+0, yy+0) or
+        m_world->getBlock(xx+1, yy+0) or
+        m_world->getBlock(xx-1, yy+0) or
+        m_world->getBlock(xx+0, yy+1) or
+        m_world->getBlock(xx+0, yy-1))
+        and ((xx != floor(x/32) and xx != floor((x+4)/32) and xx != floor((x-4)/32))
+             or (yy != floor((y-32)/32) and yy != floor((y-64)/32))))
         return true;
     return false;
 }

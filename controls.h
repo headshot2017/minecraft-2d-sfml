@@ -37,6 +37,8 @@ public:
     bool Pressed(const char *action);
     bool PressedEvent(const char *action, sf::Event& event);
 
+    const std::map<std::string,MyKeys>& getKeys() {return m_keys;}
+
 private:
     std::map<std::string,MyKeys> m_keys;
 };
