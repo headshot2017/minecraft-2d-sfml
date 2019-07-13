@@ -48,10 +48,25 @@ void World::setBlock(int x, int y, int block, int layer)
     m_blocks2[y_ind][x_ind].setBlock(x, y, block, layer);
     sf::VertexArray& m_blocks = getBlocksFromPoint(x, y);
 
-    m_blocks[ind+0].color = (layer != LAYER_DECORATION) ? sf::Color(255, 255, 255) : sf::Color(192, 192, 192);
-    m_blocks[ind+1].color = (layer != LAYER_DECORATION) ? sf::Color(255, 255, 255) : sf::Color(192, 192, 192);
-    m_blocks[ind+2].color = (layer != LAYER_DECORATION) ? sf::Color(255, 255, 255) : sf::Color(192, 192, 192);
-    m_blocks[ind+3].color = (layer != LAYER_DECORATION) ? sf::Color(255, 255, 255) : sf::Color(192, 192, 192);
+    if (layer == LAYER_DECORATION)
+    {
+        m_blocks[ind+0].color = sf::Color(192, 192, 192);
+        m_blocks[ind+1].color = sf::Color(192, 192, 192);
+        m_blocks[ind+2].color = sf::Color(192, 192, 192);
+        m_blocks[ind+3].color = sf::Color(192, 192, 192);
+    }
+    else if (layer == LAYER_BUILD)
+    {
+        updateLighting(x, y);
+        if (x > 0)
+            updateLighting(x-1, y);
+        if (x < WORLD_W-1)
+            updateLighting(x+1, y);
+        if (y > 0)
+            updateLighting(x, y-1);
+        if (y < WORLD_H-1)
+            updateLighting(x, y+1);
+    }
 }
 
 int World::getBlock(int x, int y)
@@ -86,6 +101,35 @@ int World::getBlockLayer(int x, int y)
     return block;
 }
 
+void World::updateLighting(int x, int y)
+{
+    int block = getBlock(x, y);
+    int layer = getBlockLayer(x, y);
+    int x_block_chunk = x % CHUNK_W;
+    int y_block_chunk = y % CHUNK_H;
+    int ind = (y_block_chunk * CHUNK_W + x_block_chunk)*4;
+    sf::VertexArray& m_blocks = getBlocksFromPoint(x, y);
+
+    if (layer == LAYER_DECORATION)
+    {
+        m_blocks[ind+0].color = sf::Color(192, 192, 192);
+        m_blocks[ind+1].color = sf::Color(192, 192, 192);
+        m_blocks[ind+2].color = sf::Color(192, 192, 192);
+        m_blocks[ind+3].color = sf::Color(192, 192, 192);
+    }
+    else if (layer == LAYER_BUILD and block != BLOCK_AIR)
+    {
+        int alpha = (((!getBlock(x-1, y) or getBlockLayer(x-1, y) != LAYER_BUILD) or
+                      (!getBlock(x+1, y) or getBlockLayer(x+1, y) != LAYER_BUILD) or
+                      (!getBlock(x, y-1) or getBlockLayer(x, y-1) != LAYER_BUILD) or
+                      (!getBlock(x, y+1) or getBlockLayer(x, y+1) != LAYER_BUILD))) ? 255 : 128;
+        m_blocks[ind+0].color = sf::Color(alpha, alpha, alpha);
+        m_blocks[ind+1].color = sf::Color(alpha, alpha, alpha);
+        m_blocks[ind+2].color = sf::Color(alpha, alpha, alpha);
+        m_blocks[ind+3].color = sf::Color(alpha, alpha, alpha);
+    }
+}
+
 sf::VertexArray& World::getBlocksFromPoint(int x, int y)
 {
     int x_ind = x/CHUNK_W;
@@ -100,9 +144,6 @@ void World::generateWorld(unsigned int seed, const char *name)
 {
     srand(seed);
     sprintf(fileName, "worlds/%s.dat", name);
-
-    bool lighting = m_engine->Settings()->m_layerlighting;
-    m_engine->Settings()->m_layerlighting = false;
 
     double pi = 3.141592653589793;
     int heights[] = {58,59,60,61,62,63,64,65,66,67,68,69,70};
@@ -147,7 +188,13 @@ void World::generateWorld(unsigned int seed, const char *name)
     }
 
     saveWorld();
-    m_engine->Settings()->m_layerlighting = lighting;
+    printf("lighting up the world...\n");
+    for(int i=0; i<WORLD_W*WORLD_H*4; i++)
+    {
+        int x = i % WORLD_W;
+        int y = i / WORLD_W;
+        updateLighting(x, y);
+    }
     printf("completed!\n");
 }
 
@@ -210,5 +257,14 @@ void World::loadWorld(const char *worldName)
 
         setBlock(pos_x, pos_y, block_type, block_layer);
     }
+
+    printf("lighting up the world...\n");
+    for(int i=0; i<width*height*4; i++)
+    {
+        int x = i % width;
+        int y = i / width;
+        updateLighting(x, y);
+    }
+
     printf("world loaded!\n");
 }

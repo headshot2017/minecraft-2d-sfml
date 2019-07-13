@@ -24,6 +24,8 @@ public:
     int getBlock(int x, int y);
     int getBlockLayer(int x, int y);
 
+    void updateLighting(int x, int y);
+
     void generateWorld(unsigned int seed, const char *name);
     void loadWorld(const char *worldName);
     void saveWorld();
