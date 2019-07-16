@@ -1,4 +1,5 @@
 #include "world.h"
+#include "entities/falling_block.h"
 #include <fstream>
 #include <stdlib.h>
 #include <math.h>
@@ -6,6 +7,7 @@
 World::World()
 {
     m_blocks2.clear();
+    m_entities.clear();
     for(int yy=0; yy < WORLD_H/CHUNK_H+1; yy++)
     {
         m_blocks2.push_back(std::vector<Chunk>());
@@ -20,6 +22,7 @@ World::World(GameEngine *engine)
 {
     m_engine = engine;
     m_blocks2.clear();
+    m_entities.clear();
     for(int yy=0; yy < WORLD_H/CHUNK_H+1; yy++)
     {
         m_blocks2.push_back(std::vector<Chunk>());
@@ -33,6 +36,39 @@ World::World(GameEngine *engine)
 World::~World()
 {
     m_blocks2.clear();
+    m_entities.clear();
+}
+
+void World::updateEntities()
+{
+    for (unsigned int i=0; i<m_entities.size(); i++)
+    {
+        if (i >= m_entities.size())
+            break;
+
+        if (m_entities[i])
+        {
+            m_entities[i]->update();
+            if (m_entities[i]->entityId() == ENT_FALLINGBLOCK)
+            {
+                if (m_entities[i]->groundCollide())
+                {
+                    sf::Vector2f pos = m_entities[i]->getPos();
+                    setBlock(pos.x/32, pos.y/32+1, m_entities[i]->getBlock());
+                    m_entities.erase(m_entities.begin() + i);
+                }
+            }
+        }
+    }
+}
+
+void World::drawEntities()
+{
+    for (unsigned int i=0; i<m_entities.size(); i++)
+    {
+        if (m_entities[i])
+            m_entities[i]->draw();
+    }
 }
 
 void World::setBlock(int x, int y, int block, int layer)
@@ -66,6 +102,29 @@ void World::setBlock(int x, int y, int block, int layer)
             updateLighting(x, y-1);
         if (y < WORLD_H-1)
             updateLighting(x, y+1);
+    }
+
+    if (block == BLOCK_AIR)
+    {
+        if (y > 0)
+        {
+            if (getBlock(x, y-1) == BLOCK_SAND or getBlock(x, y-1) == BLOCK_GRAVEL)
+            {
+                m_entities.push_back(new FallingBlock(this, m_engine, x, y-1, getBlock(x, y-1)));
+                setBlock(x, y-1, BLOCK_AIR);
+            }
+        }
+    }
+    else if (block == BLOCK_SAND or block == BLOCK_GRAVEL)
+    {
+        if (y < WORLD_H-1)
+        {
+            if (getBlock(x, y+1) == BLOCK_AIR)
+            {
+                setBlock(x, y, BLOCK_AIR);
+                m_entities.push_back(new FallingBlock(this, m_engine, x, y, block));
+            }
+        }
     }
 }
 

@@ -59,6 +59,7 @@ void IngameState::update(GameEngine *engine)
             engine->quit();
     }
     m_player.update(engine);
+    m_world.updateEntities();
 }
 
 void IngameState::event_input(GameEngine *engine, sf::Event& event)
@@ -141,6 +142,7 @@ void IngameState::draw(GameEngine *engine)
     }
 
     m_player.draw(engine);
+    m_world.drawEntities();
 
     sf::Vector2f outlinepos = m_blockoutline.getPosition();
     if (m_world.getBlock((outlinepos.x+00)/32, (outlinepos.y+00)/32) or

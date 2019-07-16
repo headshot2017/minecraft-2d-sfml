@@ -9,9 +9,11 @@
 #include <SFML/Graphics.hpp>
 #include "../game_engine.h"
 #include "chunk.h"
+#include "entity.h"
 #include <vector>
 
 class Chunk;
+class Entity;
 
 class World
 {
@@ -25,6 +27,8 @@ public:
     int getBlockLayer(int x, int y);
 
     void updateLighting(int x, int y);
+    void updateEntities();
+    void drawEntities();
 
     void generateWorld(unsigned int seed, const char *name);
     void loadWorld(const char *worldName);
@@ -36,6 +40,7 @@ private:
     char fileName[96];
     GameEngine *m_engine;
     std::vector<std::vector<Chunk>> m_blocks2;
+    std::vector<Entity*> m_entities;
 };
 
 #endif // WORLD_H_INCLUDED
