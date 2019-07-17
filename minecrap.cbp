@@ -39,6 +39,10 @@
 		<Unit filename="game/block.h" />
 		<Unit filename="game/chunk.cpp" />
 		<Unit filename="game/chunk.h" />
+		<Unit filename="game/entities/falling_block.cpp" />
+		<Unit filename="game/entities/falling_block.h" />
+		<Unit filename="game/entity.cpp" />
+		<Unit filename="game/entity.h" />
 		<Unit filename="game/player.cpp" />
 		<Unit filename="game/player.h" />
 		<Unit filename="game/world.cpp" />
