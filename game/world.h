@@ -37,6 +37,7 @@ public:
     sf::VertexArray& getBlocksFromPoint(int x, int y);
 
 private:
+    bool loaded;
     char fileName[96];
     GameEngine *m_engine;
     std::vector<std::vector<Chunk>> m_blocks2;

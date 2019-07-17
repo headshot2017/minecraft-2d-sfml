@@ -6,6 +6,7 @@
 
 World::World()
 {
+    loaded = false;
     m_blocks2.clear();
     m_entities.clear();
     for(int yy=0; yy < WORLD_H/CHUNK_H+1; yy++)
@@ -20,6 +21,7 @@ World::World()
 
 World::World(GameEngine *engine)
 {
+    loaded = false;
     m_engine = engine;
     m_blocks2.clear();
     m_entities.clear();
@@ -105,25 +107,28 @@ void World::setBlock(int x, int y, int block, int layer)
             updateLighting(x, y+1);
     }
 
-    if (block == BLOCK_AIR)
+    if (loaded) // only spawn block entities if the world has loaded
     {
-        if (y > 0)
+        if (block == BLOCK_AIR)
         {
-            if (getBlock(x, y-1) == BLOCK_SAND or getBlock(x, y-1) == BLOCK_GRAVEL)
+            if (y > 0)
             {
-                m_entities.push_back(new FallingBlock(this, m_engine, x, y-1, getBlock(x, y-1)));
-                setBlock(x, y-1, BLOCK_AIR);
+                if (getBlock(x, y-1) == BLOCK_SAND or getBlock(x, y-1) == BLOCK_GRAVEL)
+                {
+                    m_entities.push_back(new FallingBlock(this, m_engine, x, y-1, getBlock(x, y-1)));
+                    setBlock(x, y-1, BLOCK_AIR);
+                }
             }
         }
-    }
-    else if (block == BLOCK_SAND or block == BLOCK_GRAVEL)
-    {
-        if (y < WORLD_H-1)
+        else if (block == BLOCK_SAND or block == BLOCK_GRAVEL)
         {
-            if (getBlock(x, y+1) == BLOCK_AIR)
+            if (y < WORLD_H-1)
             {
-                setBlock(x, y, BLOCK_AIR);
-                m_entities.push_back(new FallingBlock(this, m_engine, x, y, block));
+                if (getBlock(x, y+1) == BLOCK_AIR)
+                {
+                    setBlock(x, y, BLOCK_AIR);
+                    m_entities.push_back(new FallingBlock(this, m_engine, x, y, block));
+                }
             }
         }
     }
@@ -204,6 +209,7 @@ void World::generateWorld(unsigned int seed, const char *name)
 {
     srand(seed);
     sprintf(fileName, "worlds/%s.dat", name);
+    loaded = false;
 
     double pi = 3.141592653589793;
     int heights[] = {58,59,60,61,62,63,64,65,66,67,68,69,70};
@@ -256,6 +262,7 @@ void World::generateWorld(unsigned int seed, const char *name)
         updateLighting(x, y);
     }
     printf("completed!\n");
+    loaded = true;
 }
 
 void World::saveWorld()
@@ -287,6 +294,7 @@ void World::loadWorld(const char *worldName)
 {
     sprintf(fileName, "worlds/%s.dat", worldName);
     std::fstream file(fileName, std::ios::in | std::ios::binary);
+    loaded = false;
 
     m_blocks2.clear();
 
@@ -327,4 +335,5 @@ void World::loadWorld(const char *worldName)
     }
 
     printf("world loaded!\n");
+    loaded = true;
 }
