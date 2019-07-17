@@ -44,6 +44,7 @@ void FallingBlock::update()
 
     hspeed += x_acc;
     vspeed += gravity;
+    if (vspeed > 6) vspeed = 6;
 
     x += hspeed;
     y += vspeed;

@@ -56,6 +56,7 @@ void World::updateEntities()
                     sf::Vector2f pos = m_entities[i]->getPos();
                     setBlock(pos.x/32, pos.y/32+1, m_entities[i]->getBlock());
                     m_entities.erase(m_entities.begin() + i);
+                    i--;
                 }
             }
         }
