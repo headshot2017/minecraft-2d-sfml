@@ -3,8 +3,8 @@
 
 #define WORLD_W 2048
 #define WORLD_H 192
-#define CHUNK_W 25 // * 32 = 800
-#define CHUNK_H 15 // * 32 = 480
+#define CHUNK_W 24
+#define CHUNK_H 16
 
 #include <SFML/Graphics.hpp>
 #include "../game_engine.h"
