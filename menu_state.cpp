@@ -350,6 +350,7 @@ void MenuState::event_input(GameEngine* engine, sf::Event& event)
         {
             sf::VideoMode mode = engine->getResolutions()[s_videores.getValue()];
             sf::Uint32 flags = (fullscreen) ? sf::Style::Fullscreen : sf::Style::Close;
+            m_engine->Settings()->m_fullscreen = fullscreen;
             engine->setResolution(sf::Vector2u(mode.width, mode.height), flags);
         }
         if (b_back_options.update())
