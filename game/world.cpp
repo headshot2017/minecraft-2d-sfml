@@ -1,5 +1,6 @@
 #include "world.h"
 #include "entities/falling_block.h"
+#include "entities/tnt.h"
 #include <fstream>
 #include <stdlib.h>
 #include <math.h>
@@ -41,6 +42,11 @@ World::~World()
     m_entities.clear();
 }
 
+void World::addEntity(Entity *ent)
+{
+    m_entities.push_back(ent);
+}
+
 void World::updateEntities()
 {
     for (unsigned int i=0; i<m_entities.size(); i++)
@@ -57,6 +63,32 @@ void World::updateEntities()
                 {
                     sf::Vector2f pos = m_entities[i]->getPos();
                     setBlock(pos.x/32, pos.y/32+1, m_entities[i]->getBlock());
+                    m_entities.erase(m_entities.begin() + i);
+                    i--;
+                }
+            }
+            else if (m_entities[i]->entityId() == ENT_TNT)
+            {
+                if (m_entities[i]->getTicksLeft() == 0)
+                {
+                    sf::Vector2f pos = m_entities[i]->getPos();
+                    setBlock(pos.x/32, pos.y/32, BLOCK_AIR);
+                    for (int yy=-3; yy<4; yy++)
+                    {
+                        for (int xx=-3; xx<4; xx++)
+                        {
+                            if ((yy == 3 and xx == 3) or (yy == -3 and xx == -3) or (yy == 3 and xx == -3) or (yy == -3 and xx == 3))
+                                continue;
+
+                            int block2 = getBlock(pos.x/32+xx, pos.y/32+yy);
+                            if (block2 == BLOCK_TNT)
+                                addEntity(new Dynamite(this, m_engine, pos.x/32+xx, pos.y/32+yy, 35 + (rand() % 90)));
+
+                            setBlock(pos.x/32+xx, pos.y/32+yy, BLOCK_AIR);
+                        }
+                    }
+                    sf::Vector2f view = m_engine->m_window.getView().getCenter();
+                    m_engine->Sound()->playGameSound(pos.x, pos.y, view.x, view.y, SOUND_EXPLODE);
                     m_entities.erase(m_entities.begin() + i);
                     i--;
                 }

@@ -1,6 +1,7 @@
 #define _USE_MATH_DEFINES
 
 #include "player.h"
+#include "entities/tnt.h"
 #include <math.h>
 #include <fstream>
 
@@ -282,6 +283,25 @@ void Player::destroyBlock(int xx, int yy)
     m_world->setBlock(xx, yy, BLOCK_AIR);
 }
 
+void Player::interactBlock(int xx, int yy)
+{
+    int block2 = m_world->getBlock(xx, yy);
+
+    m_armtick = 150;
+    if (block2 == BLOCK_AIR) return;
+
+    if (block2 == BLOCK_TNT)
+    {
+        m_world->setBlock(xx, yy, BLOCK_AIR);
+
+        sf::Vector2f view = m_engine->m_window.getView().getCenter();
+        m_engine->Sound()->playGameSound(xx*32, yy*32, view.x, view.y, SOUND_TNT_FUSE, false);
+
+        Entity *tnt = new Dynamite(m_world, m_engine, xx, yy);
+        m_world->addEntity(tnt);
+    }
+}
+
 void Player::update(GameEngine *engine)
 {
     if (groundCollide()) // gravity.
@@ -399,7 +419,12 @@ void Player::process_input(GameEngine *engine)
     if (engine->Settings()->controls()->Pressed("place") and not rmb)
     {
         if (canBuild(mousepos.x/32, (mousepos.y-56)/32))
-            placeBlock(mousepos.x/32, (mousepos.y-56)/32, m_currblock, m_layer);
+        {
+            if (m_world->getBlock(mousepos.x/32, (mousepos.y-56)/32))
+                interactBlock(mousepos.x/32, (mousepos.y-56)/32);
+            else
+                placeBlock(mousepos.x/32, (mousepos.y-56)/32, m_currblock, m_layer);
+        }
         rmb = true;
     }
     else if (not engine->Settings()->controls()->Pressed("place") and rmb)

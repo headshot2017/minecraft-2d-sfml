@@ -5,6 +5,7 @@ Entity::Entity(World *world, GameEngine *engine)
     m_world = world;
     m_engine = engine;
     x = y = hspeed = vspeed = x_acc = gravity = 0;
+    m_ticks = m_ticksleft = 0;
 }
 
 bool Entity::blockCollide(int x, int y)

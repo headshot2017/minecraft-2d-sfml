@@ -24,6 +24,8 @@ bool SoundEngine::loadTheme(const char *theme)
     char aFile[128];
     sprintf(aFile, "data/sounds/%s/click.wav", theme);
     m_sounds[SOUND_CLICK] = BASS_StreamCreateFile(false, aFile, 0, 0, 0);
+    sprintf(aFile, "data/sounds/%s/fuse.wav", theme);
+    m_sounds[SOUND_TNT_FUSE] = BASS_StreamCreateFile(false, aFile, 0, 0, 0);
     for(int i=0; i<4; i++)
     {
         sprintf(aFile, "data/sounds/%s/step/grass%d.wav", theme, i+1);
@@ -51,6 +53,9 @@ bool SoundEngine::loadTheme(const char *theme)
         m_sounds[SOUND_WOOD_DIG+i] = BASS_StreamCreateFile(false, aFile, 0, 0, 0);
         sprintf(aFile, "data/sounds/%s/step/wool%d.wav", theme, i+1);
         m_sounds[SOUND_WOOL_DIG+i] = BASS_StreamCreateFile(false, aFile, 0, 0, 0);
+
+        sprintf(aFile, "data/sounds/%s/explode%d.wav", theme, i+1);
+        m_sounds[SOUND_EXPLODE+i] = BASS_StreamCreateFile(false, aFile, 0, 0, 0);
     }
 
     theme_loaded = true;
@@ -79,7 +84,7 @@ void SoundEngine::playDigSound(float player_x, float player_y, float x, float y,
 {
     int blocktype = SOUND_STONE_DIG;
 
-    if (type == BLOCK_GRASS or type == BLOCK_OAK_LEAVES)
+    if (type == BLOCK_GRASS or type == BLOCK_OAK_LEAVES or type == BLOCK_TNT)
         blocktype = SOUND_GRASS_DIG;
     else if (type == BLOCK_DIRT or type == BLOCK_GRAVEL)
         blocktype = SOUND_DIRT_DIG;
@@ -95,7 +100,7 @@ void SoundEngine::playFootstepSound(float player_x, float player_y, float x, flo
 {
     int blocktype = SOUND_STONE_STEP;
 
-    if (type == BLOCK_GRASS or type == BLOCK_OAK_LEAVES)
+    if (type == BLOCK_GRASS or type == BLOCK_OAK_LEAVES or type == BLOCK_TNT)
         blocktype = SOUND_GRASS_STEP;
     else if (type == BLOCK_DIRT or type == BLOCK_GRAVEL)
         blocktype = SOUND_DIRT_STEP;
@@ -107,7 +112,7 @@ void SoundEngine::playFootstepSound(float player_x, float player_y, float x, flo
     playGameSound(player_x, player_y, x, y, blocktype);
 }
 
-void SoundEngine::playGameSound(float player_x, float player_y, float x, float y, int type)
+void SoundEngine::playGameSound(float player_x, float player_y, float x, float y, int type, bool multi)
 {
     float vol, pan, dist;
     dist = sqrt(pow(x - player_x, 2) + pow(y - player_y, 2));
@@ -119,7 +124,7 @@ void SoundEngine::playGameSound(float player_x, float player_y, float x, float y
 
     pan = (-x + player_x) / 500.0f;
 
-    int ind = rand() % 4;
+    int ind = (multi) ? rand() % 4 : 0;
     BASS_ChannelSetAttribute(m_sounds[type+ind], BASS_ATTRIB_VOL, vol);
     BASS_ChannelSetAttribute(m_sounds[type+ind], BASS_ATTRIB_PAN, pan);
     BASS_ChannelPlay(m_sounds[type+ind], true);

@@ -27,6 +27,8 @@ public:
     int getBlockLayer(int x, int y);
 
     void updateLighting(int x, int y);
+
+    void addEntity(Entity* ent);
     void updateEntities();
     void drawEntities();
 

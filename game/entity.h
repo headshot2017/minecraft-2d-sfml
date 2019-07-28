@@ -6,7 +6,8 @@
 
 enum
 {
-    ENT_FALLINGBLOCK
+    ENT_FALLINGBLOCK,
+    ENT_TNT
 };
 
 class World;
@@ -24,12 +25,15 @@ public:
     bool blockCollide(int x, int y);
     int entityId() {return m_entityid;}
     int getBlock() {return m_block;}
+    int getTicks() {return m_ticks;}
+    int getTicksLeft() {return m_ticksleft;}
     sf::Vector2f getPos() {return sf::Vector2f(x,y);}
 
 protected:
     float x, y, hspeed, vspeed, x_acc, gravity;
     int m_entityid;
     int m_block;
+    int m_ticks, m_ticksleft;
     GameEngine *m_engine;
     World *m_world;
 };

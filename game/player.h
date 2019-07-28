@@ -39,6 +39,7 @@ public:
     bool canBuild(int x, int y);
     void placeBlock(int x, int y, int block, int layer);
     void destroyBlock(int x, int y);
+    void interactBlock(int x, int y);
 
     sf::VertexArray& getSkinVertex() {return m_skinvertex;}
     sf::Vector2f getPos() const {return sf::Vector2f(x,y);}

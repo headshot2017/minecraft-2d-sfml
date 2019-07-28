@@ -42,9 +42,17 @@ void FallingBlock::update()
     else
         gravity = 0.25f;
 
+    if (blockCollide((x+hspeed)/32, y/32) or
+        blockCollide((x+32+hspeed)/32, y/32) or
+        blockCollide((x+hspeed)/32, (y+32)/32) or
+        blockCollide((x+32+hspeed)/32, (y+32)/32))
+    {
+        hspeed = x_acc = 0;
+    }
+
     hspeed += x_acc;
     vspeed += gravity;
-    if (vspeed > 6) vspeed = 6;
+    if (vspeed > 9) vspeed = 9;
 
     x += hspeed;
     y += vspeed;

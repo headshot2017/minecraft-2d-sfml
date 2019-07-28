@@ -11,10 +11,10 @@ public:
     FallingBlock(World *world, GameEngine *engine, int xx, int yy, int block);
 
     bool groundCollide();
-    void update();
-    void draw();
+    virtual void update();
+    virtual void draw();
 
-private:
+protected:
     sf::VertexArray m_blockarray;
 };
 
