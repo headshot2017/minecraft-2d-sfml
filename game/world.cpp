@@ -91,8 +91,11 @@ void World::updateEntities()
                     int radius = 120;
 
                     std::vector<Entity*> nearTNT = getNearestEntities(pos.x, pos.y, ENT_TNT, radius);
+                    std::vector<Entity*> nearGravBlocks = getNearestEntities(pos.x, pos.y, ENT_FALLINGBLOCK, radius);
                     for(unsigned int i=0; i<nearTNT.size(); i++)
                         nearTNT[i]->knockBack(pos.x, pos.y, radius);
+                    for(unsigned int i=0; i<nearGravBlocks.size(); i++)
+                        nearGravBlocks[i]->knockBack(pos.x, pos.y, radius);
 
                     for (int yy=-3; yy<4; yy++)
                     {
