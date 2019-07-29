@@ -5,6 +5,7 @@
 void SoundEngine::init()
 {
     m_sounds.resize(SOUND_TOTAL);
+    m_samples.resize(SAMPLE_TOTAL);
     BASS_Init(-1, 44100, 0, 0, 0);
     theme_loaded = false;
 }
@@ -25,7 +26,7 @@ bool SoundEngine::loadTheme(const char *theme)
     sprintf(aFile, "data/sounds/%s/click.wav", theme);
     m_sounds[SOUND_CLICK] = BASS_StreamCreateFile(false, aFile, 0, 0, 0);
     sprintf(aFile, "data/sounds/%s/fuse.wav", theme);
-    m_sounds[SOUND_TNT_FUSE] = BASS_StreamCreateFile(false, aFile, 0, 0, 0);
+    m_samples[SAMPLE_TNT_FUSE] = BASS_SampleLoad(false, aFile, 0, 0, 65536/4, BASS_SAMPLE_OVER_POS);
     for(int i=0; i<4; i++)
     {
         sprintf(aFile, "data/sounds/%s/step/grass%d.wav", theme, i+1);
@@ -55,7 +56,7 @@ bool SoundEngine::loadTheme(const char *theme)
         m_sounds[SOUND_WOOL_DIG+i] = BASS_StreamCreateFile(false, aFile, 0, 0, 0);
 
         sprintf(aFile, "data/sounds/%s/explode%d.wav", theme, i+1);
-        m_sounds[SOUND_EXPLODE+i] = BASS_StreamCreateFile(false, aFile, 0, 0, 0);
+        m_samples[SAMPLE_EXPLODE+i] = BASS_SampleLoad(false, aFile, 0, 0, 65536/4, BASS_SAMPLE_OVER_POS);
     }
 
     theme_loaded = true;
@@ -68,6 +69,8 @@ bool SoundEngine::unloadTheme()
 
     for(int i=0; i<SOUND_TOTAL; i++)
         BASS_StreamFree(m_sounds[i]);
+    for(int i=0; i<SAMPLE_TOTAL; i++)
+        BASS_SampleFree(m_samples[i]);
 
     theme_loaded = false;
     return true;
@@ -128,4 +131,24 @@ void SoundEngine::playGameSound(float player_x, float player_y, float x, float y
     BASS_ChannelSetAttribute(m_sounds[type+ind], BASS_ATTRIB_VOL, vol);
     BASS_ChannelSetAttribute(m_sounds[type+ind], BASS_ATTRIB_PAN, pan);
     BASS_ChannelPlay(m_sounds[type+ind], true);
+}
+
+void SoundEngine::playSample(float player_x, float player_y, float x, float y, int type, bool multi)
+{
+    float vol, pan, dist;
+    dist = sqrt(pow(x - player_x, 2) + pow(y - player_y, 2));
+
+    if (dist < 500)
+        vol = (500.0f - dist) / 500.0f;
+    else
+        vol = 0;
+
+    pan = (-x + player_x) / 500.0f;
+
+    int ind = (multi) ? rand() % 4 : 0;
+
+    HCHANNEL channel = BASS_SampleGetChannel(m_samples[type+ind], true);
+    BASS_ChannelSetAttribute(channel, BASS_ATTRIB_VOL, vol);
+    BASS_ChannelSetAttribute(channel, BASS_ATTRIB_PAN, pan);
+    BASS_ChannelPlay(channel, false);
 }

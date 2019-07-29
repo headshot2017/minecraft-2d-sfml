@@ -31,6 +31,7 @@ public:
     void addEntity(Entity* ent);
     void updateEntities();
     void drawEntities();
+    std::vector<Entity*> getNearestEntities(float x, float y, int type, int radius);
 
     void generateWorld(unsigned int seed, const char *name);
     void loadWorld(const char *worldName);

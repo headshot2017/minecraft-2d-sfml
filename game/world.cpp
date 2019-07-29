@@ -47,6 +47,22 @@ void World::addEntity(Entity *ent)
     m_entities.push_back(ent);
 }
 
+std::vector<Entity*> World::getNearestEntities(float x, float y, int type, int radius)
+{
+    std::vector<Entity*> ents;
+    for (unsigned int i=0; i<m_entities.size(); i++)
+    {
+        if (m_entities[i]->entityId() != type) continue;
+
+        sf::Vector2f pos = m_entities[i]->getPos();
+        float dist;
+        dist = sqrt(pow(pos.x - x, 2) + pow(pos.y - y, 2));
+        if (dist < radius)
+            ents.push_back(m_entities[i]);
+    }
+    return ents;
+}
+
 void World::updateEntities()
 {
     for (unsigned int i=0; i<m_entities.size(); i++)
@@ -72,7 +88,12 @@ void World::updateEntities()
                 if (m_entities[i]->getTicksLeft() == 0)
                 {
                     sf::Vector2f pos = m_entities[i]->getPos();
-                    setBlock(pos.x/32, pos.y/32, BLOCK_AIR);
+                    int radius = 120;
+
+                    std::vector<Entity*> nearTNT = getNearestEntities(pos.x, pos.y, ENT_TNT, radius);
+                    for(unsigned int i=0; i<nearTNT.size(); i++)
+                        nearTNT[i]->knockBack(pos.x, pos.y, radius);
+
                     for (int yy=-3; yy<4; yy++)
                     {
                         for (int xx=-3; xx<4; xx++)
@@ -82,13 +103,18 @@ void World::updateEntities()
 
                             int block2 = getBlock(pos.x/32+xx, pos.y/32+yy);
                             if (block2 == BLOCK_TNT)
-                                addEntity(new Dynamite(this, m_engine, pos.x/32+xx, pos.y/32+yy, 35 + (rand() % 90)));
+                            {
+                                Entity *tnt = new Dynamite(this, m_engine, pos.x/32+xx, pos.y/32+yy, 25 + (rand() % 20));
+                                tnt->knockBack(pos.x, pos.y, radius);
+                                addEntity(tnt);
+                            }
 
-                            setBlock(pos.x/32+xx, pos.y/32+yy, BLOCK_AIR);
+                            if (block2 != BLOCK_BEDROCK)
+                                setBlock(pos.x/32+xx, pos.y/32+yy, BLOCK_AIR);
                         }
                     }
                     sf::Vector2f view = m_engine->m_window.getView().getCenter();
-                    m_engine->Sound()->playGameSound(pos.x, pos.y, view.x, view.y, SOUND_EXPLODE);
+                    m_engine->Sound()->playSample(pos.x, pos.y, view.x, view.y, SAMPLE_EXPLODE);
                     m_entities.erase(m_entities.begin() + i);
                     i--;
                 }
@@ -99,10 +125,18 @@ void World::updateEntities()
 
 void World::drawEntities()
 {
+    sf::Vector2i windowsize = sf::Vector2i(m_engine->m_window.getSize().x, m_engine->m_window.getSize().y);
     for (unsigned int i=0; i<m_entities.size(); i++)
     {
         if (m_entities[i])
-            m_entities[i]->draw();
+        {
+            sf::Vector2f pos = m_entities[i]->getPos();
+            sf::Vector2i screenpos = m_engine->m_window.mapCoordsToPixel(pos, m_engine->m_window.getView());
+            sf::Vector2i Size = sf::Vector2i(m_entities[i]->getSize().x, m_entities[i]->getSize().y);
+            if (screenpos.x >= 0-Size.x and screenpos.x < windowsize.x and
+                screenpos.y >= 0-Size.y and screenpos.y < windowsize.y)
+                m_entities[i]->draw();
+        }
     }
 }
 

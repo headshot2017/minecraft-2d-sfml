@@ -10,6 +10,7 @@ public:
     FallingBlock() {}
     FallingBlock(World *world, GameEngine *engine, int xx, int yy, int block);
 
+    sf::Vector2u getSize() {return sf::Vector2u(32, 32);}
     bool groundCollide();
     virtual void update();
     virtual void draw();

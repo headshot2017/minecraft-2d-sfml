@@ -295,7 +295,7 @@ void Player::interactBlock(int xx, int yy)
         m_world->setBlock(xx, yy, BLOCK_AIR);
 
         sf::Vector2f view = m_engine->m_window.getView().getCenter();
-        m_engine->Sound()->playGameSound(xx*32, yy*32, view.x, view.y, SOUND_TNT_FUSE, false);
+        m_engine->Sound()->playSample(xx*32, yy*32, view.x, view.y, SAMPLE_TNT_FUSE, false);
 
         Entity *tnt = new Dynamite(m_world, m_engine, xx, yy);
         m_world->addEntity(tnt);

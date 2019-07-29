@@ -18,11 +18,14 @@ public:
     Entity() {}
     Entity(World *world, GameEngine *engine);
 
+    virtual sf::Vector2u getSize() = 0;
     virtual bool groundCollide() = 0;
     virtual void update() = 0;
     virtual void draw() = 0;
 
     bool blockCollide(int x, int y);
+    void knockBack(float xx, float yy, int force);
+
     int entityId() {return m_entityid;}
     int getBlock() {return m_block;}
     int getTicks() {return m_ticks;}

@@ -6,8 +6,11 @@ Dynamite::Dynamite(World *world, GameEngine *engine, int xx, int yy, int startin
     m_ticksleft = startingticks;
     m_whiteFlash = false;
 
-    hspeed = -2 + (rand() % 5);
-    vspeed = -(rand() % 3);
+    if (startingticks == 60*5)
+    {
+        hspeed = -2 + (rand() % 5);
+        vspeed = -(rand() % 3);
+    }
 }
 
 void Dynamite::update()
