@@ -10,10 +10,12 @@
 #include "../game_engine.h"
 #include "chunk.h"
 #include "entity.h"
+#include "player.h"
 #include <vector>
 
 class Chunk;
 class Entity;
+class Player;
 
 class World
 {
@@ -37,12 +39,16 @@ public:
     void loadWorld(const char *worldName);
     void saveWorld();
 
+    Player* getPlayer() {return m_player;}
     sf::VertexArray& getBlocksFromPoint(int x, int y);
+    std::vector<std::vector<Chunk>>* getBlocks() {return &m_blocks2;}
 
 private:
     bool loaded;
     char fileName[96];
     GameEngine *m_engine;
+
+    Player* m_player; // will later be changed to vectors for multiplayer
     std::vector<std::vector<Chunk>> m_blocks2;
     std::vector<Entity*> m_entities;
 };

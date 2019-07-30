@@ -19,7 +19,7 @@ public:
     void pause();
     void resume();
     void onResolutionChange(sf::Vector2u res) {}
-    void generateWorld(unsigned int seed, const char *name) {m_world.generateWorld(seed, name);}
+    void generateWorld(unsigned int seed, const char *name) {m_world->generateWorld(seed, name);}
     void loadWorld(const char *worldName);
 
     static IngameState* Instance() {return &m_Instance;}
@@ -27,8 +27,7 @@ public:
 private:
     static IngameState m_Instance;
 
-    World m_world;
-    Player m_player; // will later be changed to pointers for multiplayer
+    World *m_world;
     GameEngine *m_engine;
 
     sf::RectangleShape m_sky;

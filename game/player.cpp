@@ -18,8 +18,6 @@ Player::Player(World* world, GameEngine *engine)
 
     m_skinvertex.resize(6*4);
     m_skinvertex.setPrimitiveType(sf::Quads);
-    move((WORLD_W*32)/2, 32.0f);
-    moveToGround();
     setSkin("steve");
 }
 
@@ -288,7 +286,7 @@ void Player::interactBlock(int xx, int yy)
     int block2 = m_world->getBlock(xx, yy);
 
     m_armtick = 150;
-    if (block2 == BLOCK_AIR) return;
+    if (block2 == BLOCK_AIR or m_sneak) return;
 
     if (block2 == BLOCK_TNT)
     {
@@ -299,6 +297,19 @@ void Player::interactBlock(int xx, int yy)
 
         Entity *tnt = new Dynamite(m_world, m_engine, xx, yy);
         m_world->addEntity(tnt);
+    }
+}
+
+void Player::knockBack(float xx, float yy, int maxdist)
+{
+    float dist;
+    dist = sqrt(pow(xx - x, 2) + pow(yy - y, 2));
+    if (dist < maxdist)
+    {
+        int force = abs(maxdist-dist)/4;
+        float angle = atan2(y - yy, x - xx);
+        hspeed += round(force * cos(angle));
+        vspeed += round(force * sin(angle));
     }
 }
 

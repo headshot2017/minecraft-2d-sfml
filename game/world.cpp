@@ -40,6 +40,7 @@ World::~World()
 {
     m_blocks2.clear();
     m_entities.clear();
+    if (m_player) delete m_player;
 }
 
 void World::addEntity(Entity *ent)
@@ -96,6 +97,7 @@ void World::updateEntities()
                         nearTNT[i]->knockBack(pos.x, pos.y, radius);
                     for(unsigned int i=0; i<nearGravBlocks.size(); i++)
                         nearGravBlocks[i]->knockBack(pos.x, pos.y, radius);
+                    m_player->knockBack(pos.x+16, pos.y+32, radius);
 
                     for (int yy=-3; yy<4; yy++)
                     {
@@ -279,6 +281,7 @@ void World::generateWorld(unsigned int seed, const char *name)
     srand(seed);
     sprintf(fileName, "worlds/%s.dat", name);
     loaded = false;
+    if (m_player) delete m_player;
 
     double pi = 3.141592653589793;
     int heights[] = {58,59,60,61,62,63,64,65,66,67,68,69,70};
@@ -331,6 +334,9 @@ void World::generateWorld(unsigned int seed, const char *name)
         updateLighting(x, y);
     }
     printf("completed!\n");
+    m_player = new Player(this, m_engine);
+    m_player->move(WORLD_W/2.0f, 32);
+    m_player->moveToGround();
     loaded = true;
 }
 
@@ -404,5 +410,8 @@ void World::loadWorld(const char *worldName)
     }
 
     printf("world loaded!\n");
+    m_player = new Player(this, m_engine);
+    m_player->move(WORLD_W/2.0f, 32);
+    m_player->moveToGround();
     loaded = true;
 }

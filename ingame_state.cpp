@@ -23,7 +23,7 @@ void IngameState::init(GameEngine *engine)
     cam_x = 0;
     cam_y = 0;
     m_engine = engine;
-    m_world = World(engine);
+    m_world = new World(engine);
 
     m_sky = sf::RectangleShape(sf::Vector2f(800, 480));
     m_sky.setFillColor(sf::Color(154, 190, 255));
@@ -43,6 +43,7 @@ void IngameState::init(GameEngine *engine)
 void IngameState::destroy()
 {
     m_engine->m_window.setView(m_engine->m_window.getDefaultView());
+    delete m_world;
 }
 
 void IngameState::update(GameEngine *engine)
@@ -51,24 +52,29 @@ void IngameState::update(GameEngine *engine)
     {
         int leave_type = engine->leavingGame();
         engine->leaveGame(0);
-        m_world.saveWorld();
+        m_world->saveWorld();
 
         if (leave_type == 1) // return to main menu
+        {
             engine->changeState(MenuState::Instance());
+        }
         else if (leave_type == 2) // leave game entirely
             engine->quit();
     }
-    m_player.update(engine);
-    m_world.updateEntities();
+    else
+    {
+        m_world->getPlayer()->update(engine);
+        m_world->updateEntities();
+    }
 }
 
 void IngameState::event_input(GameEngine *engine, sf::Event& event)
 {
-    m_player.event_input(engine, event);
+    m_world->getPlayer()->event_input(engine, event);
 
     if (event.type == sf::Event::Closed)
     {
-        m_world.saveWorld();
+        m_world->saveWorld();
         engine->quit();
     }
 
@@ -86,10 +92,10 @@ void IngameState::event_input(GameEngine *engine, sf::Event& event)
 
 void IngameState::process_input(GameEngine* engine)
 {
-    m_player.process_input(engine);
+    m_world->getPlayer()->process_input(engine);
 
-    sf::Vector2f pos = m_player.getPos();
-    sf::Vector2f spd = m_player.getSpeed();
+    sf::Vector2f pos = m_world->getPlayer()->getPos();
+    sf::Vector2f spd = m_world->getPlayer()->getSpeed();
     sf::Vector2u res = engine->app.getSize();
     float old_cam_x = cam_x;
     float old_cam_y = cam_y;
@@ -98,16 +104,16 @@ void IngameState::process_input(GameEngine* engine)
     float cam_y_dist = ((pos.y - old_cam_y)-(res.y/2))/16.0f;
 
     cam_x += cam_x_dist + (spd.x*2.0f);
-    if (m_player.blockCollide(pos.x/32, pos.y/32) or
-        m_player.blockCollide((pos.x-4)/32, pos.y/32) or
-        m_player.blockCollide((pos.x+4)/32, pos.y/32) or
+    if (m_world->getPlayer()->blockCollide(pos.x/32, pos.y/32) or
+        m_world->getPlayer()->blockCollide((pos.x-4)/32, pos.y/32) or
+        m_world->getPlayer()->blockCollide((pos.x+4)/32, pos.y/32) or
         (cam_y_dist > 8 or cam_y_dist < -8))
         cam_y += cam_y_dist;
 
     cam_x = numwrap(cam_x, 0.0f, WORLD_W*32-(res.x));
     cam_y = numwrap(cam_y, 0.0f, WORLD_H*32-(res.y));
 
-    sf::Vector2f m_mousepos = m_player.getMouse();
+    sf::Vector2f m_mousepos = m_world->getPlayer()->getMouse();
     m_blockoutline.setPosition(floor(m_mousepos.x/32)*32, floor((m_mousepos.y-56)/32)*32);
 }
 
@@ -125,7 +131,7 @@ void IngameState::draw(GameEngine *engine)
 
     // draw visible chunks
     sf::Vector2u windowsize = engine->app.getSize();
-    engine->m_window.draw(m_world.getBlocksFromPoint(xx, yy), &engine->m_blocks);
+    engine->m_window.draw(m_world->getBlocksFromPoint(xx, yy), &engine->m_blocks);
     unsigned int maxColumns = windowsize.x/(CHUNK_W*32);
     unsigned int maxRows = windowsize.y/(CHUNK_H*32);
     if (windowsize.x % (CHUNK_W*32)) maxColumns++;
@@ -134,40 +140,40 @@ void IngameState::draw(GameEngine *engine)
     if (windowsize.y / (CHUNK_H*32) < 1) maxRows++;
     for(unsigned int xsep=1; xsep<maxColumns; xsep++)
     {
-        engine->m_window.draw(m_world.getBlocksFromPoint(xx-(CHUNK_W*xsep), yy), &engine->m_blocks);
+        engine->m_window.draw(m_world->getBlocksFromPoint(xx-(CHUNK_W*xsep), yy), &engine->m_blocks);
         if ((xx+(CHUNK_W*xsep))/CHUNK_W < WORLD_W/CHUNK_W+1)
-            engine->m_window.draw(m_world.getBlocksFromPoint(xx+(CHUNK_W*xsep), yy), &engine->m_blocks);
+            engine->m_window.draw(m_world->getBlocksFromPoint(xx+(CHUNK_W*xsep), yy), &engine->m_blocks);
 
         for (unsigned int ysep=1; ysep<maxRows; ysep++)
         {
-            engine->m_window.draw(m_world.getBlocksFromPoint(xx-(CHUNK_W*xsep), yy-(CHUNK_H*ysep)), &engine->m_blocks);
-            engine->m_window.draw(m_world.getBlocksFromPoint(xx, yy-(CHUNK_H*ysep)), &engine->m_blocks);
+            engine->m_window.draw(m_world->getBlocksFromPoint(xx-(CHUNK_W*xsep), yy-(CHUNK_H*ysep)), &engine->m_blocks);
+            engine->m_window.draw(m_world->getBlocksFromPoint(xx, yy-(CHUNK_H*ysep)), &engine->m_blocks);
             if ((xx+(CHUNK_W*xsep))/CHUNK_W < WORLD_W/CHUNK_W+1)
-                engine->m_window.draw(m_world.getBlocksFromPoint(xx+(CHUNK_W*xsep), yy-(CHUNK_H*ysep)), &engine->m_blocks);
+                engine->m_window.draw(m_world->getBlocksFromPoint(xx+(CHUNK_W*xsep), yy-(CHUNK_H*ysep)), &engine->m_blocks);
 
             if ((yy+(CHUNK_H*ysep))/CHUNK_H < WORLD_H/CHUNK_H-2)
             {
-                engine->m_window.draw(m_world.getBlocksFromPoint(xx-(CHUNK_W*xsep), yy+(CHUNK_H*ysep)), &engine->m_blocks);
-                engine->m_window.draw(m_world.getBlocksFromPoint(xx, yy+(CHUNK_H*ysep)), &engine->m_blocks);
+                engine->m_window.draw(m_world->getBlocksFromPoint(xx-(CHUNK_W*xsep), yy+(CHUNK_H*ysep)), &engine->m_blocks);
+                engine->m_window.draw(m_world->getBlocksFromPoint(xx, yy+(CHUNK_H*ysep)), &engine->m_blocks);
                 if ((xx+(CHUNK_W*xsep))/CHUNK_W < WORLD_W/CHUNK_W+1)
-                    engine->m_window.draw(m_world.getBlocksFromPoint(xx+(CHUNK_W*xsep), yy+(CHUNK_H*ysep)), &engine->m_blocks);
+                    engine->m_window.draw(m_world->getBlocksFromPoint(xx+(CHUNK_W*xsep), yy+(CHUNK_H*ysep)), &engine->m_blocks);
             }
         }
     }
 
-    m_player.draw(engine);
-    m_world.drawEntities();
+    m_world->getPlayer()->draw(engine);
+    m_world->drawEntities();
 
     sf::Vector2f outlinepos = m_blockoutline.getPosition();
-    if (m_world.getBlock((outlinepos.x+00)/32, (outlinepos.y+00)/32) or
-        m_world.getBlock((outlinepos.x+32)/32, (outlinepos.y+00)/32) or
-        m_world.getBlock((outlinepos.x-32)/32, (outlinepos.y+00)/32) or
-        m_world.getBlock((outlinepos.x+00)/32, (outlinepos.y+32)/32) or
-        m_world.getBlock((outlinepos.x+00)/32, (outlinepos.y-32)/32))
+    if (m_world->getBlock((outlinepos.x+00)/32, (outlinepos.y+00)/32) or
+        m_world->getBlock((outlinepos.x+32)/32, (outlinepos.y+00)/32) or
+        m_world->getBlock((outlinepos.x-32)/32, (outlinepos.y+00)/32) or
+        m_world->getBlock((outlinepos.x+00)/32, (outlinepos.y+32)/32) or
+        m_world->getBlock((outlinepos.x+00)/32, (outlinepos.y-32)/32))
         engine->m_window.draw(m_blockoutline);
 
     char aBuf[192];
-    sprintf(aBuf, "%.1f,%.1f\nChunk position: %d,%d\nBuilding layer: %d\n", cam_x/32, cam_y/32, xx/CHUNK_W, yy/CHUNK_H, m_player.getBuildLayer());
+    sprintf(aBuf, "%.1f,%.1f\nChunk position: %d,%d\nBuilding layer: %d\n", cam_x/32, cam_y/32, xx/CHUNK_W, yy/CHUNK_H, m_world->getPlayer()->getBuildLayer());
     text_cam_pos.setString(sf::String(aBuf));
     text_cam_pos.setPosition(cam_x, cam_y);
     engine->m_window.draw(text_cam_pos);
@@ -202,12 +208,11 @@ void IngameState::loadWorld(const char *worldName)
     else
     {
         worldFile.close();
-        m_world.loadWorld(worldName);
+        m_world->loadWorld(worldName);
     }
 
-    m_player = Player(&m_world, m_engine);
-    m_player.setPlayer(true);
-    m_player.setSkin(m_engine->Settings()->m_playerskin);
+    m_world->getPlayer()->setPlayer(true);
+    m_world->getPlayer()->setSkin(m_engine->Settings()->m_playerskin);
 
     printf("starting\n");
 }
