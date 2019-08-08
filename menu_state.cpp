@@ -29,7 +29,7 @@ void MenuState::init(GameEngine* engine)
     m_minecraft_logo_final.copy(m_minecraft_logo_raw, 155, 0, sf::IntRect(0, 45, 119, 88));
 
     dirt_tile.setTexture(m_dirt_tile);
-    dirt_tile.setScale(2.0f, 2.0f);
+    dirt_tile.setScale(4.0f, 4.0f);
     dirt_tile.setColor(sf::Color(128, 128, 128));
 
     m_minecraft_logo.loadFromImage(m_minecraft_logo_final);
@@ -99,7 +99,7 @@ void MenuState::destroy()
 
 void MenuState::setAllPositions(sf::Vector2u& windowsize)
 {
-    dirt_tile.setTextureRect(sf::IntRect(0, 0, windowsize.x/2, windowsize.y/2));
+    dirt_tile.setTextureRect(sf::IntRect(0, 0, windowsize.x/4, windowsize.y/4));
     minecraft_logo.setPosition((windowsize.x/2) - 274.0f, (windowsize.y/4)-64);
 
     b_back.setPosition((windowsize.x/2)-200, windowsize.y-48);

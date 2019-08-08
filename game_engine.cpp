@@ -170,6 +170,10 @@ void GameEngine::setResolution(sf::Vector2u res, sf::Uint32 flags)
     //app.setSize(res);
     app.setFramerateLimit(60);
 
+    sf::Image icon;
+    icon.loadFromFile("data/icons/game.png");
+    app.setIcon(16, 16, icon.getPixelsPtr());
+
     m_settings.m_screenwidth = res.x;
     m_settings.m_screenheight = res.y;
 
