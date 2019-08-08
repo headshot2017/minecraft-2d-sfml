@@ -60,6 +60,9 @@
 		<Unit filename="gui/slider.h" />
 		<Unit filename="gui/textinput.cpp" />
 		<Unit filename="gui/textinput.h" />
+		<Unit filename="icon.rc">
+			<Option compilerVar="WINDRES" />
+		</Unit>
 		<Unit filename="ingame_state.cpp" />
 		<Unit filename="ingame_state.h" />
 		<Unit filename="main.cpp" />
