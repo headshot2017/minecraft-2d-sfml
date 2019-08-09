@@ -119,10 +119,11 @@ void IngameState::process_input(GameEngine* engine)
 
 void IngameState::draw(GameEngine *engine)
 {
-    sf::View m_view(sf::FloatRect(cam_x, cam_y, engine->app.getSize().x, engine->app.getSize().y));
+    sf::Vector2u windowsize = engine->app.getSize();
+    sf::View m_view(sf::FloatRect(cam_x, cam_y, windowsize.x, windowsize.y));
     engine->m_window.setView(m_view);
 
-    m_sky.setSize(sf::Vector2f(engine->app.getSize().x, engine->app.getSize().y));
+    m_sky.setSize(sf::Vector2f(windowsize.x, windowsize.y));
     m_sky.setPosition(cam_x, cam_y);
     engine->m_window.draw(m_sky);
 
@@ -130,7 +131,6 @@ void IngameState::draw(GameEngine *engine)
     int yy = (cam_y+240)/32;
 
     // draw visible chunks
-    sf::Vector2u windowsize = engine->app.getSize();
     engine->m_window.draw(m_world->getBlocksFromPoint(xx, yy), &engine->m_blocks);
     unsigned int maxColumns = windowsize.x/(CHUNK_W*32);
     unsigned int maxRows = windowsize.y/(CHUNK_H*32);
@@ -161,9 +161,11 @@ void IngameState::draw(GameEngine *engine)
         }
     }
 
+    // world
     m_world->getPlayer()->draw(engine);
     m_world->drawEntities();
 
+    // mouse block outline
     sf::Vector2f outlinepos = m_blockoutline.getPosition();
     if (m_world->getBlock((outlinepos.x+00)/32, (outlinepos.y+00)/32) or
         m_world->getBlock((outlinepos.x+32)/32, (outlinepos.y+00)/32) or
@@ -171,6 +173,16 @@ void IngameState::draw(GameEngine *engine)
         m_world->getBlock((outlinepos.x+00)/32, (outlinepos.y+32)/32) or
         m_world->getBlock((outlinepos.x+00)/32, (outlinepos.y-32)/32))
         engine->m_window.draw(m_blockoutline);
+
+    // inventory
+    sf::Sprite hotbar(engine->m_hotbar);
+    sf::Sprite hotbarselect(engine->m_hotbarselect);
+    hotbar.scale(2,2);
+    hotbarselect.scale(2,2);
+    hotbar.setPosition(cam_x + (windowsize.x/2) - engine->m_hotbar.getSize().x, windowsize.y - (engine->m_hotbar.getSize().y*2)+cam_y);
+    hotbarselect.setPosition(hotbar.getPosition().x - 2 + (m_hotbarslot*32), hotbar.getPosition().y - 2);
+    engine->m_window.draw(hotbar);
+    engine->m_window.draw(hotbarselect);
 
     char aBuf[192];
     sprintf(aBuf, "%.1f,%.1f\nChunk position: %d,%d\nBuilding layer: %d\n", cam_x/32, cam_y/32, xx/CHUNK_W, yy/CHUNK_H, m_world->getPlayer()->getBuildLayer());

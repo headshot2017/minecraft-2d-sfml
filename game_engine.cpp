@@ -27,6 +27,8 @@ void GameEngine::init()
     m_button.loadFromImage(widgets, sf::IntRect(0, 66, 200, 20));
     m_button_hover.loadFromImage(widgets, sf::IntRect(0, 86, 200, 20));
     m_button_locked.loadFromImage(widgets, sf::IntRect(0, 46, 200, 20));
+    m_hotbar.loadFromImage(widgets, sf::IntRect(0, 0, 182, 22));
+    m_hotbarselect.loadFromImage(widgets, sf::IntRect(0, 22, 24, 24));
 
     std::vector<sf::VideoMode> modes = sf::VideoMode::getFullscreenModes();
     bool original_res = false;

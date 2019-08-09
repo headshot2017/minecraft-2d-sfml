@@ -7,6 +7,15 @@
 #include "game/player.h"
 #include <fstream>
 
+enum
+{
+    INV_HOTBAR,
+    INV_PAGE1=9,
+    INV_PAGE2=18,
+    INV_PAGE3=27,
+    INV_TOTAL=36
+};
+
 class IngameState : public GameState
 {
 public:
@@ -35,6 +44,10 @@ private:
     sf::Text text_cam_pos;
 
     float cam_x, cam_y;
+
+    // player
+    int m_inventory[INV_TOTAL][1] = {0};
+    int m_hotbarslot = 0;
 
 protected:
     IngameState() {}
