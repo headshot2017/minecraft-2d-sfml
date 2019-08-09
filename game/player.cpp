@@ -119,7 +119,7 @@ void Player::adjustSkinDir()
     sf:: Transform arm1, arm2, leg1, leg2, body, head;
     head.rotate((m_dir > 0) ? m_angle : m_angle+180, x, y-48+y_sneak);
     body.rotate(sneakangle, x, y-48+y_sneak);
-    arm1.rotate((angle + (((m_armtick/10.0f)*(6.0f))*-m_dir)) + sneakangle, x-4, y-48+y_sneak);
+    arm1.rotate((angle + (((m_armtick/10.0f)*(6.0f))*-m_dir)) + sneakangle, x-4+(m_dir*2), y-48+y_sneak);
     arm2.rotate(-angle+sneakangle, x+4, y-48+y_sneak);
     leg1.rotate(angle, x+x_sneak, y-24);
     leg2.rotate(-angle, x+x_sneak, y-24);
