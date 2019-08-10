@@ -39,6 +39,7 @@ private:
     World *m_world;
     GameEngine *m_engine;
 
+    int m_skytime;
     sf::RectangleShape m_sky;
     sf::RectangleShape m_blockoutline;
     sf::Text text_cam_pos;

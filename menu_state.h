@@ -6,6 +6,7 @@
 #include "gui/slider.h"
 #include "gui/textinput.h"
 #include "gui/label.h"
+#include <vector>
 
 typedef enum
 {
@@ -49,6 +50,9 @@ private:
 
     sf::Texture m_dirt_tile;
     sf::Texture m_minecraft_logo;
+
+    Label m_splashtext;
+    std::vector<std::string> m_splashtexts;
 
     // general buttons
     Button b_back;

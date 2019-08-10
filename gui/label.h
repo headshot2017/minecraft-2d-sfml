@@ -18,6 +18,11 @@ public:
     void setText(sf::String text);
     void setPosition(float x, float y);
     void setPosition(sf::Vector2f pos);
+    void setColor(sf::Color color);
+    void setScale(float amount);
+    void setRotation(float angle);
+
+    const sf::String getText() {return m_text.getString();}
 
     void draw();
 

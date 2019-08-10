@@ -2,7 +2,10 @@
 #include "game_engine.h"
 #include "menu_state.h"
 #include "ingame_state.h"
-#include <vector>
+#include <fstream>
+#include <algorithm>
+#include <stdio.h>
+#include <time.h>
 
 MenuState MenuState::m_Instance;
 
@@ -36,6 +39,36 @@ void MenuState::init(GameEngine* engine)
     minecraft_logo.setTexture(m_minecraft_logo);
     minecraft_logo.setPosition((windowsize.x/2) - 274.0f, (windowsize.y/4)-64);
     minecraft_logo.setScale(2.0f, 2.0f);
+
+    std::ifstream texts = std::ifstream("data/splashes.txt");
+    char major[16];
+    char minor[16];
+    sprintf(major, "%d", m_engine->app.getSettings().majorVersion);
+    sprintf(minor, "%d", m_engine->app.getSettings().minorVersion);
+    if (texts.good())
+    {
+        std::string line;
+        while (getline(texts, line))
+        {
+            std::size_t m_major = line.find("[M]");
+            std::size_t m_minor = line.find("[m]");
+
+            if (m_major != std::string::npos)
+                line.replace(m_major, 3, major);
+            if (m_minor != std::string::npos)
+                line.replace(m_minor, 3, minor);
+            m_splashtexts.push_back(line);
+        }
+    }
+    else
+        m_splashtexts.push_back(std::string("splashes.txt broken go home"));
+
+    srand(time(0));
+    m_splashtext = Label(m_engine, m_splashtexts[rand() % m_splashtexts.size()].c_str(), 0, 0);
+    m_splashtext.setAlign(1);
+    m_splashtext.setColor(sf::Color::Yellow);
+    m_splashtext.setRotation(-20);
+    m_splashtext.setScale(0.2);
 
     b_back = Button(engine, sf::String("Back"), (windowsize.x/2)-200, windowsize.y-48);
     b_back_options = Button(engine, sf::String("Back"), (windowsize.x/2)-200, windowsize.y-48);
@@ -94,13 +127,15 @@ void MenuState::init(GameEngine* engine)
 
 void MenuState::destroy()
 {
-
+    m_splashtexts.clear();
 }
 
 void MenuState::setAllPositions(sf::Vector2u& windowsize)
 {
     dirt_tile.setTextureRect(sf::IntRect(0, 0, windowsize.x/4, windowsize.y/4));
     minecraft_logo.setPosition((windowsize.x/2) - 274.0f, (windowsize.y/4)-64);
+    sf::Vector2f aPos = minecraft_logo.getPosition();
+    m_splashtext.setPosition(aPos.x+384+96, aPos.y+80+m_splashtext.getText().getSize());
 
     b_back.setPosition((windowsize.x/2)-200, windowsize.y-48);
     b_back_options.setPosition((windowsize.x/2)-200, windowsize.y-48);
@@ -391,6 +426,7 @@ void MenuState::draw(GameEngine* engine)
     if (m_submenu == MENU_MAINMENU)
     {
         engine->m_window.draw(minecraft_logo);
+        m_splashtext.draw();
         b_singleplayer.draw();
         b_multiplayer.draw();
         b_options.draw();

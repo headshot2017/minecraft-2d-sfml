@@ -5,7 +5,7 @@ Label::Label(GameEngine *engine, const char *text, float x, float y, int align)
     m_engine = engine;
     m_text.setString(sf::String(text));
     m_text.setFont(engine->mc_font);
-    m_text.setScale(0.16667f, 0.16667f);
+    setScale(0.16667f);
     m_text.setCharacterSize(96);
     setPosition(sf::Vector2f(x,y));
     setAlign(align);
@@ -16,7 +16,7 @@ Label::Label(GameEngine *engine, sf::String text, float x, float y, int align)
     m_engine = engine;
     m_text.setString(text);
     m_text.setFont(engine->mc_font);
-    m_text.setScale(0.16667f, 0.16667f);
+    setScale(0.16667f);
     m_text.setCharacterSize(96);
     setPosition(sf::Vector2f(x,y));
     setAlign(align);
@@ -27,7 +27,7 @@ Label::Label(GameEngine *engine, const char *text, sf::Vector2f pos, int align)
     m_engine = engine;
     m_text.setString(sf::String(text));
     m_text.setFont(engine->mc_font);
-    m_text.setScale(0.16667f, 0.16667f);
+    setScale(0.16667f);
     m_text.setCharacterSize(96);
     setPosition(pos);
     setAlign(align);
@@ -38,10 +38,25 @@ Label::Label(GameEngine *engine, sf::String text, sf::Vector2f pos, int align)
     m_engine = engine;
     m_text.setString(text);
     m_text.setFont(engine->mc_font);
-    m_text.setScale(0.16667f, 0.16667f);
+    setScale(0.16667f);
     m_text.setCharacterSize(96);
     setPosition(pos);
     setAlign(align);
+}
+
+void Label::setScale(float amount)
+{
+    m_text.setScale(amount, amount);
+}
+
+void Label::setRotation(float angle)
+{
+    m_text.setRotation(angle);
+}
+
+void Label::setColor(sf::Color color)
+{
+    m_text.setFillColor(color);
 }
 
 void Label::setAlign(int align)

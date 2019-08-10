@@ -22,6 +22,7 @@ void IngameState::init(GameEngine *engine)
 {
     cam_x = 0;
     cam_y = 0;
+    m_skytime = 0;
     m_engine = engine;
     m_world = new World(engine);
 
