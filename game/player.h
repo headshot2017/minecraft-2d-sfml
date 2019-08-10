@@ -11,7 +11,8 @@ enum
     PLAYER_ARMBACK=8,
     PLAYER_BODY=12,
     PLAYER_ARMFRONT=16,
-    PLAYER_HEAD=20
+    PLAYER_HEAD=20,
+    PLAYER_HOODIE=24
 };
 
 class World;

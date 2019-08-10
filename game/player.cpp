@@ -16,7 +16,7 @@ Player::Player(World* world, GameEngine *engine)
     m_world = world;
     m_engine = engine;
 
-    m_skinvertex.resize(6*4);
+    m_skinvertex.resize(7*4);
     m_skinvertex.setPrimitiveType(sf::Quads);
     setSkin("steve");
 }
@@ -124,7 +124,7 @@ void Player::adjustSkinDir()
     leg1.rotate(angle, x+x_sneak, y-24);
     leg2.rotate(-angle, x+x_sneak, y-24);
 
-    if (m_dir > 0)
+    if (m_dir > 0) // right
     {
         // texture coordinates
         m_skinvertex[PLAYER_HEAD+0].texCoords = sf::Vector2f(0, 8);
@@ -157,6 +157,11 @@ void Player::adjustSkinDir()
         m_skinvertex[PLAYER_LEGFRONT+2].texCoords = sf::Vector2f(4, 32);
         m_skinvertex[PLAYER_LEGFRONT+3].texCoords = sf::Vector2f(0, 32);
 
+        m_skinvertex[PLAYER_HOODIE+0].texCoords = sf::Vector2f(32, 8);
+        m_skinvertex[PLAYER_HOODIE+1].texCoords = sf::Vector2f(40, 8);
+        m_skinvertex[PLAYER_HOODIE+2].texCoords = sf::Vector2f(40, 16);
+        m_skinvertex[PLAYER_HOODIE+3].texCoords = sf::Vector2f(32, 16);
+
 
         // positions
         m_skinvertex[PLAYER_LEGFRONT+0].position = leg1.transformPoint(sf::Vector2f(x-4+x_sneak, y-24));
@@ -188,6 +193,11 @@ void Player::adjustSkinDir()
         m_skinvertex[PLAYER_HEAD+1].position = head.transformPoint(sf::Vector2f(x+8, y-64+y_sneak));
         m_skinvertex[PLAYER_HEAD+2].position = head.transformPoint(sf::Vector2f(x+8, y-48+y_sneak));
         m_skinvertex[PLAYER_HEAD+3].position = head.transformPoint(sf::Vector2f(x-8, y-48+y_sneak));
+
+        m_skinvertex[PLAYER_HOODIE+0].position = head.transformPoint(sf::Vector2f(x-8, y-64+y_sneak));
+        m_skinvertex[PLAYER_HOODIE+1].position = head.transformPoint(sf::Vector2f(x+8, y-64+y_sneak));
+        m_skinvertex[PLAYER_HOODIE+2].position = head.transformPoint(sf::Vector2f(x+8, y-48+y_sneak));
+        m_skinvertex[PLAYER_HOODIE+3].position = head.transformPoint(sf::Vector2f(x-8, y-48+y_sneak));
     }
 
     else if (m_dir < 0)
@@ -223,6 +233,11 @@ void Player::adjustSkinDir()
         m_skinvertex[PLAYER_LEGFRONT+2].texCoords = sf::Vector2f(12, 32);
         m_skinvertex[PLAYER_LEGFRONT+3].texCoords = sf::Vector2f(8, 32);
 
+        m_skinvertex[PLAYER_HOODIE+0].texCoords = sf::Vector2f(48, 8);
+        m_skinvertex[PLAYER_HOODIE+1].texCoords = sf::Vector2f(56, 8);
+        m_skinvertex[PLAYER_HOODIE+2].texCoords = sf::Vector2f(56, 16);
+        m_skinvertex[PLAYER_HOODIE+3].texCoords = sf::Vector2f(48, 16);
+
 
         // positions
         m_skinvertex[PLAYER_LEGFRONT+0].position = leg1.transformPoint(sf::Vector2f(x-4+x_sneak, y-24));
@@ -254,6 +269,11 @@ void Player::adjustSkinDir()
         m_skinvertex[PLAYER_HEAD+1].position = head.transformPoint(sf::Vector2f(x+8, y-64+y_sneak));
         m_skinvertex[PLAYER_HEAD+2].position = head.transformPoint(sf::Vector2f(x+8, y-48+y_sneak));
         m_skinvertex[PLAYER_HEAD+3].position = head.transformPoint(sf::Vector2f(x-8, y-48+y_sneak));
+
+        m_skinvertex[PLAYER_HOODIE+0].position = head.transformPoint(sf::Vector2f(x-8, y-64+y_sneak));
+        m_skinvertex[PLAYER_HOODIE+1].position = head.transformPoint(sf::Vector2f(x+8, y-64+y_sneak));
+        m_skinvertex[PLAYER_HOODIE+2].position = head.transformPoint(sf::Vector2f(x+8, y-48+y_sneak));
+        m_skinvertex[PLAYER_HOODIE+3].position = head.transformPoint(sf::Vector2f(x-8, y-48+y_sneak));
     }
 }
 
