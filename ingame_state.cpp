@@ -81,10 +81,26 @@ void IngameState::event_input(GameEngine *engine, sf::Event& event)
 
     else if (event.type == sf::Event::KeyPressed)
     {
+        int intcode = static_cast<int>(event.key.code);
+        int num1code = static_cast<int>(sf::Keyboard::Num1);
+        int num9code = static_cast<int>(sf::Keyboard::Num9);
+
         if (event.key.code == sf::Keyboard::R)
             cam_x = cam_y = 0.f;
         else if (event.key.code == sf::Keyboard::Escape)
             engine->pushState(PausedState::Instance());
+        else if (intcode >= num1code and intcode <= num9code)
+            m_hotbarslot = intcode - num1code;
+    }
+    else if (event.type == sf::Event::MouseWheelScrolled)
+    {
+        if (event.mouseWheelScroll.wheel == sf::Mouse::VerticalWheel)
+            m_hotbarslot -= event.mouseWheelScroll.delta;
+
+        if (m_hotbarslot < 0)
+            m_hotbarslot = 9+m_hotbarslot;
+        if (m_hotbarslot > 8)
+            m_hotbarslot = -9+m_hotbarslot;
     }
 
     else if (event.type == sf::Event::LostFocus)
@@ -181,7 +197,7 @@ void IngameState::draw(GameEngine *engine)
     hotbar.scale(2,2);
     hotbarselect.scale(2,2);
     hotbar.setPosition(cam_x + (windowsize.x/2) - engine->m_hotbar.getSize().x, windowsize.y - (engine->m_hotbar.getSize().y*2)+cam_y);
-    hotbarselect.setPosition(hotbar.getPosition().x - 2 + (m_hotbarslot*32), hotbar.getPosition().y - 2);
+    hotbarselect.setPosition(hotbar.getPosition().x - 2 + (m_hotbarslot*40), hotbar.getPosition().y - 2);
     engine->m_window.draw(hotbar);
     engine->m_window.draw(hotbarselect);
 
