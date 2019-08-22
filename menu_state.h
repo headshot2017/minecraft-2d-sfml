@@ -54,6 +54,9 @@ private:
     Label m_splashtext;
     std::vector<std::string> m_splashtexts;
 
+    float m_splashscale;
+    float m_splashscaledir;
+
     // general buttons
     Button b_back;
     Button b_back_options;

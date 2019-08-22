@@ -40,6 +40,9 @@ void MenuState::init(GameEngine* engine)
     minecraft_logo.setPosition((windowsize.x/2) - 274.0f, (windowsize.y/4)-64);
     minecraft_logo.setScale(2.0f, 2.0f);
 
+    m_splashscale = 0.2;
+    m_splashscaledir = 0.002;
+
     std::ifstream texts = std::ifstream("data/splashes.txt");
     char major[16];
     char minor[16];
@@ -51,10 +54,10 @@ void MenuState::init(GameEngine* engine)
         while (getline(texts, line))
         {
             std::size_t m_major = line.find("[M]");
-            std::size_t m_minor = line.find("[m]");
-
             if (m_major != std::string::npos)
                 line.replace(m_major, 3, major);
+
+            std::size_t m_minor = line.find("[m]");
             if (m_minor != std::string::npos)
                 line.replace(m_minor, 3, minor);
             m_splashtexts.push_back(line);
@@ -187,12 +190,25 @@ void MenuState::update(GameEngine* engine)
 {
     char aBuf[128];
 
+    m_splashscale += m_splashscaledir;
+    if (m_splashscale >= 0.226)
+    {
+        m_splashscale = 0.226;
+        m_splashscaledir = -0.002;
+    }
+    else if (m_splashscale < 0.2)
+    {
+        m_splashscale = 0.2;
+        m_splashscaledir = 0.002;
+    }
+    m_splashtext.setScale(m_splashscale);
+
     b_moveleft.setText(sf::String("Move left: ") + engine->Settings()->controls()->getKeyName("left"));
     b_moveright.setText(sf::String("Move right: ") + engine->Settings()->controls()->getKeyName("right"));
     b_jump.setText(sf::String("Jump: ") + engine->Settings()->controls()->getKeyName("jump"));
     b_sneak.setText(sf::String("Sneak: ") + engine->Settings()->controls()->getKeyName("sneak"));
-    b_run.setText(sf::String("Run: ") + engine->Settings()->controls()->getKeyName("inventory"));
-    b_inventory.setText(sf::String("Inventory: ") + engine->Settings()->controls()->getKeyName("run"));
+    b_run.setText(sf::String("Run: ") + engine->Settings()->controls()->getKeyName("run"));
+    b_inventory.setText(sf::String("Inventory: ") + engine->Settings()->controls()->getKeyName("inventory"));
     b_layerswap.setText(sf::String("Swap layers: ") + engine->Settings()->controls()->getKeyName("layerswap"));
     b_place.setText(sf::String("Place block: ") + engine->Settings()->controls()->getKeyName("place"));
     b_destroy.setText(sf::String("Destroy block: ") + engine->Settings()->controls()->getKeyName("destroy"));
