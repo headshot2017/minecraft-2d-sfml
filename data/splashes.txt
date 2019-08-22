@@ -1,4 +1,4 @@
-﻿Open source on GitHub!
+Open source on GitHub!
 Not finished!
 OpenGL [M].[m]!
 Uses SFML!
