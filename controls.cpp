@@ -32,6 +32,9 @@ Controls::Controls()
     key.key = sf::Keyboard::LControl;
     m_keys["run"] = key;
 
+    key.key = sf::Keyboard::E;
+    m_keys["inventory"] = key;
+
     key.key = sf::Keyboard::LAlt;
     m_keys["layerswap"] = key;
 

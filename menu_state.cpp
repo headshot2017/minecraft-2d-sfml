@@ -103,7 +103,8 @@ void MenuState::init(GameEngine* engine)
     b_jump = Button(engine, "Jump: ", (windowsize.x/2)-300-8, 64+(48*2), 300);
     b_sneak = Button(engine, "Sneak: ", (windowsize.x/2)-300-8, 64+(48*3), 300);
     b_run = Button(engine, "Run: ", (windowsize.x/2)-300-8, 64+(48*4), 300);
-    b_layerswap = Button(engine, "Swap layers: ", (windowsize.x/2)-300-8, 64+(48*5), 300);
+    b_inventory = Button(engine, "Inventory: ", (windowsize.x/2)-300-8, 64+(48*5), 300);
+    b_layerswap = Button(engine, "Swap layers: ", (windowsize.x/2)-300-8, 64+(48*6), 300);
     b_place = Button(engine, "Place block: ", (windowsize.x/2)+8, 64+(48*0), 300);
     b_destroy = Button(engine, "Destroy block: ", (windowsize.x/2)+8, 64+(48*1), 300);
     b_pick = Button(engine, "Pick block: ", (windowsize.x/2)+8, 64+(48*2), 300);
@@ -167,7 +168,8 @@ void MenuState::setAllPositions(sf::Vector2u& windowsize)
     b_jump.setPosition((windowsize.x/2)-300-8, 64+(48*2));
     b_sneak.setPosition((windowsize.x/2)-300-8, 64+(48*3));
     b_run.setPosition((windowsize.x/2)-300-8, 64+(48*4));
-    b_layerswap.setPosition((windowsize.x/2)-300-8, 64+(48*5));
+    b_inventory.setPosition((windowsize.x/2)-300-8, 64+(48*5));
+    b_layerswap.setPosition((windowsize.x/2)-300-8, 64+(48*6));
     b_place.setPosition((windowsize.x/2)+8, 64+(48*0));
     b_destroy.setPosition((windowsize.x/2)+8, 64+(48*1));
     b_pick.setPosition((windowsize.x/2)+8, 64+(48*2));
@@ -189,7 +191,8 @@ void MenuState::update(GameEngine* engine)
     b_moveright.setText(sf::String("Move right: ") + engine->Settings()->controls()->getKeyName("right"));
     b_jump.setText(sf::String("Jump: ") + engine->Settings()->controls()->getKeyName("jump"));
     b_sneak.setText(sf::String("Sneak: ") + engine->Settings()->controls()->getKeyName("sneak"));
-    b_run.setText(sf::String("Run: ") + engine->Settings()->controls()->getKeyName("run"));
+    b_run.setText(sf::String("Run: ") + engine->Settings()->controls()->getKeyName("inventory"));
+    b_inventory.setText(sf::String("Inventory: ") + engine->Settings()->controls()->getKeyName("run"));
     b_layerswap.setText(sf::String("Swap layers: ") + engine->Settings()->controls()->getKeyName("layerswap"));
     b_place.setText(sf::String("Place block: ") + engine->Settings()->controls()->getKeyName("place"));
     b_destroy.setText(sf::String("Destroy block: ") + engine->Settings()->controls()->getKeyName("destroy"));
@@ -280,6 +283,7 @@ void MenuState::event_input(GameEngine* engine, sf::Event& event)
         b_jump.process_input(event);
         b_sneak.process_input(event);
         b_run.process_input(event);
+        b_inventory.process_input(event);
         b_layerswap.process_input(event);
         b_place.process_input(event);
         b_destroy.process_input(event);
@@ -403,6 +407,8 @@ void MenuState::event_input(GameEngine* engine, sf::Event& event)
             changeBind("sneak");
         if (b_run.update())
             changeBind("run");
+        if (b_inventory.update())
+            changeBind("inventory");
         if (b_layerswap.update())
             changeBind("layerswap");
         if (b_place.update())
@@ -480,6 +486,7 @@ void MenuState::draw(GameEngine* engine)
         b_jump.draw();
         b_sneak.draw();
         b_run.draw();
+        b_inventory.draw();
         b_layerswap.draw();
         b_place.draw();
         b_destroy.draw();

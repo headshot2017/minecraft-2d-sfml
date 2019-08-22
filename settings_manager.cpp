@@ -110,6 +110,14 @@ void SettingsManager::loadSettings()
                 else
                     m_controls.setKeyBind("run", static_cast<sf::Keyboard::Key>(key));
             }
+            else if (strcmp(name.c_str(), "control_inventory") == 0)
+            {
+                int key = std::atoi(value.c_str());
+                if (key >= maxkeys)
+                    m_controls.setMouseBind("inventory", static_cast<sf::Mouse::Button>(key - maxkeys));
+                else
+                    m_controls.setKeyBind("inventory", static_cast<sf::Keyboard::Key>(key));
+            }
             else if (strcmp(name.c_str(), "control_layerswap") == 0)
             {
                 int key = std::atoi(value.c_str());
@@ -165,6 +173,7 @@ void SettingsManager::saveSettings()
     configfile << "control_jump: " << (keys["jump"].inputType == MouseInput ? (static_cast<int>(keys["jump"].mouseButton)) + maxkeys : static_cast<int>(keys["jump"].key)) << "\n";
     configfile << "control_sneak: " << (keys["sneak"].inputType == MouseInput ? (static_cast<int>(keys["sneak"].mouseButton)) + maxkeys : static_cast<int>(keys["sneak"].key)) << "\n";
     configfile << "control_run: " << (keys["run"].inputType == MouseInput ? (static_cast<int>(keys["run"].mouseButton)) + maxkeys : static_cast<int>(keys["run"].key)) << "\n";
+    configfile << "control_inventory: " << (keys["inventory"].inputType == MouseInput ? (static_cast<int>(keys["inventory"].mouseButton)) + maxkeys : static_cast<int>(keys["inventory"].key)) << "\n";
     configfile << "control_layerswap: " << (keys["layerswap"].inputType == MouseInput ? (static_cast<int>(keys["layerswap"].mouseButton)) + maxkeys : static_cast<int>(keys["layerswap"].key)) << "\n";
     configfile << "control_screenshot: " << (keys["screenshot"].inputType == MouseInput ? (static_cast<int>(keys["screenshot"].mouseButton)) + maxkeys : static_cast<int>(keys["screenshot"].key)) << "\n";
     configfile << "control_fullscreen: " << (keys["fullscreen"].inputType == MouseInput ? (static_cast<int>(keys["fullscreen"].mouseButton)) + maxkeys : static_cast<int>(keys["fullscreen"].key)) << "\n";

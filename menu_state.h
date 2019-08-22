@@ -98,6 +98,7 @@ private:
     Button b_jump;
     Button b_sneak;
     Button b_run;
+    Button b_inventory;
     Button b_layerswap;
     Button b_place;
     Button b_destroy;
