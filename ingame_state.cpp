@@ -25,6 +25,7 @@ void IngameState::init(GameEngine *engine)
     m_skytime = 0;
     m_engine = engine;
     m_world = new World(engine);
+    m_gamegui = new GameGUI;
 
     m_sky = sf::RectangleShape(sf::Vector2f(800, 480));
     m_sky.setFillColor(sf::Color(154, 190, 255));
@@ -45,6 +46,7 @@ void IngameState::destroy()
 {
     m_engine->m_window.setView(m_engine->m_window.getDefaultView());
     delete m_world;
+    delete m_gamegui;
 }
 
 void IngameState::update(GameEngine *engine)
@@ -66,12 +68,22 @@ void IngameState::update(GameEngine *engine)
     {
         m_world->getPlayer()->update(engine);
         m_world->updateEntities();
+        m_gamegui->update(engine);
     }
 }
 
 void IngameState::event_input(GameEngine *engine, sf::Event& event)
 {
     m_world->getPlayer()->event_input(engine, event);
+    m_gamegui->event_input(engine, event);
+
+    if (engine->Settings()->controls()->PressedEvent("inventory", event))
+    {
+        if (not m_gamegui->isOpen())
+            m_gamegui->openInventory();
+        else
+            m_gamegui->closeGUI();
+    }
 
     if (event.type == sf::Event::Closed)
     {
@@ -206,6 +218,8 @@ void IngameState::draw(GameEngine *engine)
     text_cam_pos.setString(sf::String(aBuf));
     text_cam_pos.setPosition(cam_x, cam_y);
     engine->m_window.draw(text_cam_pos);
+
+    m_gamegui->draw(engine);
 }
 
 void IngameState::pause()

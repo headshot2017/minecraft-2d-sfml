@@ -38,6 +38,8 @@ public:
     SoundEngine* Sound() {return m_sound;}
     SettingsManager* Settings() {return &m_settings;}
 
+    sf::VertexArray getGUIWindow(sf::Vector2f size);
+
     sf::RenderTexture m_window;
     sf::Texture m_screenshot;
 

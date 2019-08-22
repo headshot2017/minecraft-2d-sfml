@@ -5,6 +5,7 @@
 #include "game_state.h"
 #include "game/world.h"
 #include "game/player.h"
+#include "ingame_gui.h"
 #include <fstream>
 
 enum
@@ -38,6 +39,7 @@ private:
 
     World *m_world;
     GameEngine *m_engine;
+    GameGUI *m_gamegui;
 
     int m_skytime;
     sf::RectangleShape m_sky;
