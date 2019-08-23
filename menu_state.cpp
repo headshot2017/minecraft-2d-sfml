@@ -139,7 +139,7 @@ void MenuState::setAllPositions(sf::Vector2u& windowsize)
     dirt_tile.setTextureRect(sf::IntRect(0, 0, windowsize.x/4, windowsize.y/4));
     minecraft_logo.setPosition((windowsize.x/2) - 274.0f, (windowsize.y/4)-64);
     sf::Vector2f aPos = minecraft_logo.getPosition();
-    m_splashtext.setPosition(aPos.x+384+96, aPos.y+80+m_splashtext.getText().getSize());
+    m_splashtext.setPosition(aPos.x+384+88, aPos.y+88+m_splashtext.getText().getSize());
 
     b_back.setPosition((windowsize.x/2)-200, windowsize.y-48);
     b_back_options.setPosition((windowsize.x/2)-200, windowsize.y-48);
@@ -191,15 +191,15 @@ void MenuState::update(GameEngine* engine)
     char aBuf[128];
 
     m_splashscale += m_splashscaledir;
-    if (m_splashscale >= 0.226)
+    if (m_splashscale >= 0.215)
     {
-        m_splashscale = 0.226;
-        m_splashscaledir = -0.002;
+        m_splashscale = 0.215;
+        m_splashscaledir = -0.001;
     }
     else if (m_splashscale < 0.2)
     {
         m_splashscale = 0.2;
-        m_splashscaledir = 0.002;
+        m_splashscaledir = 0.001;
     }
     m_splashtext.setScale(m_splashscale);
 

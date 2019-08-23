@@ -47,11 +47,13 @@ Label::Label(GameEngine *engine, sf::String text, sf::Vector2f pos, int align)
 void Label::setScale(float amount)
 {
     m_text.setScale(amount, amount);
+    setPosition(m_pos);
 }
 
 void Label::setRotation(float angle)
 {
     m_text.setRotation(angle);
+    setPosition(m_pos);
 }
 
 void Label::setColor(sf::Color color)
