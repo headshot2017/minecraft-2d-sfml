@@ -80,9 +80,15 @@ void IngameState::event_input(GameEngine *engine, sf::Event& event)
     if (engine->Settings()->controls()->PressedEvent("inventory", event))
     {
         if (not m_gamegui->isOpen())
+        {
             m_gamegui->openInventory();
+            m_world->getPlayer()->setCanMove(false);
+        }
         else
+        {
             m_gamegui->closeGUI();
+            m_world->getPlayer()->setCanMove(true);
+        }
     }
 
     if (event.type == sf::Event::Closed)

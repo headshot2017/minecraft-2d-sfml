@@ -444,52 +444,74 @@ void Player::event_input(GameEngine *engine, sf::Event &event)
 
 void Player::process_input(GameEngine *engine)
 {
-    if (not m_isPlayer or not can_move) return;
+    if (not m_isPlayer) return;
 
     // mouse
-    if (engine->Settings()->controls()->Pressed("place") and not rmb)
+    if (can_move)
     {
-        if (canBuild(mousepos.x/32, (mousepos.y-56)/32))
+        if (engine->Settings()->controls()->Pressed("place") and not rmb)
         {
-            if (m_world->getBlock(mousepos.x/32, (mousepos.y-56)/32))
-                interactBlock(mousepos.x/32, (mousepos.y-56)/32);
-            else
-                placeBlock(mousepos.x/32, (mousepos.y-56)/32, m_currblock, m_layer);
+            if (canBuild(mousepos.x/32, (mousepos.y-56)/32))
+            {
+                if (m_world->getBlock(mousepos.x/32, (mousepos.y-56)/32))
+                    interactBlock(mousepos.x/32, (mousepos.y-56)/32);
+                else
+                    placeBlock(mousepos.x/32, (mousepos.y-56)/32, m_currblock, m_layer);
+            }
+            rmb = true;
         }
-        rmb = true;
-    }
-    else if (not engine->Settings()->controls()->Pressed("place") and rmb)
-        rmb = false;
+        else if (not engine->Settings()->controls()->Pressed("place") and rmb)
+            rmb = false;
 
-    if (engine->Settings()->controls()->Pressed("destroy"))
-    {
-        if (not lmb_tick)
+        if (engine->Settings()->controls()->Pressed("destroy"))
         {
-            destroyBlock(mousepos.x/32, (mousepos.y-56)/32);
-            lmb_tick = 60 * 0.22;
+            if (not lmb_tick)
+            {
+                destroyBlock(mousepos.x/32, (mousepos.y-56)/32);
+                lmb_tick = 60 * 0.22;
+            }
+            else
+                lmb_tick--;
+            lmb = true;
         }
         else
-            lmb_tick--;
-        lmb = true;
-    }
-    else
-    {
-        lmb = false;
-        lmb_tick = 0;
-    }
+        {
+            lmb = false;
+            lmb_tick = 0;
+        }
 
-    // keyboard
-    m_sneak = engine->Settings()->controls()->Pressed("sneak");
-    float spd;
-    if (not m_sneak)
-        spd = (engine->Settings()->controls()->Pressed("run")) ? 4 : 3;
-    else
-        spd = 1.5f;
+        // keyboard
+        m_sneak = engine->Settings()->controls()->Pressed("sneak");
+        float spd;
+        if (not m_sneak)
+            spd = (engine->Settings()->controls()->Pressed("run")) ? 4 : 3;
+        else
+            spd = 1.5f;
 
-    if (engine->Settings()->controls()->Pressed("left"))
-        x_acc = (hspeed > 0) ? -0.5f : -0.25f;
-    else if (engine->Settings()->controls()->Pressed("right"))
-        x_acc = (hspeed < 0) ? 0.5f : 0.25f;
+        if (engine->Settings()->controls()->Pressed("left"))
+            x_acc = (hspeed > 0) ? -0.5f : -0.25f;
+        else if (engine->Settings()->controls()->Pressed("right"))
+            x_acc = (hspeed < 0) ? 0.5f : 0.25f;
+        else
+        {
+            if (hspeed > 0)
+                x_acc = -0.25f;
+            else if (hspeed < 0)
+                x_acc = +0.25f;
+            else
+                x_acc = 0.f;
+        }
+        if (hspeed > spd)
+            hspeed = spd;
+        if (hspeed < -spd)
+            hspeed = -spd;
+
+        if (engine->Settings()->controls()->Pressed("jump") and
+            (blockCollide(x/32, y/32) or
+            blockCollide((x-4)/32, y/32) or
+            blockCollide((x+4)/32, y/32)))
+            vspeed = -4.5f;
+    }
     else
     {
         if (hspeed > 0)
@@ -499,16 +521,6 @@ void Player::process_input(GameEngine *engine)
         else
             x_acc = 0.f;
     }
-    if (hspeed > spd)
-        hspeed = spd;
-    if (hspeed < -spd)
-        hspeed = -spd;
-
-    if (engine->Settings()->controls()->Pressed("jump") and
-        (blockCollide(x/32, y/32) or
-        blockCollide((x-4)/32, y/32) or
-        blockCollide((x+4)/32, y/32)))
-        vspeed = -4.5f;
 }
 
 void Player::draw(GameEngine *engine)
