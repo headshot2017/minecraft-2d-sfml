@@ -83,11 +83,11 @@ void Label::setPosition(sf::Vector2f pos)
     sf::FloatRect m_size = m_text.getGlobalBounds();
 
     if (m_align == 0) // left
-        m_text.setOrigin(0, 0);
+        m_text.setPosition(m_pos.x, m_pos.y);
     else if (m_align == 1) // middle
-        m_text.setOrigin(m_size.width/2.0f, 0);
+        m_text.setPosition(m_pos.x - (m_size.width/2.0f), m_pos.y);
     else if (m_align == 2) // right
-        m_text.setOrigin(m_size.width, 0);
+        m_text.setPosition(m_pos.x - m_size.width, m_pos.y);
 }
 
 void Label::setPosition(float x, float y)
