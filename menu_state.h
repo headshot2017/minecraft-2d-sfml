@@ -37,6 +37,7 @@ public:
 
     void changeBind(const char *keybind);
     void setAllPositions(sf::Vector2u& windowsize);
+    void setSplashText();
 
     static MenuState* Instance() {return &m_Instance;}
 

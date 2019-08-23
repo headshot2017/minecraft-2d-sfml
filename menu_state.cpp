@@ -43,35 +43,13 @@ void MenuState::init(GameEngine* engine)
     m_splashscale = 0.2;
     m_splashscaledir = 0.002;
 
-    std::ifstream texts = std::ifstream("data/splashes.txt");
-    char major[16];
-    char minor[16];
-    sprintf(major, "%d", m_engine->app.getSettings().majorVersion);
-    sprintf(minor, "%d", m_engine->app.getSettings().minorVersion);
-    if (texts.good())
-    {
-        std::string line;
-        while (getline(texts, line))
-        {
-            std::size_t m_major = line.find("[M]");
-            if (m_major != std::string::npos)
-                line.replace(m_major, 3, major);
-
-            std::size_t m_minor = line.find("[m]");
-            if (m_minor != std::string::npos)
-                line.replace(m_minor, 3, minor);
-            m_splashtexts.push_back(line);
-        }
-    }
-    else
-        m_splashtexts.push_back(std::string("splashes.txt broken go home"));
-
     srand(time(0));
-    m_splashtext = Label(m_engine, m_splashtexts[rand() % m_splashtexts.size()].c_str(), 0, 0);
+    m_splashtext = Label(m_engine, "ara ara", 0, 0);
     m_splashtext.setAlign(1);
     m_splashtext.setColor(sf::Color::Yellow);
     m_splashtext.setRotation(-20);
     m_splashtext.setScale(0.2);
+    setSplashText();
 
     b_back = Button(engine, sf::String("Back"), (windowsize.x/2)-200, windowsize.y-48);
     b_back_options = Button(engine, sf::String("Back"), (windowsize.x/2)-200, windowsize.y-48);
@@ -132,6 +110,35 @@ void MenuState::init(GameEngine* engine)
 void MenuState::destroy()
 {
     m_splashtexts.clear();
+}
+
+void MenuState::setSplashText()
+{
+    m_splashtexts.clear();
+    std::ifstream texts = std::ifstream("data/splashes.txt");
+    char major[16];
+    char minor[16];
+    sprintf(major, "%d", m_engine->app.getSettings().majorVersion);
+    sprintf(minor, "%d", m_engine->app.getSettings().minorVersion);
+    if (texts.good())
+    {
+        std::string line;
+        while (getline(texts, line))
+        {
+            std::size_t m_major = line.find("[M]");
+            if (m_major != std::string::npos)
+                line.replace(m_major, 3, major);
+
+            std::size_t m_minor = line.find("[m]");
+            if (m_minor != std::string::npos)
+                line.replace(m_minor, 3, minor);
+            m_splashtexts.push_back(line);
+        }
+    }
+    else
+        m_splashtexts.push_back(std::string("splashes.txt broken go home"));
+
+    m_splashtext.setText(m_splashtexts[rand() % m_splashtexts.size()].c_str());
 }
 
 void MenuState::setAllPositions(sf::Vector2u& windowsize)
@@ -237,7 +244,10 @@ void MenuState::event_input(GameEngine* engine, sf::Event& event)
             if (engine->isPaused())
                 engine->popState();
             else
+            {
                 m_submenu = MENU_MAINMENU;
+                setSplashText(); // minecraft does this too.
+            }
         }
     }
 
