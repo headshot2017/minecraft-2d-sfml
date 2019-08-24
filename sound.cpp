@@ -56,7 +56,7 @@ bool SoundEngine::loadTheme(const char *theme)
         m_sounds[SOUND_WOOL_DIG+i] = BASS_StreamCreateFile(false, aFile, 0, 0, 0);
 
         sprintf(aFile, "data/sounds/%s/explode%d.wav", theme, i+1);
-        m_samples[SAMPLE_EXPLODE+i] = BASS_SampleLoad(false, aFile, 0, 0, 65536/4, BASS_SAMPLE_OVER_POS);
+        m_samples[SAMPLE_EXPLODE+i] = BASS_SampleLoad(false, aFile, 0, 0, 16384, BASS_SAMPLE_OVER_POS);
     }
 
     theme_loaded = true;
@@ -147,7 +147,7 @@ void SoundEngine::playSample(float player_x, float player_y, float x, float y, i
 
     int ind = (multi) ? rand() % 4 : 0;
 
-    HCHANNEL channel = BASS_SampleGetChannel(m_samples[type+ind], true);
+    HCHANNEL channel = BASS_SampleGetChannel(m_samples[type+ind], false);
     BASS_ChannelSetAttribute(channel, BASS_ATTRIB_VOL, vol);
     BASS_ChannelSetAttribute(channel, BASS_ATTRIB_PAN, pan);
     BASS_ChannelPlay(channel, false);
