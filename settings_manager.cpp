@@ -70,6 +70,14 @@ void SettingsManager::loadSettings()
                 else
                     m_controls.setKeyBind("pick", static_cast<sf::Keyboard::Key>(key));
             }
+            else if (strcmp(name.c_str(), "control_drop") == 0)
+            {
+                int key = std::atoi(value.c_str());
+                if (key >= maxkeys)
+                    m_controls.setMouseBind("drop", static_cast<sf::Mouse::Button>(key - maxkeys));
+                else
+                    m_controls.setKeyBind("drop", static_cast<sf::Keyboard::Key>(key));
+            }
             else if (strcmp(name.c_str(), "control_left") == 0)
             {
                 int key = std::atoi(value.c_str());
@@ -168,6 +176,7 @@ void SettingsManager::saveSettings()
     configfile << "control_destroy: " << (keys["destroy"].inputType == MouseInput ? (static_cast<int>(keys["destroy"].mouseButton)) + maxkeys : static_cast<int>(keys["destroy"].key)) << "\n";
     configfile << "control_place: " << (keys["place"].inputType == MouseInput ? (static_cast<int>(keys["place"].mouseButton)) + maxkeys : static_cast<int>(keys["place"].key)) << "\n";
     configfile << "control_pick: " << (keys["pick"].inputType == MouseInput ? (static_cast<int>(keys["pick"].mouseButton)) + maxkeys : static_cast<int>(keys["pick"].key)) << "\n";
+    configfile << "control_drop: " << (keys["drop"].inputType == MouseInput ? (static_cast<int>(keys["drop"].mouseButton)) + maxkeys : static_cast<int>(keys["drop"].key)) << "\n";
     configfile << "control_left: " << (keys["left"].inputType == MouseInput ? (static_cast<int>(keys["left"].mouseButton)) + maxkeys : static_cast<int>(keys["left"].key)) << "\n";
     configfile << "control_right: " << (keys["right"].inputType == MouseInput ? (static_cast<int>(keys["right"].mouseButton)) + maxkeys : static_cast<int>(keys["right"].key)) << "\n";
     configfile << "control_jump: " << (keys["jump"].inputType == MouseInput ? (static_cast<int>(keys["jump"].mouseButton)) + maxkeys : static_cast<int>(keys["jump"].key)) << "\n";
