@@ -37,6 +37,8 @@ public:
     void setCanMove(bool t) {can_move = t;}
     void setPlayer(bool t) {m_isPlayer = t;}
     void setCurrBlock(int t) {m_currblock = t;}
+    void setAngle(float t) {m_angle = t;}
+    float getAngle() {return m_angle;}
     int getCurrBlock() {return m_currblock;}
     bool isPlayer() {return m_isPlayer;}
     bool blockCollide(int x, int y);
