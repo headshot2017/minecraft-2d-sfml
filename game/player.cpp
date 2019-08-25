@@ -479,20 +479,4 @@ void Player::draw(GameEngine *engine)
     state.texture = &m_skin;
 
     engine->m_window.draw(m_skinvertex, state);
-
-    if (m_isPlayer)
-    {
-        sf::Vector2f cam = engine->m_window.getView().getCenter();
-        sf::Vector2u res = engine->app.getSize();
-        sf::Vertex vert[4];
-        vert[0].position = sf::Vector2f(cam.x+(res.x/2)-48, cam.y-(res.y/2)+16);
-        vert[1].position = sf::Vector2f(cam.x+(res.x/2)-16, cam.y-(res.y/2)+16);
-        vert[2].position = sf::Vector2f(cam.x+(res.x/2)-16, cam.y-(res.y/2)+48);
-        vert[3].position = sf::Vector2f(cam.x+(res.x/2)-48, cam.y-(res.y/2)+48);
-        vert[0].texCoords = sf::Vector2f(m_currblock*32, 0);
-        vert[1].texCoords = sf::Vector2f(m_currblock*32+32, 0);
-        vert[2].texCoords = sf::Vector2f(m_currblock*32+32, 32);
-        vert[3].texCoords = sf::Vector2f(m_currblock*32, 32);
-        engine->m_window.draw(vert, 4, sf::Quads, &engine->m_blocks);
-    }
 }
