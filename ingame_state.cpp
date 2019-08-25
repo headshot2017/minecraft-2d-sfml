@@ -97,7 +97,10 @@ void IngameState::event_input(GameEngine *engine, sf::Event& event)
         {
             m_inventory[m_hotbarslot][1]--;
             if (m_inventory[m_hotbarslot][1] <= 0)
+            {
                 m_inventory[m_hotbarslot][0] = BLOCK_AIR;
+                m_world->getPlayer()->setCurrBlock(BLOCK_AIR);
+            }
         }
     }
     else if (engine->Settings()->controls()->PressedEvent("pick", event))
@@ -119,6 +122,7 @@ void IngameState::event_input(GameEngine *engine, sf::Event& event)
             {
                 m_inventory[i][1]++;
                 m_hotbarslot = i;
+                m_world->getPlayer()->setCurrBlock(m_inventory[i][0]);
                 break;
             }
             else if (ii >= 9 and not m_inventory[i][0]) // this block is not in the hotbar so add it to the nearest empty slot
@@ -126,6 +130,7 @@ void IngameState::event_input(GameEngine *engine, sf::Event& event)
                 m_inventory[i][0] = block;
                 m_inventory[i][1] = 1;
                 m_hotbarslot = i;
+                m_world->getPlayer()->setCurrBlock(m_inventory[i][0]);
                 break;
             }
         }
@@ -153,8 +158,11 @@ void IngameState::event_input(GameEngine *engine, sf::Event& event)
             cam_x = cam_y = 0.f;
         else if (event.key.code == sf::Keyboard::Escape)
             engine->pushState(PausedState::Instance());
-        else if (intcode >= num1code and intcode <= num9code)
+        else if (intcode >= num1code and intcode <= num9code) // hotbar
+        {
             m_hotbarslot = intcode - num1code;
+            m_world->getPlayer()->setCurrBlock(m_inventory[m_hotbarslot][0]);
+        }
     }
     else if (event.type == sf::Event::MouseWheelScrolled)
     {
@@ -165,6 +173,8 @@ void IngameState::event_input(GameEngine *engine, sf::Event& event)
             m_hotbarslot = 9+m_hotbarslot;
         if (m_hotbarslot > 8)
             m_hotbarslot = -9+m_hotbarslot;
+
+        m_world->getPlayer()->setCurrBlock(m_inventory[m_hotbarslot][0]);
     }
 
     else if (event.type == sf::Event::LostFocus)
