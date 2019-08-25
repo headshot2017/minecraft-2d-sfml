@@ -227,6 +227,14 @@ void IngameState::draw(GameEngine *engine)
     hotbarselect.setPosition(hotbar.getPosition().x - 2 + (m_hotbarslot*40), hotbar.getPosition().y - 2);
     engine->m_window.draw(hotbar);
     engine->m_window.draw(hotbarselect);
+    for (int i=0; i<9; i++) // hotbar blocks
+    {
+        if (m_inventory[i][0])
+        {
+            sf::Sprite block(engine->m_blocks, sf::IntRect(m_inventory[i][0]*32, 0, 32, 32));
+            engine->m_window.draw(block);
+        }
+    }
 
     char aBuf[192];
     sprintf(aBuf, "%.1f,%.1f\nChunk position: %d,%d\nBuilding layer: %d\n", cam_x/32, cam_y/32, xx/CHUNK_W, yy/CHUNK_H, m_world->getPlayer()->getBuildLayer());
