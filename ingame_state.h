@@ -51,6 +51,8 @@ private:
     // player
     int m_inventory[INV_TOTAL][2] = {0};
     int m_hotbarslot = 0;
+    bool lmb = false, rmb = false, mmb = false; // mouse buttons
+    int lmb_tick = 0;
 
 protected:
     IngameState() {}

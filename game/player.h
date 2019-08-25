@@ -36,6 +36,8 @@ public:
 
     void setCanMove(bool t) {can_move = t;}
     void setPlayer(bool t) {m_isPlayer = t;}
+    void setCurrBlock(int t) {m_currblock = t;}
+    int getCurrBlock() {return m_currblock;}
     bool isPlayer() {return m_isPlayer;}
     bool blockCollide(int x, int y);
     bool groundCollide();
@@ -70,9 +72,6 @@ private:
     int m_ticks = 0; // ticks elapsed since creation (mainly for footstep sounds)
     int m_armtick = 0; // arm swing (when clicking)
     int m_footstepwait = 0; // ticks to wait until next footstep sound
-
-    bool lmb = false, rmb = false, mmb = false; // mouse buttons
-    int lmb_tick = 0;
 
     int m_currblock = 1;
 

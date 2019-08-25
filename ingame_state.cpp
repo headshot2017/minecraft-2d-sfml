@@ -174,7 +174,45 @@ void IngameState::event_input(GameEngine *engine, sf::Event& event)
 void IngameState::process_input(GameEngine* engine)
 {
     m_world->getPlayer()->process_input(engine);
+    if (m_world->getPlayer()->getCanMove())
+    {
+        sf::Vector2f mousepos = m_world->getPlayer()->getMouse();
+        if (engine->Settings()->controls()->Pressed("place") and not rmb)
+        {
+            if (m_world->getPlayer()->canBuild(mousepos.x/32, (mousepos.y-56)/32))
+            {
+                if (m_world->getBlock(mousepos.x/32, (mousepos.y-56)/32))
+                    m_world->getPlayer()->interactBlock(mousepos.x/32, (mousepos.y-56)/32);
+                else
+                {
+                    if (m_inventory[m_hotbarslot][0])
+                        m_world->getPlayer()->placeBlock(mousepos.x/32, (mousepos.y-56)/32, m_inventory[m_hotbarslot][0], m_layer);
+                }
+            }
+            rmb = true;
+        }
+        else if (not engine->Settings()->controls()->Pressed("place") and rmb)
+            rmb = false;
 
+        if (engine->Settings()->controls()->Pressed("destroy"))
+        {
+            if (not lmb_tick)
+            {
+                m_world->getPlayer()->destroyBlock(mousepos.x/32, (mousepos.y-56)/32);
+                lmb_tick = 60 * 0.22;
+            }
+            else
+                lmb_tick--;
+            lmb = true;
+        }
+        else
+        {
+            lmb = false;
+            lmb_tick = 0;
+        }
+    }
+
+    // smooth camera
     sf::Vector2f pos = m_world->getPlayer()->getPos();
     sf::Vector2f spd = m_world->getPlayer()->getSpeed();
     sf::Vector2u res = engine->app.getSize();

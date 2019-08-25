@@ -420,17 +420,6 @@ void Player::event_input(GameEngine *engine, sf::Event &event)
         m_layer++;
         if (m_layer > LAYER_DECORATION) m_layer = 0;
     }
-
-    if (event.type == sf::Event::MouseWheelScrolled)
-    {
-        if (event.mouseWheelScroll.wheel == sf::Mouse::VerticalWheel)
-            m_currblock -= event.mouseWheelScroll.delta;
-
-        if (m_currblock < 1)
-            m_currblock = 1;
-        if (m_currblock > BLOCK_TOTAL-1)
-            m_currblock = BLOCK_TOTAL-1;
-    }
 }
 
 void Player::process_input(GameEngine *engine)
