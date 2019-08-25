@@ -3,6 +3,7 @@
 #include "ingame_state.h"
 #include "menu_state.h"
 #include "paused_state.h"
+#include "gui/label.h"
 #include <SFML/Graphics.hpp>
 #include <direct.h>
 #include <math.h>
@@ -97,6 +98,42 @@ void IngameState::event_input(GameEngine *engine, sf::Event& event)
             m_inventory[m_hotbarslot][1]--;
             if (m_inventory[m_hotbarslot][1] <= 0)
                 m_inventory[m_hotbarslot][0] = BLOCK_AIR;
+        }
+    }
+    else if (engine->Settings()->controls()->PressedEvent("pick", event))
+    {
+        sf::Vector2f mousepos = m_world->getPlayer()->getMouse();
+        int xx = mousepos.x/32;
+        int yy = (mousepos.y-56)/32;
+        int block = m_world->getBlock(xx, yy);
+        int hotbar_filled = 0;
+
+        printf("%d,%d block %d\n", xx, yy, block);
+
+        for(int ii=0; ii<18; ii++)
+        {
+            int i = ii%9;
+            if (ii < 9 and m_inventory[i]) hotbar_filled++;
+
+            if (ii < 9 and m_inventory[i][0] == block and m_inventory[i][1] < 64) // check if the block is already in the hotbar, and add amount
+            {
+                m_inventory[i][1]++;
+                m_hotbarslot = i;
+                break;
+            }
+            else if (ii >= 9 and not m_inventory[i][0]) // this block is not in the hotbar so add it to the nearest empty slot
+            {
+                m_inventory[i][0] = block;
+                m_inventory[i][1] = 1;
+                m_hotbarslot = i;
+                break;
+            }
+        }
+
+        if (hotbar_filled == 9) // hotbar is full, replace the current slot
+        {
+            m_inventory[m_hotbarslot][0] = block;
+            m_inventory[m_hotbarslot][1] = 1;
         }
     }
 
@@ -231,8 +268,16 @@ void IngameState::draw(GameEngine *engine)
     {
         if (m_inventory[i][0])
         {
+            char amount[16];
+            sprintf(amount, "%d", m_inventory[i][1]);
             sf::Sprite block(engine->m_blocks, sf::IntRect(m_inventory[i][0]*32, 0, 32, 32));
+            Label text_amount(engine, amount, cam_x + (windowsize.x/2) - engine->m_hotbar.getSize().x + (i*40)+36, windowsize.y - (engine->m_hotbar.getSize().y*2)+cam_y + 20, 2);
+
+            block.setPosition(cam_x + (windowsize.x/2) - engine->m_hotbar.getSize().x + (i*40)+6, windowsize.y - (engine->m_hotbar.getSize().y*2)+cam_y + 6);
+
             engine->m_window.draw(block);
+            if (m_inventory[i][1] > 1)
+                text_amount.draw();
         }
     }
 

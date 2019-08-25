@@ -431,15 +431,6 @@ void Player::event_input(GameEngine *engine, sf::Event &event)
         if (m_currblock > BLOCK_TOTAL-1)
             m_currblock = BLOCK_TOTAL-1;
     }
-    else if (event.type == sf::Event::MouseButtonPressed)
-    {
-        if (event.mouseButton.button == sf::Mouse::Middle)
-        {
-            int xx = mousepos.x/32;
-            int yy = (mousepos.y-56)/32;
-            printf("%d,%d block %d\n", xx, yy, m_world->getBlock(xx, yy));
-        }
-    }
 }
 
 void Player::process_input(GameEngine *engine)
