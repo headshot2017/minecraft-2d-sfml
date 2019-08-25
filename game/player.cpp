@@ -426,40 +426,8 @@ void Player::process_input(GameEngine *engine)
 {
     if (not m_isPlayer) return;
 
-    // mouse
     if (can_move)
     {
-        if (engine->Settings()->controls()->Pressed("place") and not rmb)
-        {
-            if (canBuild(mousepos.x/32, (mousepos.y-56)/32))
-            {
-                if (m_world->getBlock(mousepos.x/32, (mousepos.y-56)/32))
-                    interactBlock(mousepos.x/32, (mousepos.y-56)/32);
-                else
-                    placeBlock(mousepos.x/32, (mousepos.y-56)/32, m_currblock, m_layer);
-            }
-            rmb = true;
-        }
-        else if (not engine->Settings()->controls()->Pressed("place") and rmb)
-            rmb = false;
-
-        if (engine->Settings()->controls()->Pressed("destroy"))
-        {
-            if (not lmb_tick)
-            {
-                destroyBlock(mousepos.x/32, (mousepos.y-56)/32);
-                lmb_tick = 60 * 0.22;
-            }
-            else
-                lmb_tick--;
-            lmb = true;
-        }
-        else
-        {
-            lmb = false;
-            lmb_tick = 0;
-        }
-
         // keyboard
         m_sneak = engine->Settings()->controls()->Pressed("sneak");
         float spd;
