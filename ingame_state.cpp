@@ -186,7 +186,7 @@ void IngameState::process_input(GameEngine* engine)
                 else
                 {
                     if (m_inventory[m_hotbarslot][0])
-                        m_world->getPlayer()->placeBlock(mousepos.x/32, (mousepos.y-56)/32, m_inventory[m_hotbarslot][0], m_layer);
+                        m_world->getPlayer()->placeBlock(mousepos.x/32, (mousepos.y-56)/32, m_inventory[m_hotbarslot][0], m_world->getPlayer()->getBuildLayer());
                 }
             }
             rmb = true;
