@@ -107,6 +107,7 @@ private:
     Button b_place;
     Button b_destroy;
     Button b_pick;
+    Button b_drop;
     Button b_screenshot;
     Button b_fullscreen_control;
 

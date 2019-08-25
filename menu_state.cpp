@@ -89,8 +89,9 @@ void MenuState::init(GameEngine* engine)
     b_place = Button(engine, "Place block: ", (windowsize.x/2)+8, 64+(48*0), 300);
     b_destroy = Button(engine, "Destroy block: ", (windowsize.x/2)+8, 64+(48*1), 300);
     b_pick = Button(engine, "Pick block: ", (windowsize.x/2)+8, 64+(48*2), 300);
-    b_screenshot = Button(engine, "Screenshot: ", (windowsize.x/2)+8, 64+(48*3), 300);
-    b_fullscreen_control = Button(engine, "Fullscreen: ", (windowsize.x/2)+8, 64+(48*4), 300);
+    b_drop = Button(engine, "Drop item: ", (windowsize.x/2)+8, 64+(48*3), 300);
+    b_screenshot = Button(engine, "Screenshot: ", (windowsize.x/2)+8, 64+(48*4), 300);
+    b_fullscreen_control = Button(engine, "Fullscreen: ", (windowsize.x/2)+8, 64+(48*5), 300);
 
     l_pressakey = Label(engine, "", windowsize.x/2, windowsize.y/2-48, 1);
 
@@ -183,8 +184,9 @@ void MenuState::setAllPositions(sf::Vector2u& windowsize)
     b_place.setPosition((windowsize.x/2)+8, 64+(48*0));
     b_destroy.setPosition((windowsize.x/2)+8, 64+(48*1));
     b_pick.setPosition((windowsize.x/2)+8, 64+(48*2));
-    b_screenshot.setPosition((windowsize.x/2)+8, 64+(48*3));
-    b_fullscreen_control.setPosition((windowsize.x/2)+8, 64+(48*4));
+    b_drop.setPosition((windowsize.x/2)+8, 64+(48*3));
+    b_screenshot.setPosition((windowsize.x/2)+8, 64+(48*4));
+    b_fullscreen_control.setPosition((windowsize.x/2)+8, 64+(48*5));
 
     l_pressakey.setPosition(windowsize.x/2, windowsize.y/2-48);
 
@@ -220,6 +222,7 @@ void MenuState::update(GameEngine* engine)
     b_place.setText(sf::String("Place block: ") + engine->Settings()->controls()->getKeyName("place"));
     b_destroy.setText(sf::String("Destroy block: ") + engine->Settings()->controls()->getKeyName("destroy"));
     b_pick.setText(sf::String("Pick block: ") + engine->Settings()->controls()->getKeyName("pick"));
+    b_drop.setText(sf::String("Drop item: ") + engine->Settings()->controls()->getKeyName("drop"));
     b_screenshot.setText(sf::String("Screenshot: ") + engine->Settings()->controls()->getKeyName("screenshot"));
     b_fullscreen_control.setText(sf::String("Fullscreen: ") + engine->Settings()->controls()->getKeyName("fullscreen"));
 
@@ -314,6 +317,7 @@ void MenuState::event_input(GameEngine* engine, sf::Event& event)
         b_place.process_input(event);
         b_destroy.process_input(event);
         b_pick.process_input(event);
+        b_drop.process_input(event);
         b_screenshot.process_input(event);
         b_fullscreen_control.process_input(event);
         b_back_options.process_input(event);
@@ -443,6 +447,8 @@ void MenuState::event_input(GameEngine* engine, sf::Event& event)
             changeBind("destroy");
         if (b_pick.update())
             changeBind("pick");
+        if (b_drop.update())
+            changeBind("drop");
         if (b_screenshot.update())
             changeBind("screenshot");
         if (b_fullscreen_control.update())
@@ -517,6 +523,7 @@ void MenuState::draw(GameEngine* engine)
         b_place.draw();
         b_destroy.draw();
         b_pick.draw();
+        b_drop.draw();
         b_screenshot.draw();
         b_fullscreen_control.draw();
         b_back_options.draw();

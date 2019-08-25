@@ -49,7 +49,7 @@ private:
     float cam_x, cam_y;
 
     // player
-    int m_inventory[INV_TOTAL][1] = {0};
+    int m_inventory[INV_TOTAL][2] = {0};
     int m_hotbarslot = 0;
 
 protected:

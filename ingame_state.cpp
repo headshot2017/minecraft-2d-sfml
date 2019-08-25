@@ -90,6 +90,15 @@ void IngameState::event_input(GameEngine *engine, sf::Event& event)
             m_world->getPlayer()->setCanMove(true);
         }
     }
+    else if (engine->Settings()->controls()->PressedEvent("drop", event))
+    {
+        if (m_inventory[m_hotbarslot][0])
+        {
+            m_inventory[m_hotbarslot][1]--;
+            if (m_inventory[m_hotbarslot][1] <= 0)
+                m_inventory[m_hotbarslot][0] = BLOCK_AIR;
+        }
+    }
 
     if (event.type == sf::Event::Closed)
     {
