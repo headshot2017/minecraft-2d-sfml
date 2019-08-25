@@ -32,6 +32,8 @@ public:
     void generateWorld(unsigned int seed, const char *name) {m_world->generateWorld(seed, name);}
     void loadWorld(const char *worldName);
 
+    void setHotbarSlot(int slot);
+
     static IngameState* Instance() {return &m_Instance;}
 
 private:

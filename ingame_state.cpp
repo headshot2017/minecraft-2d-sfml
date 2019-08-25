@@ -99,7 +99,7 @@ void IngameState::event_input(GameEngine *engine, sf::Event& event)
             if (m_inventory[m_hotbarslot][1] <= 0)
             {
                 m_inventory[m_hotbarslot][0] = BLOCK_AIR;
-                m_world->getPlayer()->setCurrBlock(BLOCK_AIR);
+                setHotbarSlot(m_hotbarslot);
             }
         }
     }
@@ -121,16 +121,14 @@ void IngameState::event_input(GameEngine *engine, sf::Event& event)
             if (ii < 9 and m_inventory[i][0] == block and m_inventory[i][1] < 64) // check if the block is already in the hotbar, and add amount
             {
                 m_inventory[i][1]++;
-                m_hotbarslot = i;
-                m_world->getPlayer()->setCurrBlock(m_inventory[i][0]);
+                setHotbarSlot(i);
                 break;
             }
             else if (ii >= 9 and not m_inventory[i][0]) // this block is not in the hotbar so add it to the nearest empty slot
             {
                 m_inventory[i][0] = block;
                 m_inventory[i][1] = 1;
-                m_hotbarslot = i;
-                m_world->getPlayer()->setCurrBlock(m_inventory[i][0]);
+                setHotbarSlot(i);
                 break;
             }
         }
@@ -159,10 +157,7 @@ void IngameState::event_input(GameEngine *engine, sf::Event& event)
         else if (event.key.code == sf::Keyboard::Escape)
             engine->pushState(PausedState::Instance());
         else if (intcode >= num1code and intcode <= num9code) // hotbar
-        {
-            m_hotbarslot = intcode - num1code;
-            m_world->getPlayer()->setCurrBlock(m_inventory[m_hotbarslot][0]);
-        }
+            setHotbarSlot(intcode - num1code);
     }
     else if (event.type == sf::Event::MouseWheelScrolled)
     {
@@ -170,11 +165,9 @@ void IngameState::event_input(GameEngine *engine, sf::Event& event)
             m_hotbarslot -= event.mouseWheelScroll.delta;
 
         if (m_hotbarslot < 0)
-            m_hotbarslot = 9+m_hotbarslot;
+            setHotbarSlot(9+m_hotbarslot);
         if (m_hotbarslot > 8)
-            m_hotbarslot = -9+m_hotbarslot;
-
-        m_world->getPlayer()->setCurrBlock(m_inventory[m_hotbarslot][0]);
+            setHotbarSlot(-9+m_hotbarslot);
     }
 
     else if (event.type == sf::Event::LostFocus)
@@ -372,6 +365,13 @@ void IngameState::loadWorld(const char *worldName)
 
     m_world->getPlayer()->setPlayer(true);
     m_world->getPlayer()->setSkin(m_engine->Settings()->m_playerskin);
+    setHotbarSlot(0);
 
     printf("starting\n");
+}
+
+void IngameState::setHotbarSlot(int slot)
+{
+    m_hotbarslot = slot;
+    m_world->getPlayer()->setCurrBlock(m_inventory[slot][0]);
 }
