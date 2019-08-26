@@ -177,7 +177,13 @@ void IngameState::event_input(GameEngine *engine, sf::Event& event)
     {
         if (event.mouseWheelScroll.wheel == sf::Mouse::VerticalWheel)
             m_hotbarslot -= event.mouseWheelScroll.delta;
-        setHotbarSlot(m_hotbarslot % 9);
+
+        if (m_hotbarslot < 0)
+            setHotbarSlot(9+m_hotbarslot);
+        else if (m_hotbarslot >= 9)
+            setHotbarSlot(-9+m_hotbarslot);
+        else
+            setHotbarSlot(m_hotbarslot);
     }
 
     else if (event.type == sf::Event::LostFocus)

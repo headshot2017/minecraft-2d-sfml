@@ -487,10 +487,10 @@ void Player::draw(GameEngine *engine)
         v_arm1[2].position = arm1.transformPoint(sf::Vector2f(x+2, y-24+y_sneak));
         v_arm1[3].position = arm1.transformPoint(sf::Vector2f(x-6, y-24+y_sneak));
 
-        v_block_hand[0].position = block_hand.transformPoint(sf::Vector2f(x-18, y-32+y_sneak));
-        v_block_hand[1].position = block_hand.transformPoint(sf::Vector2f(x-2, y-32+y_sneak));
-        v_block_hand[2].position = block_hand.transformPoint(sf::Vector2f(x-2, y-16+y_sneak));
-        v_block_hand[3].position = block_hand.transformPoint(sf::Vector2f(x-18, y-16+y_sneak));
+        v_block_hand[0].position = block_hand.transformPoint(sf::Vector2f(x-16, y-32+y_sneak));
+        v_block_hand[1].position = block_hand.transformPoint(sf::Vector2f(x-0, y-32+y_sneak));
+        v_block_hand[2].position = block_hand.transformPoint(sf::Vector2f(x-0, y-16+y_sneak));
+        v_block_hand[3].position = block_hand.transformPoint(sf::Vector2f(x-16, y-16+y_sneak));
 
         m_skinvertex[PLAYER_BODY+0].position = body.transformPoint(sf::Vector2f(x-4, y-48+y_sneak));
         m_skinvertex[PLAYER_BODY+1].position = body.transformPoint(sf::Vector2f(x+4, y-48+y_sneak));
