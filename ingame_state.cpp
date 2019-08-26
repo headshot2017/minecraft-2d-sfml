@@ -76,7 +76,21 @@ void IngameState::update(GameEngine *engine)
 void IngameState::event_input(GameEngine *engine, sf::Event& event)
 {
     m_world->getPlayer()->event_input(engine, event);
-    m_gamegui->event_input(engine, event);
+    int guiresult = m_gamegui->event_input(engine, event);
+    if (guiresult > -1)
+    {
+        if (m_gamegui->getGUI() == GUI_INVENTORY)
+        {
+            if (m_inventory[m_hotbarslot][0] != guiresult or not m_inventory[m_hotbarslot][0])
+            {
+                m_inventory[m_hotbarslot][0] = guiresult;
+                m_inventory[m_hotbarslot][1] = 1;
+                setHotbarSlot(m_hotbarslot);
+            }
+            else if (m_inventory[m_hotbarslot][0] == guiresult and m_inventory[m_hotbarslot][1] < 64)
+                m_inventory[m_hotbarslot][1]++;
+        }
+    }
 
     if (engine->Settings()->controls()->PressedEvent("inventory", event))
     {
