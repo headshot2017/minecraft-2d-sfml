@@ -194,8 +194,8 @@ void Player::update(GameEngine *engine)
             blockCollide((x+hspeed+(-4*m_dir))/32, (y-1)/32) or
             blockCollide((x+hspeed+(4*m_dir))/32, (y-32)/32) or
             blockCollide((x+hspeed+(-4*m_dir))/32, (y-32)/32) or
-            blockCollide((x+hspeed+(4*m_dir))/32, (y-56)/32) or
-            blockCollide((x+hspeed+(-4*m_dir))/32, (y-56)/32)) // horizontal collisions
+            blockCollide((x+hspeed+(4*m_dir))/32, (y-64)/32) or
+            blockCollide((x+hspeed+(-4*m_dir))/32, (y-64)/32)) // horizontal collisions
         {
             hspeed = x_acc = 0;
         }
