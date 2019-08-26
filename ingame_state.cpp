@@ -270,8 +270,8 @@ void IngameState::draw(GameEngine *engine)
 
     // draw visible chunks
     engine->m_window.draw(m_world->getBlocksFromPoint(xx, yy), &engine->m_blocks);
-    unsigned int maxColumns = windowsize.x/(CHUNK_W*32);
-    unsigned int maxRows = windowsize.y/(CHUNK_H*32);
+    unsigned int maxColumns = (windowsize.x/(CHUNK_W*32))+1;
+    unsigned int maxRows = (windowsize.y/(CHUNK_H*32))+1;
     if (windowsize.x % (CHUNK_W*32)) maxColumns++;
     if (windowsize.y % (CHUNK_H*32)) maxRows++;
     if (windowsize.x / (CHUNK_W*32) < 1) maxColumns++;

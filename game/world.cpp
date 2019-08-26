@@ -273,6 +273,9 @@ sf::VertexArray& World::getBlocksFromPoint(int x, int y)
 
     if (x_ind > WORLD_W/CHUNK_W) x_ind = WORLD_W/CHUNK_W;
     if (y_ind > WORLD_H/CHUNK_H) y_ind = WORLD_H/CHUNK_H;
+    if (x_ind < 0) x_ind = 0;
+    if (y_ind < 0) y_ind = 0;
+
     return m_blocks2[y_ind][x_ind].getVertex();
 }
 
