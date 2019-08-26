@@ -320,7 +320,7 @@ void Player::draw(GameEngine *engine)
     float angle = sin(m_footstepticks/60.0f) * maxangle;
 
     sf::Transform arm1, arm2, leg1, leg2, body, head, block_hand;
-    sf::VertexArray v_block_hand(sf::Quads, 4);
+    sf::VertexArray v_block_hand(sf::Quads, 4), v_arm1(sf::Quads, 4);
     v_block_hand[0].texCoords = sf::Vector2f(m_currblock*32, 0);
     v_block_hand[1].texCoords = sf::Vector2f(m_currblock*32+32, 0);
     v_block_hand[2].texCoords = sf::Vector2f(m_currblock*32+32, 32);
@@ -352,10 +352,14 @@ void Player::draw(GameEngine *engine)
         m_skinvertex[PLAYER_BODY+2].texCoords = sf::Vector2f(20, 32);
         m_skinvertex[PLAYER_BODY+3].texCoords = sf::Vector2f(16, 32);
 
-        m_skinvertex[PLAYER_ARMFRONT+0].texCoords = sf::Vector2f(40, 20);
-        m_skinvertex[PLAYER_ARMFRONT+1].texCoords = sf::Vector2f(44, 20);
-        m_skinvertex[PLAYER_ARMFRONT+2].texCoords = sf::Vector2f(44, 32);
-        m_skinvertex[PLAYER_ARMFRONT+3].texCoords = sf::Vector2f(40, 32);
+        //m_skinvertex[PLAYER_ARMFRONT+0].texCoords = sf::Vector2f(40, 20);
+        //m_skinvertex[PLAYER_ARMFRONT+1].texCoords = sf::Vector2f(44, 20);
+        //m_skinvertex[PLAYER_ARMFRONT+2].texCoords = sf::Vector2f(44, 32);
+        //m_skinvertex[PLAYER_ARMFRONT+3].texCoords = sf::Vector2f(40, 32);
+        v_arm1[0].texCoords = sf::Vector2f(40, 20);
+        v_arm1[1].texCoords = sf::Vector2f(44, 20);
+        v_arm1[2].texCoords = sf::Vector2f(44, 32);
+        v_arm1[3].texCoords = sf::Vector2f(40, 32);
 
         m_skinvertex[PLAYER_LEGBACK+0].texCoords = sf::Vector2f(0, 20);
         m_skinvertex[PLAYER_LEGBACK+1].texCoords = sf::Vector2f(4, 20);
@@ -384,10 +388,14 @@ void Player::draw(GameEngine *engine)
         m_skinvertex[PLAYER_LEGBACK+2].position = leg2.transformPoint(sf::Vector2f(x+4+x_sneak, y));
         m_skinvertex[PLAYER_LEGBACK+3].position = leg2.transformPoint(sf::Vector2f(x-4+x_sneak, y));
 
-        m_skinvertex[PLAYER_ARMFRONT+0].position = arm1.transformPoint(sf::Vector2f(x-6, y-48+y_sneak));
-        m_skinvertex[PLAYER_ARMFRONT+1].position = arm1.transformPoint(sf::Vector2f(x+2, y-48+y_sneak));
-        m_skinvertex[PLAYER_ARMFRONT+2].position = arm1.transformPoint(sf::Vector2f(x+2, y-24+y_sneak));
-        m_skinvertex[PLAYER_ARMFRONT+3].position = arm1.transformPoint(sf::Vector2f(x-6, y-24+y_sneak));
+        m_skinvertex[PLAYER_ARMFRONT+0].position = sf::Vector2f(0, 0);
+        m_skinvertex[PLAYER_ARMFRONT+1].position = sf::Vector2f(0, 0);
+        m_skinvertex[PLAYER_ARMFRONT+2].position = sf::Vector2f(0, 0);
+        m_skinvertex[PLAYER_ARMFRONT+3].position = sf::Vector2f(0, 0);
+        v_arm1[0].position = arm1.transformPoint(sf::Vector2f(x-6, y-48+y_sneak));
+        v_arm1[1].position = arm1.transformPoint(sf::Vector2f(x+2, y-48+y_sneak));
+        v_arm1[2].position = arm1.transformPoint(sf::Vector2f(x+2, y-24+y_sneak));
+        v_arm1[3].position = arm1.transformPoint(sf::Vector2f(x-6, y-24+y_sneak));
 
         v_block_hand[0].position = block_hand.transformPoint(sf::Vector2f(x-4, y-32+y_sneak));
         v_block_hand[1].position = block_hand.transformPoint(sf::Vector2f(x+12, y-32+y_sneak));
@@ -423,10 +431,10 @@ void Player::draw(GameEngine *engine)
         m_skinvertex[PLAYER_HEAD+2].texCoords = sf::Vector2f(24, 16);
         m_skinvertex[PLAYER_HEAD+3].texCoords = sf::Vector2f(16, 16);
 
-        m_skinvertex[PLAYER_ARMBACK+0].texCoords = sf::Vector2f(48, 20);
-        m_skinvertex[PLAYER_ARMBACK+1].texCoords = sf::Vector2f(52, 20);
-        m_skinvertex[PLAYER_ARMBACK+2].texCoords = sf::Vector2f(52, 32);
-        m_skinvertex[PLAYER_ARMBACK+3].texCoords = sf::Vector2f(48, 32);
+        v_arm1[0].texCoords = sf::Vector2f(48, 20);
+        v_arm1[1].texCoords = sf::Vector2f(52, 20);
+        v_arm1[2].texCoords = sf::Vector2f(52, 32);
+        v_arm1[3].texCoords = sf::Vector2f(48, 32);
 
         m_skinvertex[PLAYER_BODY+0].texCoords = sf::Vector2f(28, 20);
         m_skinvertex[PLAYER_BODY+1].texCoords = sf::Vector2f(32, 20);
@@ -470,10 +478,14 @@ void Player::draw(GameEngine *engine)
         m_skinvertex[PLAYER_ARMFRONT+2].position = arm2.transformPoint(sf::Vector2f(x+6, y-24+y_sneak));
         m_skinvertex[PLAYER_ARMFRONT+3].position = arm2.transformPoint(sf::Vector2f(x-2, y-24+y_sneak));
 
-        m_skinvertex[PLAYER_ARMBACK+0].position = arm1.transformPoint(sf::Vector2f(x-6, y-48+y_sneak));
-        m_skinvertex[PLAYER_ARMBACK+1].position = arm1.transformPoint(sf::Vector2f(x+2, y-48+y_sneak));
-        m_skinvertex[PLAYER_ARMBACK+2].position = arm1.transformPoint(sf::Vector2f(x+2, y-24+y_sneak));
-        m_skinvertex[PLAYER_ARMBACK+3].position = arm1.transformPoint(sf::Vector2f(x-6, y-24+y_sneak));
+        m_skinvertex[PLAYER_ARMBACK+0].position = sf::Vector2f(0, 0);
+        m_skinvertex[PLAYER_ARMBACK+1].position = sf::Vector2f(0, 0);
+        m_skinvertex[PLAYER_ARMBACK+2].position = sf::Vector2f(0, 0);
+        m_skinvertex[PLAYER_ARMBACK+3].position = sf::Vector2f(0, 0);
+        v_arm1[0].position = arm1.transformPoint(sf::Vector2f(x-6, y-48+y_sneak));
+        v_arm1[1].position = arm1.transformPoint(sf::Vector2f(x+2, y-48+y_sneak));
+        v_arm1[2].position = arm1.transformPoint(sf::Vector2f(x+2, y-24+y_sneak));
+        v_arm1[3].position = arm1.transformPoint(sf::Vector2f(x-6, y-24+y_sneak));
 
         v_block_hand[0].position = block_hand.transformPoint(sf::Vector2f(x-18, y-32+y_sneak));
         v_block_hand[1].position = block_hand.transformPoint(sf::Vector2f(x-2, y-32+y_sneak));
@@ -496,6 +508,15 @@ void Player::draw(GameEngine *engine)
         m_skinvertex[PLAYER_HOODIE+3].position = head.transformPoint(sf::Vector2f(x-8, y-48+y_sneak));
     }
 
+    if (m_dir < 0)
+    {
+        engine->m_window.draw(v_arm1, state);
+        engine->m_window.draw(v_block_hand, &engine->m_blocks);
+    }
     engine->m_window.draw(m_skinvertex, state);
-    engine->m_window.draw(v_block_hand, &engine->m_blocks);
+    if (m_dir > 0)
+    {
+        engine->m_window.draw(v_block_hand, &engine->m_blocks);
+        engine->m_window.draw(v_arm1, state);
+    }
 }
