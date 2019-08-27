@@ -41,6 +41,9 @@ Controls::Controls()
     key.key = sf::Keyboard::LAlt;
     m_keys["layerswap"] = key;
 
+    key.key = sf::Keyboard::Z;
+    m_keys["layer1_collide"] = key;
+
     key.key = sf::Keyboard::F2;
     m_keys["screenshot"] = key;
 

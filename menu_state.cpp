@@ -92,6 +92,7 @@ void MenuState::init(GameEngine* engine)
     b_drop = Button(engine, "Drop item: ", (windowsize.x/2)+8, 64+(48*3), 300);
     b_screenshot = Button(engine, "Screenshot: ", (windowsize.x/2)+8, 64+(48*4), 300);
     b_fullscreen_control = Button(engine, "Fullscreen: ", (windowsize.x/2)+8, 64+(48*5), 300);
+    b_layer1_collide = Button(engine, "Layer 1 collisions: ", (windowsize.x/2)+8, 64+(48*6), 300);
 
     l_pressakey = Label(engine, "", windowsize.x/2, windowsize.y/2-48, 1);
 
@@ -187,6 +188,7 @@ void MenuState::setAllPositions(sf::Vector2u& windowsize)
     b_drop.setPosition((windowsize.x/2)+8, 64+(48*3));
     b_screenshot.setPosition((windowsize.x/2)+8, 64+(48*4));
     b_fullscreen_control.setPosition((windowsize.x/2)+8, 64+(48*5));
+    b_layer1_collide.setPosition((windowsize.x/2)+8, 64+(48*6));
 
     l_pressakey.setPosition(windowsize.x/2, windowsize.y/2-48);
 
@@ -225,6 +227,7 @@ void MenuState::update(GameEngine* engine)
     b_drop.setText(sf::String("Drop item: ") + engine->Settings()->controls()->getKeyName("drop"));
     b_screenshot.setText(sf::String("Screenshot: ") + engine->Settings()->controls()->getKeyName("screenshot"));
     b_fullscreen_control.setText(sf::String("Fullscreen: ") + engine->Settings()->controls()->getKeyName("fullscreen"));
+    b_layer1_collide.setText(sf::String("Layer 1 collisions: ") + engine->Settings()->controls()->getKeyName("layer1_collide"));
 
     sf::VideoMode mode = engine->getResolutions()[s_videores.getValue()];
     sprintf(aBuf, "Resolution: %dx%d", mode.width, mode.height);
@@ -320,6 +323,7 @@ void MenuState::event_input(GameEngine* engine, sf::Event& event)
         b_drop.process_input(event);
         b_screenshot.process_input(event);
         b_fullscreen_control.process_input(event);
+        b_layer1_collide.process_input(event);
         b_back_options.process_input(event);
     }
     else if (m_submenu == MENU_OPTIONS_CONTROLS_CHANGE)
@@ -453,6 +457,8 @@ void MenuState::event_input(GameEngine* engine, sf::Event& event)
             changeBind("screenshot");
         if (b_fullscreen_control.update())
             changeBind("fullscreen");
+        if (b_layer1_collide.update())
+            changeBind("layer1_collide");
         if (b_back_options.update())
             m_submenu = MENU_OPTIONS;
     }
@@ -526,6 +532,7 @@ void MenuState::draw(GameEngine* engine)
         b_drop.draw();
         b_screenshot.draw();
         b_fullscreen_control.draw();
+        b_layer1_collide.draw();
         b_back_options.draw();
     }
     else if (m_submenu == MENU_OPTIONS_CONTROLS_CHANGE)

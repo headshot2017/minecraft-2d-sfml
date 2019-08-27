@@ -104,6 +104,7 @@ private:
     Button b_run;
     Button b_inventory;
     Button b_layerswap;
+    Button b_layer1_collide;
     Button b_place;
     Button b_destroy;
     Button b_pick;
