@@ -125,8 +125,6 @@ void IngameState::event_input(GameEngine *engine, sf::Event& event)
         int block = m_world->getBlock(xx, yy);
         int hotbar_filled = 0;
 
-        printf("%d,%d block %d\n", xx, yy, block);
-
         for(int ii=0; ii<18; ii++)
         {
             int i = ii%9;
@@ -265,13 +263,13 @@ void IngameState::draw(GameEngine *engine)
     m_sky.setPosition(cam_x, cam_y);
     engine->m_window.draw(m_sky);
 
-    int xx = (cam_x+400)/32;
-    int yy = (cam_y+240)/32;
+    int xx = (cam_x+(windowsize.x/2))/32;
+    int yy = (cam_y+(windowsize.y/2))/32;
 
     // draw visible chunks
     engine->m_window.draw(m_world->getBlocksFromPoint(xx, yy), &engine->m_blocks);
-    unsigned int maxColumns = (windowsize.x/(CHUNK_W*32))+1;
-    unsigned int maxRows = (windowsize.y/(CHUNK_H*32))+1;
+    unsigned int maxColumns = (windowsize.x/(CHUNK_W*32));
+    unsigned int maxRows = (windowsize.y/(CHUNK_H*32));
     if (windowsize.x % (CHUNK_W*32)) maxColumns++;
     if (windowsize.y % (CHUNK_H*32)) maxRows++;
     if (windowsize.x / (CHUNK_W*32) < 1) maxColumns++;
