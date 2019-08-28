@@ -38,8 +38,10 @@ public:
     void setPlayer(bool t) {m_isPlayer = t;}
     void setCurrBlock(int t) {m_currblock = t;}
     void setAngle(float t) {m_angle = t;}
+    void setLayer1Collisions(bool t) {m_layer1_collide = t;}
     float getAngle() {return m_angle;}
     int getCurrBlock() {return m_currblock;}
+    bool getLayer1Collisions() {return m_layer1_collide;}
     bool isPlayer() {return m_isPlayer;}
     bool blockCollide(int x, int y);
     bool groundCollide();
@@ -69,7 +71,7 @@ private:
     int m_layer = LAYER_BUILD;
     bool m_sneak = false;
 
-    bool m_isPlayer = false, can_move = true;
+    bool m_isPlayer = false, can_move = true, m_layer1_collide = false;
     double m_footstepticks = 0.0; // for footstep animations
     int m_ticks = 0; // ticks elapsed since creation (mainly for footstep sounds)
     int m_armtick = 0; // arm swing (when clicking)

@@ -15,6 +15,7 @@ Player::Player(World* world, GameEngine *engine)
     hspeed = vspeed = gravity = new_x = new_y = x_acc = m_angle = 0.0f;
     m_world = world;
     m_engine = engine;
+    m_layer1_collide = false;
 
     m_skinvertex.resize(7*4);
     m_skinvertex.setPrimitiveType(sf::Quads);
@@ -81,7 +82,7 @@ void Player::moveToRoof()
 
 bool Player::blockCollide(int x, int y)
 {
-    return m_world->getBlock(x, y) != BLOCK_AIR and m_world->getBlockLayer(x, y) == LAYER_BUILD;
+    return m_world->getBlock(x, y) != BLOCK_AIR and (m_world->getBlockLayer(x, y) == LAYER_BUILD or (m_world->getBlockLayer(x, y) == LAYER_NONSOLID and m_layer1_collide));
 }
 
 bool Player::groundCollide()
@@ -252,6 +253,21 @@ void Player::event_input(GameEngine *engine, sf::Event &event)
     {
         m_layer++;
         if (m_layer > LAYER_DECORATION) m_layer = 0;
+    }
+    else if (engine->Settings()->controls()->PressedEvent("layer1_collide", event))
+    {
+        m_layer1_collide = not m_layer1_collide;
+        if (m_layer1_collide and
+           (blockCollide((x+4)/32, (y-1)/32) or
+            blockCollide((x)/32, (y-1)/32) or
+            blockCollide((x-4)/32, (y-1)/32) or
+            blockCollide((x+4)/32, (y-32)/32) or
+            blockCollide((x)/32, (y-32)/32) or
+            blockCollide((x-4)/32, (y-32)/32) or
+            blockCollide((x+4)/32, (y-56)/32) or
+            blockCollide((x)/32, (y-56)/32) or
+            blockCollide((x-4)/32, (y-56)/32)))
+            m_layer1_collide = false;
     }
 }
 
