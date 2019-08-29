@@ -287,44 +287,125 @@ void World::generateWorld(unsigned int seed, const char *name)
 
     double pi = 3.141592653589793;
     int heights[] = {58,59,60,61,62,63,64,65,66,67,68,69,70};
+    bool aHill[3] = {true, false, false};
     int randomDirtLevel[] = {2,3,3,3};
     int startingHeight = heights[rand() % 13]*32;
     int alternateHeight = startingHeight;
     int dirtLevel, stoneLevel, altDirtLvl;
+    int biome = rand() % 2;
+    int tree = rand() % 1;
+    bool hill = aHill[rand() % 3];
+
+    printf("biome: %d\n", biome);
 
     for(int xx=0; xx<WORLD_W*32; xx+=32)
     {
-        dirtLevel = alternateHeight + 32*randomDirtLevel[rand() % 4];
-        stoneLevel = WORLD_H*32;
-
-        setBlock(xx/32, alternateHeight/32, BLOCK_GRASS);
-
-        for(int yy=alternateHeight; yy<dirtLevel; yy+=32)
+        if (biome == 0) // PLAINS //
         {
-            setBlock(xx/32, yy/32+1, BLOCK_DIRT);
-            altDirtLvl = yy;
+            dirtLevel = alternateHeight + 32*randomDirtLevel[rand() % 4];
+            stoneLevel = WORLD_H*32;
+
+            setBlock(xx/32, alternateHeight/32, BLOCK_GRASS);
+
+            // dirt level
+            for(int yy=alternateHeight; yy<dirtLevel; yy+=32)
+            {
+                setBlock(xx/32, yy/32+1, BLOCK_DIRT);
+                altDirtLvl = yy;
+            }
+
+            for(int yy=altDirtLvl; yy<altDirtLvl+64; yy+=32)
+            {
+                int u = rand() % 4;
+                if (u == 1)
+                    setBlock(xx/32, yy/32+2, BLOCK_STONE);
+                else
+                    setBlock(xx/32, yy/32+2, BLOCK_DIRT);
+            }
+
+            //stoneLevel
+            for(int yy=altDirtLvl+64; yy<stoneLevel; yy+=32)
+            {
+                if (yy/32+2 < WORLD_H-2)
+                    setBlock(xx/32, yy/32+2, BLOCK_STONE);
+                else
+                    setBlock(xx/32, yy/32+2, BLOCK_BEDROCK);
+            }
+
+            int amp = rand() % 13;
+            alternateHeight += int((amp*sin((2*pi)/1728*(xx-864))));
         }
 
-        for(int yy=altDirtLvl; yy<altDirtLvl+64; yy+=32)
+        else if (biome == 1) // PLAINS WITH TREES //
         {
-            int u = rand() % 4;
-            if (u == 1)
-                setBlock(xx/32, yy/32+2, BLOCK_STONE);
+            setBlock(xx/32, alternateHeight/32, BLOCK_GRASS);
+
+            dirtLevel = alternateHeight + 32*randomDirtLevel[rand() % 4];
+            stoneLevel = WORLD_H*32;
+            int waterLevel = (WORLD_H-32)*32;
+            int cc[3] = {1,1,2};
+            if (alternateHeight <= waterLevel)
+                tree++;
+
+            // trees
+            if (tree == 9 and alternateHeight <= waterLevel)
+            {
+                int c = cc[rand() % 3];
+                if (c == 1) // put the tree
+                {
+                    int tree_y = alternateHeight-32;
+                    int tree_height = (rand() % 4) + 2;
+                    for (int aY=tree_y; aY >= tree_y-(tree_height*32); aY-=32)
+                        setBlock(xx/32, aY/32, BLOCK_OAK_WOOD, LAYER_NONSOLID);
+                    for (int aY = tree_y-(tree_height*32)-32; aY <= tree_y-(tree_height*32)+32; aY+=32)
+                    {
+                        for (int aX=-2; aX<=2; aX++)
+                        {
+                            if (aY == tree_y-(tree_height*32)-32 and (aX == -2 or aX == 2))
+                                continue;
+                            if (getBlock(xx/32+aX, aY/32) != BLOCK_OAK_WOOD)
+                                setBlock(xx/32+aX, aY/32, BLOCK_OAK_LEAVES, LAYER_NONSOLID);
+                        }
+                    }
+                }
+                int aTree[7] = {1,2,2,3,3,3,4};
+                tree = aTree[rand() % 7];
+            }
+
+            // dirt level
+            for(int yy=alternateHeight; yy<dirtLevel; yy+=32)
+            {
+                setBlock(xx/32, yy/32+1, BLOCK_DIRT);
+                altDirtLvl = yy;
+            }
+
+            for(int yy=altDirtLvl; yy<altDirtLvl+64; yy+=32)
+            {
+                int u = rand() % 4;
+                if (u == 1)
+                    setBlock(xx/32, yy/32+2, BLOCK_STONE);
+                else
+                    setBlock(xx/32, yy/32+2, BLOCK_DIRT);
+            }
+
+            //stoneLevel
+            for(int yy=altDirtLvl+64; yy<stoneLevel; yy+=32)
+            {
+                if (yy/32+2 < WORLD_H-2)
+                    setBlock(xx/32, yy/32+2, BLOCK_STONE);
+                else
+                    setBlock(xx/32, yy/32+2, BLOCK_BEDROCK);
+            }
+
+            int amp;
+            if (hill)
+                amp = 16;
             else
-                setBlock(xx/32, yy/32+2, BLOCK_DIRT);
-        }
+                amp = 10 + (rand() % 4);
 
-        //stoneLevel
-        for(int yy=altDirtLvl+64; yy<stoneLevel; yy+=32)
-        {
-            if (yy/32+2 < WORLD_H-2)
-                setBlock(xx/32, yy/32+2, BLOCK_STONE);
-            else
-                setBlock(xx/32, yy/32+2, BLOCK_BEDROCK);
+            int aChoose[3] = {54,108,240};
+            alternateHeight += amp*sin((2*pi)/1728*(xx-864))+((8+(rand() % 8))*sin((2*pi)/(aChoose[rand()%3])*xx))+((15+(rand()%2))*sin((2*pi/240)*xx));
         }
-
-        int amp = rand() % 13;
-        alternateHeight += int((amp*sin((2*pi)/1728*(xx-864))));
     }
 
     saveWorld();
