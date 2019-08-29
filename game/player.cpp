@@ -131,7 +131,10 @@ void Player::destroyBlock(int xx, int yy)
     if (block2 == BLOCK_AIR) return;
 
     sf::Vector2f view = m_engine->m_window.getView().getCenter();
-    m_engine->Sound()->playDigSound(xx*32, yy*32, view.x, view.y, block2);
+    if (block2 != BLOCK_GLASS and block2 != BLOCK_GLOWSTONE and block2 != BLOCK_ICE)
+        m_engine->Sound()->playDigSound(xx*32, yy*32, view.x, view.y, block2);
+    else
+        m_engine->Sound()->playGlassBreakSound(xx*32, yy*32, view.x, view.y);
     m_world->setBlock(xx, yy, BLOCK_AIR);
 }
 
@@ -147,7 +150,7 @@ void Player::interactBlock(int xx, int yy)
         m_world->setBlock(xx, yy, BLOCK_AIR);
 
         sf::Vector2f view = m_engine->m_window.getView().getCenter();
-        m_engine->Sound()->playSample(xx*32, yy*32, view.x, view.y, SAMPLE_TNT_FUSE, false);
+        m_engine->Sound()->playSample(xx*32, yy*32, view.x, view.y, SAMPLE_TNT_FUSE, 0);
 
         Entity *tnt = new Dynamite(m_world, m_engine, xx, yy);
         m_world->addEntity(tnt);
