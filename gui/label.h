@@ -19,19 +19,22 @@ public:
     void setText(const char *text);
     void setText(sf::String text);
     void setPosition(sf::Vector2f pos);
-    void setPosition(float x, float y) {setPosition(sf::Vector2f(x,y));}
+    void setPosition(float x, float y);
     void setColor(sf::Color color);
     void setScale(float amount);
     void setRotation(float angle);
 
     const sf::String getText() {return m_text.getString();}
+    sf::Vector2f getPosition() {return m_pos;}
+    int getHAlign() {return m_align.x;}
+    int getVAlign() {return m_align.y;}
 
     void draw();
 
 private:
     GameEngine *m_engine;
     sf::Text m_text;
-    sf::Vector2i m_align(0,0);
+    sf::Vector2i m_align;
     sf::Vector2f m_pos;
 };
 

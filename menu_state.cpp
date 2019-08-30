@@ -44,12 +44,15 @@ void MenuState::init(GameEngine* engine)
     m_splashscaledir = 0.002;
 
     srand(time(0));
-    m_splashtext = Label(m_engine, "ara ara", 0, 0);
-    m_splashtext.setAlign(1);
+    m_splashtext = Label(engine, "ara ara", 0, 0, 0, 0);
+    m_splashtext.setHAlign(1);
     m_splashtext.setColor(sf::Color::Yellow);
     m_splashtext.setRotation(-20);
     m_splashtext.setScale(0.2);
     setSplashText();
+
+    m_versioninfo = Label(engine, "Minecraft 2D 0.1", 2, windowsize.y-2, 0, 2);
+    m_fanmadeproject = Label(engine, "Fanmade project", windowsize.x-2, windowsize.y-2, 2, 2);
 
     b_back = Button(engine, sf::String("Back"), (windowsize.x/2)-200, windowsize.y-48);
     b_back_options = Button(engine, sf::String("Back"), (windowsize.x/2)-200, windowsize.y-48);
@@ -149,6 +152,9 @@ void MenuState::setAllPositions(sf::Vector2u& windowsize)
     minecraft_logo.setPosition((windowsize.x/2) - 274.0f, (windowsize.y/4)-64);
     sf::Vector2f aPos = minecraft_logo.getPosition();
     m_splashtext.setPosition(aPos.x+384+88, aPos.y+88+m_splashtext.getText().getSize());
+
+    m_versioninfo.setPosition(2, windowsize.y-2);
+    m_fanmadeproject.setPosition(windowsize.x-2, windowsize.y-2);
 
     b_back.setPosition((windowsize.x/2)-200, windowsize.y-48);
     b_back_options.setPosition((windowsize.x/2)-200, windowsize.y-48);
@@ -471,6 +477,8 @@ void MenuState::draw(GameEngine* engine)
     {
         engine->m_window.draw(minecraft_logo);
         m_splashtext.draw();
+        m_versioninfo.draw();
+        m_fanmadeproject.draw();
         b_singleplayer.draw();
         b_multiplayer.draw();
         b_options.draw();

@@ -89,18 +89,24 @@ void Label::setPosition(sf::Vector2f pos)
 {
     m_pos = pos;
     sf::FloatRect m_size = m_text.getGlobalBounds();
+    sf::Vector2f newpos(pos);
 
     if (m_align.x == 1) // middle
-        m_pos.x = m_pos.x - (m_size.width/2.0f);
+        newpos.x = pos.x - (m_size.width/2.0f);
     else if (m_align.x == 2) // right
-        m_pos.x - m_size.width;
+        newpos.x = pos.x - m_size.width;
 
     if (m_align.y == 1) // middle
-        m_pos.y = m_pos.y - (m_size.height/2.0f);
+        newpos.y = pos.y - (m_size.height/2.0f);
     else if (m_align.y == 2) // bottom
-        m_pos.y - m_size.height;
+        newpos.y = pos.y - m_size.height - 2;
 
-    m_text.setPosition(m_pos);
+    m_text.setPosition(newpos);
+}
+
+void Label::setPosition(float x, float y)
+{
+    setPosition(sf::Vector2f(x,y));
 }
 
 void Label::draw()

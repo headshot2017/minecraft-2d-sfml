@@ -58,6 +58,9 @@ private:
     float m_splashscale;
     float m_splashscaledir;
 
+    Label m_versioninfo;
+    Label m_fanmadeproject;
+
     // general buttons
     Button b_back;
     Button b_back_options;
