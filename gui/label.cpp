@@ -1,6 +1,6 @@
 #include "label.h"
 
-Label::Label(GameEngine *engine, const char *text, float x, float y, int align)
+Label::Label(GameEngine *engine, const char *text, float x, float y, int halign, int valign)
 {
     m_engine = engine;
     m_text.setString(sf::String(text));
@@ -8,10 +8,10 @@ Label::Label(GameEngine *engine, const char *text, float x, float y, int align)
     setScale(0.16667f);
     m_text.setCharacterSize(96);
     setPosition(sf::Vector2f(x,y));
-    setAlign(align);
+    setAlign(halign, valign);
 }
 
-Label::Label(GameEngine *engine, sf::String text, float x, float y, int align)
+Label::Label(GameEngine *engine, sf::String text, float x, float y, int halign, int valign)
 {
     m_engine = engine;
     m_text.setString(text);
@@ -19,10 +19,10 @@ Label::Label(GameEngine *engine, sf::String text, float x, float y, int align)
     setScale(0.16667f);
     m_text.setCharacterSize(96);
     setPosition(sf::Vector2f(x,y));
-    setAlign(align);
+    setAlign(halign, valign);
 }
 
-Label::Label(GameEngine *engine, const char *text, sf::Vector2f pos, int align)
+Label::Label(GameEngine *engine, const char *text, sf::Vector2f pos, int halign, int valign)
 {
     m_engine = engine;
     m_text.setString(sf::String(text));
@@ -30,10 +30,10 @@ Label::Label(GameEngine *engine, const char *text, sf::Vector2f pos, int align)
     setScale(0.16667f);
     m_text.setCharacterSize(96);
     setPosition(pos);
-    setAlign(align);
+    setAlign(halign, valign);
 }
 
-Label::Label(GameEngine *engine, sf::String text, sf::Vector2f pos, int align)
+Label::Label(GameEngine *engine, sf::String text, sf::Vector2f pos, int halign, int valign)
 {
     m_engine = engine;
     m_text.setString(text);
@@ -41,7 +41,7 @@ Label::Label(GameEngine *engine, sf::String text, sf::Vector2f pos, int align)
     setScale(0.16667f);
     m_text.setCharacterSize(96);
     setPosition(pos);
-    setAlign(align);
+    setAlign(halign, valign);
 }
 
 void Label::setScale(float amount)
@@ -61,9 +61,15 @@ void Label::setColor(sf::Color color)
     m_text.setFillColor(color);
 }
 
-void Label::setAlign(int align)
+void Label::setHAlign(int align)
 {
-    m_align = align;
+    m_align.x = align;
+    setPosition(m_pos);
+}
+
+void Label::setVAlign(int align)
+{
+    m_align.y = align;
     setPosition(m_pos);
 }
 
@@ -84,25 +90,17 @@ void Label::setPosition(sf::Vector2f pos)
     m_pos = pos;
     sf::FloatRect m_size = m_text.getGlobalBounds();
 
-    if (m_align == 0) // left
-        m_text.setPosition(m_pos.x, m_pos.y);
-    else if (m_align == 1) // middle
-        m_text.setPosition(m_pos.x - (m_size.width/2.0f), m_pos.y);
-    else if (m_align == 2) // right
-        m_text.setPosition(m_pos.x - m_size.width, m_pos.y);
-}
+    if (m_align.x == 1) // middle
+        m_pos.x = m_pos.x - (m_size.width/2.0f);
+    else if (m_align.x == 2) // right
+        m_pos.x - m_size.width;
 
-void Label::setPosition(float x, float y)
-{
-    m_pos = sf::Vector2f(x,y);
-    sf::FloatRect m_size = m_text.getGlobalBounds();
+    if (m_align.y == 1) // middle
+        m_pos.y = m_pos.y - (m_size.height/2.0f);
+    else if (m_align.y == 2) // bottom
+        m_pos.y - m_size.height;
 
-    if (m_align == 0) // left
-        m_text.setPosition(m_pos.x, m_pos.y);
-    else if (m_align == 1) // middle
-        m_text.setPosition(m_pos.x - (m_size.width/2.0f), m_pos.y);
-    else if (m_align == 2) // right
-        m_text.setPosition(m_pos.x - m_size.width, m_pos.y);
+    m_text.setPosition(m_pos);
 }
 
 void Label::draw()
