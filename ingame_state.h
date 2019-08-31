@@ -54,6 +54,9 @@ private:
     int m_inventory[INV_TOTAL][2] = {0};
     int m_hotbarslot = 0;
     bool lmb = false, rmb = false, mmb = false; // mouse buttons
+    bool m_freecam;
+    bool m_showgui;
+    int m_freecam_add = 32;
     int lmb_tick = 0;
 
 protected:

@@ -28,6 +28,9 @@ void IngameState::init(GameEngine *engine)
     m_world = new World(engine);
     m_gamegui = new GameGUI;
 
+    m_freecam = false;
+    m_showgui = true;
+
     m_sky = sf::RectangleShape(sf::Vector2f(800, 480));
     m_sky.setFillColor(sf::Color(154, 190, 255));
 
@@ -170,6 +173,21 @@ void IngameState::event_input(GameEngine *engine, sf::Event& event)
             engine->pushState(PausedState::Instance());
         else if (intcode >= num1code and intcode <= num9code) // hotbar
             setHotbarSlot(intcode - num1code);
+        else if (event.key.code == sf::Keyboard::F1) // show hotbar, etc
+            m_showgui = not m_showgui;
+        else if (event.key.code == sf::Keyboard::F4) // freecam
+        {
+            m_freecam = not m_freecam;
+            m_world->getPlayer()->setCanMove(not m_freecam);
+        }
+        else if (event.key.code == sf::Keyboard::Right and m_freecam)
+            cam_x = (floor(cam_x/32)*32) + m_freecam_add;
+        else if (event.key.code == sf::Keyboard::Left and m_freecam)
+            cam_x = (floor(cam_x/32)*32) - m_freecam_add;
+        else if (event.key.code == sf::Keyboard::Down and m_freecam)
+            cam_y = (floor(cam_y/32)*32) + m_freecam_add;
+        else if (event.key.code == sf::Keyboard::Up and m_freecam)
+            cam_y = (floor(cam_y/32)*32) - m_freecam_add;
     }
     else if (event.type == sf::Event::MouseWheelScrolled)
     {
@@ -230,21 +248,24 @@ void IngameState::process_input(GameEngine* engine)
     }
 
     // smooth camera
-    sf::Vector2f pos = m_world->getPlayer()->getPos();
-    sf::Vector2f spd = m_world->getPlayer()->getSpeed();
     sf::Vector2u res = engine->app.getSize();
-    float old_cam_x = cam_x;
-    float old_cam_y = cam_y;
+    if (not m_freecam)
+    {
+        sf::Vector2f pos = m_world->getPlayer()->getPos();
+        sf::Vector2f spd = m_world->getPlayer()->getSpeed();
+        float old_cam_x = cam_x;
+        float old_cam_y = cam_y;
 
-    float cam_x_dist = ((pos.x - old_cam_x)-(res.x/2))/16.0f;
-    float cam_y_dist = ((pos.y - old_cam_y)-(res.y/2))/16.0f;
+        float cam_x_dist = ((pos.x - old_cam_x)-(res.x/2))/16.0f;
+        float cam_y_dist = ((pos.y - old_cam_y)-(res.y/2))/16.0f;
 
-    cam_x += cam_x_dist + (spd.x*2.0f);
-    if (m_world->getPlayer()->blockCollide(pos.x/32, pos.y/32) or
-        m_world->getPlayer()->blockCollide((pos.x-4)/32, pos.y/32) or
-        m_world->getPlayer()->blockCollide((pos.x+4)/32, pos.y/32) or
-        (cam_y_dist > 8 or cam_y_dist < -8))
-        cam_y += cam_y_dist;
+        cam_x += cam_x_dist + (spd.x*2.0f);
+        if (m_world->getPlayer()->blockCollide(pos.x/32, pos.y/32) or
+            m_world->getPlayer()->blockCollide((pos.x-4)/32, pos.y/32) or
+            m_world->getPlayer()->blockCollide((pos.x+4)/32, pos.y/32) or
+            (cam_y_dist > 8 or cam_y_dist < -8))
+            cam_y += cam_y_dist;
+    }
 
     cam_x = numwrap(cam_x, 0.0f, WORLD_W*32-(res.x));
     cam_y = numwrap(cam_y, 0.0f, WORLD_H*32-(res.y));
@@ -301,48 +322,51 @@ void IngameState::draw(GameEngine *engine)
     m_world->getPlayer()->draw(engine);
     m_world->drawEntities();
 
-    // mouse block outline
-    sf::Vector2f outlinepos = m_blockoutline.getPosition();
-    if (m_world->getBlock((outlinepos.x+00)/32, (outlinepos.y+00)/32) or
-        m_world->getBlock((outlinepos.x+32)/32, (outlinepos.y+00)/32) or
-        m_world->getBlock((outlinepos.x-32)/32, (outlinepos.y+00)/32) or
-        m_world->getBlock((outlinepos.x+00)/32, (outlinepos.y+32)/32) or
-        m_world->getBlock((outlinepos.x+00)/32, (outlinepos.y-32)/32))
-        engine->m_window.draw(m_blockoutline);
-
-    // inventory
-    sf::Sprite hotbar(engine->m_hotbar);
-    sf::Sprite hotbarselect(engine->m_hotbarselect);
-    hotbar.scale(2,2);
-    hotbarselect.scale(2,2);
-    hotbar.setPosition(cam_x + (windowsize.x/2) - engine->m_hotbar.getSize().x, windowsize.y - (engine->m_hotbar.getSize().y*2)+cam_y);
-    hotbarselect.setPosition(hotbar.getPosition().x - 2 + (m_hotbarslot*40), hotbar.getPosition().y - 2);
-    engine->m_window.draw(hotbar);
-    engine->m_window.draw(hotbarselect);
-    for (int i=0; i<9; i++) // hotbar blocks
+    if (m_showgui)
     {
-        if (m_inventory[i][0])
+        // mouse block outline
+        sf::Vector2f outlinepos = m_blockoutline.getPosition();
+        if (m_world->getBlock((outlinepos.x+00)/32, (outlinepos.y+00)/32) or
+            m_world->getBlock((outlinepos.x+32)/32, (outlinepos.y+00)/32) or
+            m_world->getBlock((outlinepos.x-32)/32, (outlinepos.y+00)/32) or
+            m_world->getBlock((outlinepos.x+00)/32, (outlinepos.y+32)/32) or
+            m_world->getBlock((outlinepos.x+00)/32, (outlinepos.y-32)/32))
+            engine->m_window.draw(m_blockoutline);
+
+        // inventory
+        sf::Sprite hotbar(engine->m_hotbar);
+        sf::Sprite hotbarselect(engine->m_hotbarselect);
+        hotbar.scale(2,2);
+        hotbarselect.scale(2,2);
+        hotbar.setPosition(cam_x + (windowsize.x/2) - engine->m_hotbar.getSize().x, windowsize.y - (engine->m_hotbar.getSize().y*2)+cam_y);
+        hotbarselect.setPosition(hotbar.getPosition().x - 2 + (m_hotbarslot*40), hotbar.getPosition().y - 2);
+        engine->m_window.draw(hotbar);
+        engine->m_window.draw(hotbarselect);
+        for (int i=0; i<9; i++) // hotbar blocks
         {
-            char amount[16];
-            sprintf(amount, "%d", m_inventory[i][1]);
-            sf::Sprite block(engine->m_blocks, sf::IntRect(m_inventory[i][0]*32, 0, 32, 32));
-            Label text_amount(engine, amount, cam_x + (windowsize.x/2) - engine->m_hotbar.getSize().x + (i*40)+36, windowsize.y - (engine->m_hotbar.getSize().y*2)+cam_y + 20, 2);
+            if (m_inventory[i][0])
+            {
+                char amount[16];
+                sprintf(amount, "%d", m_inventory[i][1]);
+                sf::Sprite block(engine->m_blocks, sf::IntRect(m_inventory[i][0]*32, 0, 32, 32));
+                Label text_amount(engine, amount, cam_x + (windowsize.x/2) - engine->m_hotbar.getSize().x + (i*40)+36, windowsize.y - (engine->m_hotbar.getSize().y*2)+cam_y + 20, 2);
 
-            block.setPosition(cam_x + (windowsize.x/2) - engine->m_hotbar.getSize().x + (i*40)+6, windowsize.y - (engine->m_hotbar.getSize().y*2)+cam_y + 6);
+                block.setPosition(cam_x + (windowsize.x/2) - engine->m_hotbar.getSize().x + (i*40)+6, windowsize.y - (engine->m_hotbar.getSize().y*2)+cam_y + 6);
 
-            engine->m_window.draw(block);
-            if (m_inventory[i][1] > 1)
-                text_amount.draw();
+                engine->m_window.draw(block);
+                if (m_inventory[i][1] > 1)
+                    text_amount.draw();
+            }
         }
+
+        char aBuf[192];
+        sprintf(aBuf, "%.1f,%.1f\nChunk position: %d,%d\nBuilding layer: %d\nLayer 1 collisions: %s\n", cam_x/32, cam_y/32, xx/CHUNK_W, yy/CHUNK_H, m_world->getPlayer()->getBuildLayer(), m_world->getPlayer()->getLayer1Collisions() ? "Yes" : "No");
+        text_cam_pos.setString(sf::String(aBuf));
+        text_cam_pos.setPosition(cam_x, cam_y);
+        engine->m_window.draw(text_cam_pos);
     }
 
-    char aBuf[192];
-    sprintf(aBuf, "%.1f,%.1f\nChunk position: %d,%d\nBuilding layer: %d\nLayer 1 collisions: %s\n", cam_x/32, cam_y/32, xx/CHUNK_W, yy/CHUNK_H, m_world->getPlayer()->getBuildLayer(), m_world->getPlayer()->getLayer1Collisions() ? "Yes" : "No");
-    text_cam_pos.setString(sf::String(aBuf));
-    text_cam_pos.setPosition(cam_x, cam_y);
-    engine->m_window.draw(text_cam_pos);
-
-    m_gamegui->draw(engine);
+    m_gamegui->draw(engine); // inventory window, crafting window, etc
 }
 
 void IngameState::pause()
