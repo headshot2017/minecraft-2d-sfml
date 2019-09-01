@@ -40,6 +40,14 @@ void MenuState::init(GameEngine* engine)
     minecraft_logo.setPosition((windowsize.x/2) - 274.0f, (windowsize.y/4)-64);
     minecraft_logo.setScale(2.0f, 2.0f);
 
+    char bgfile[128];
+    //sprintf(bgfile, "data/gui/background/%d.png", rand() % 3);
+    sprintf(bgfile, "data/gui/background/%d.png", 0);
+    m_parallax_bg.loadFromFile(bgfile);
+    parallax_bg.setPrimitiveType(sf::Quads);
+    parallax_bg.resize(4);
+    m_parallax_x = 0.f;
+
     m_splashscale = 0.2;
     m_splashscaledir = 0.002;
 
@@ -152,6 +160,10 @@ void MenuState::setAllPositions(sf::Vector2u& windowsize)
     minecraft_logo.setPosition((windowsize.x/2) - 274.0f, (windowsize.y/4)-64);
     sf::Vector2f aPos = minecraft_logo.getPosition();
     m_splashtext.setPosition(aPos.x+384+88, aPos.y+88+m_splashtext.getText().getSize());
+    parallax_bg[0].position = sf::Vector2f(0, 0);
+    parallax_bg[1].position = sf::Vector2f(windowsize.x, 0);
+    parallax_bg[2].position = sf::Vector2f(windowsize.x, windowsize.y);
+    parallax_bg[3].position = sf::Vector2f(0, windowsize.y);
 
     m_versioninfo.setPosition(2, windowsize.y-2);
     m_fanmadeproject.setPosition(windowsize.x-2, windowsize.y-2);
@@ -206,6 +218,7 @@ void MenuState::setAllPositions(sf::Vector2u& windowsize)
 void MenuState::update(GameEngine* engine)
 {
     char aBuf[128];
+    sf::Vector2u windowsize = engine->app.getSize();
 
     m_splashscale += m_splashscaledir;
     if (m_splashscale >= 0.215)
@@ -219,6 +232,13 @@ void MenuState::update(GameEngine* engine)
         m_splashscaledir = 0.001;
     }
     m_splashtext.setScale(m_splashscale);
+    m_parallax_x += 1.0f;
+    if (m_parallax_x >= m_parallax_bg.getSize().x/2.0f)
+        m_parallax_x = 0;
+    parallax_bg[0].texCoords = sf::Vector2f(m_parallax_x, 0);
+    parallax_bg[1].texCoords = sf::Vector2f(m_parallax_x+windowsize.x, 0);
+    parallax_bg[2].texCoords = sf::Vector2f(m_parallax_x+windowsize.x, m_parallax_bg.getSize().y);
+    parallax_bg[3].texCoords = sf::Vector2f(m_parallax_x, m_parallax_bg.getSize().y);
 
     b_moveleft.setText(sf::String("Move left: ") + engine->Settings()->controls()->getKeyName("left"));
     b_moveright.setText(sf::String("Move right: ") + engine->Settings()->controls()->getKeyName("right"));
@@ -475,6 +495,7 @@ void MenuState::draw(GameEngine* engine)
     engine->m_window.draw(dirt_tile);
     if (m_submenu == MENU_MAINMENU)
     {
+        engine->m_window.draw(parallax_bg, &m_parallax_bg);
         engine->m_window.draw(minecraft_logo);
         m_splashtext.draw();
         m_versioninfo.draw();

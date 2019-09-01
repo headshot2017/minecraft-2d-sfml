@@ -48,9 +48,12 @@ private:
 
     sf::Sprite dirt_tile;
     sf::Sprite minecraft_logo;
+    sf::VertexArray parallax_bg;
 
     sf::Texture m_dirt_tile;
     sf::Texture m_minecraft_logo;
+    sf::Texture m_parallax_bg;
+    float m_parallax_x;
 
     Label m_splashtext;
     std::vector<std::string> m_splashtexts;
