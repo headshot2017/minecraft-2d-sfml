@@ -3,6 +3,7 @@
 
 #include <SFML/Graphics.hpp>
 #include "../game_engine.h"
+#include "label.h"
 
 class Button
 {
@@ -24,7 +25,7 @@ public:
     void draw();
 
 private:
-    sf::Text m_text;
+    Label m_text;
     sf::VertexArray m_sprite;
     sf::Texture* m_texture;
     sf::Vector2f m_pos;

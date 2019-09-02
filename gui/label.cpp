@@ -111,5 +111,17 @@ void Label::setPosition(float x, float y)
 
 void Label::draw()
 {
+    sf::Text shadowtext(m_text.getString(), m_engine->mc_font, 96);
+    sf::Color textcolor(m_text.getFillColor().toInteger());
+    textcolor.r = (textcolor.r > 192) ? textcolor.r-192 : 0;
+    textcolor.g = (textcolor.g > 192) ? textcolor.g-192 : 0;
+    textcolor.b = (textcolor.b > 192) ? textcolor.b-192 : 0;
+
+    shadowtext.setScale(m_text.getScale());
+    shadowtext.setPosition(m_text.getPosition().x+2, m_text.getPosition().y+2);
+    shadowtext.setFillColor(textcolor);
+    shadowtext.setRotation(m_text.getRotation());
+
+    m_engine->m_window.draw(shadowtext);
     m_engine->m_window.draw(m_text);
 }

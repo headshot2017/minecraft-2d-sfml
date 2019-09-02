@@ -15,12 +15,10 @@ Button::Button(GameEngine* _engine, sf::String text, sf::Vector2f pos, int width
     m_pos = pos;
     m_texture = &engine->m_button;
 
-    m_text.setString(text);
-    m_text.setFont(engine->mc_font);
-    m_text.setScale(0.25f, 0.25f);
-    m_text.setCharacterSize(96);
-    m_text.setPosition(m_pos.x + (width/2) - (m_text.getGlobalBounds().width/2.0f),
-                       m_pos.y + 17 - (m_text.getGlobalBounds().height/2.0f));
+    m_text = Label(_engine, text, pos, 1, 1);
+    m_text.setPosition(m_pos.x + (width/2), m_pos.y + 17);
+    //m_text.setPosition(m_pos.x + (width/2) - (m_text.getGlobalBounds().width/2.0f),
+    //                   m_pos.y + 17 - (m_text.getGlobalBounds().height/2.0f));
 
     m_sprite.resize(8);
     m_sprite.setPrimitiveType(sf::Quads);
@@ -33,12 +31,10 @@ Button::Button(GameEngine* _engine, sf::String text, float X, float Y, int width
     m_pos = sf::Vector2f(X, Y);
     m_texture = &engine->m_button;
 
-    m_text.setString(text);
-    m_text.setFont(engine->mc_font);
-    m_text.setScale(0.16667f, 0.16667f);
-    m_text.setCharacterSize(96);
-    m_text.setPosition(m_pos.x + (width/2) - (m_text.getGlobalBounds().width/2.0f),
-                       m_pos.y + 17 - (m_text.getGlobalBounds().height/2.0f));
+    m_text = Label(_engine, text, X, Y, 1, 1);
+    m_text.setPosition(m_pos.x + (width/2), m_pos.y + 17);
+    //m_text.setPosition(m_pos.x + (width/2) - (m_text.getGlobalBounds().width/2.0f),
+    //                   m_pos.y + 17 - (m_text.getGlobalBounds().height/2.0f));
 
     m_sprite.resize(8);
     m_sprite.setPrimitiveType(sf::Quads);
@@ -51,12 +47,10 @@ Button::Button(GameEngine* _engine, const char* text, sf::Vector2f pos, int widt
     m_pos = pos;
     m_texture = &engine->m_button;
 
-    m_text.setString(sf::String(text));
-    m_text.setFont(engine->mc_font);
-    m_text.setScale(0.25f, 0.25f);
-    m_text.setCharacterSize(96);
-    m_text.setPosition(m_pos.x + (width/2) - (m_text.getGlobalBounds().width/2.0f),
-                       m_pos.y + 17 - (m_text.getGlobalBounds().height/2.0f));
+    m_text = Label(_engine, text, pos, 1, 1);
+    m_text.setPosition(m_pos.x + (width/2), m_pos.y + 17);
+    //m_text.setPosition(m_pos.x + (width/2) - (m_text.getGlobalBounds().width/2.0f),
+    //                   m_pos.y + 17 - (m_text.getGlobalBounds().height/2.0f));
 
     m_sprite.resize(8);
     m_sprite.setPrimitiveType(sf::Quads);
@@ -69,12 +63,10 @@ Button::Button(GameEngine* _engine, const char* text, float X, float Y, int widt
     m_pos = sf::Vector2f(X, Y);
     m_texture = &engine->m_button;
 
-    m_text.setString(sf::String(text));
-    m_text.setFont(engine->mc_font);
-    m_text.setScale(0.16667f, 0.16667f);
-    m_text.setCharacterSize(96);
-    m_text.setPosition(m_pos.x + (width/2) - (m_text.getGlobalBounds().width/2.0f),
-                       m_pos.y + 17 - (m_text.getGlobalBounds().height/2.0f));
+    m_text = Label(_engine, text, X, Y, 1, 1);
+    m_text.setPosition(m_pos.x + (width/2), m_pos.y + 17);
+    //m_text.setPosition(m_pos.x + (width/2) - (m_text.getGlobalBounds().width/2.0f),
+    //                   m_pos.y + 17 - (m_text.getGlobalBounds().height/2.0f));
 
     m_sprite.resize(8);
     m_sprite.setPrimitiveType(sf::Quads);
@@ -83,9 +75,10 @@ Button::Button(GameEngine* _engine, const char* text, float X, float Y, int widt
 
 void Button::setButtonWidth(int width)
 {
-    // left button
     m_width = width;
+    m_text.setPosition(m_pos.x + (width/2), m_pos.y + 17);
 
+    // left button
     m_sprite[0].position = m_pos;
     m_sprite[1].position = sf::Vector2f(m_pos.x+(width/2), m_pos.y);
     m_sprite[2].position = sf::Vector2f(m_pos.x+(width/2), m_pos.y+40);
@@ -110,15 +103,12 @@ void Button::setButtonWidth(int width)
 
 void Button::setText(sf::String text)
 {
-    m_text.setString(text);
-    m_text.setPosition(m_pos.x + (m_width/2) - (m_text.getGlobalBounds().width/2.0f),
-                       m_pos.y + 17 - (m_text.getGlobalBounds().height/2.0f));
+    m_text.setText(text);
 }
 
 void Button::setPosition(sf::Vector2f pos)
 {
     m_pos = pos;
-    setText(m_text.getString());
     setButtonWidth(m_width);
 }
 
@@ -144,7 +134,7 @@ bool Button::update()
         sf::Mouse::getPosition(engine->app).y < m_pos.y + 40)
     {
         m_texture = &engine->m_button_hover;
-        m_text.setFillColor(sf::Color(255, 255, 128));
+        m_text.setColor(sf::Color(255, 255, 128));
         if (clicked)
             engine->Sound()->playClickSound();
     }
@@ -152,7 +142,7 @@ bool Button::update()
     {
         clicked = false;
         m_texture = &engine->m_button;
-        m_text.setFillColor(sf::Color::White);
+        m_text.setColor(sf::Color::White);
     }
 
     return clicked;
@@ -162,5 +152,5 @@ void Button::draw()
 {
     //printf("draw. %s %s\n", m_text.getString().toAnsiString().c_str(), (m_texture == nullptr) ? "YES" : "no");
     engine->m_window.draw(m_sprite, m_texture);
-    engine->m_window.draw(m_text);
+    m_text.draw();
 }
