@@ -218,7 +218,6 @@ void MenuState::setAllPositions(sf::Vector2u& windowsize)
 void MenuState::update(GameEngine* engine)
 {
     char aBuf[128];
-    sf::Vector2u windowsize = engine->app.getSize();
 
     m_splashscale += m_splashscaledir;
     if (m_splashscale >= 0.215)
@@ -236,8 +235,8 @@ void MenuState::update(GameEngine* engine)
     if (m_parallax_x >= m_parallax_bg.getSize().x/2.0f)
         m_parallax_x = 0;
     parallax_bg[0].texCoords = sf::Vector2f(m_parallax_x, 0);
-    parallax_bg[1].texCoords = sf::Vector2f(m_parallax_x+windowsize.x, 0);
-    parallax_bg[2].texCoords = sf::Vector2f(m_parallax_x+windowsize.x, m_parallax_bg.getSize().y);
+    parallax_bg[1].texCoords = sf::Vector2f(m_parallax_x+800, 0);
+    parallax_bg[2].texCoords = sf::Vector2f(m_parallax_x+800, m_parallax_bg.getSize().y);
     parallax_bg[3].texCoords = sf::Vector2f(m_parallax_x, m_parallax_bg.getSize().y);
 
     b_moveleft.setText(sf::String("Move left: ") + engine->Settings()->controls()->getKeyName("left"));
