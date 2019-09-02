@@ -41,8 +41,7 @@ void MenuState::init(GameEngine* engine)
     minecraft_logo.setScale(2.0f, 2.0f);
 
     char bgfile[128];
-    //sprintf(bgfile, "data/gui/background/%d.png", rand() % 3);
-    sprintf(bgfile, "data/gui/background/%d.png", 0);
+    sprintf(bgfile, "data/gui/background/%d.png", rand() % 3);
     m_parallax_bg.loadFromFile(bgfile);
     parallax_bg.setPrimitiveType(sf::Quads);
     parallax_bg.resize(4);
