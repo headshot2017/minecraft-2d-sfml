@@ -5,7 +5,6 @@
 #include "paused_state.h"
 #include "gui/label.h"
 #include <SFML/Graphics.hpp>
-#include <direct.h>
 #include <math.h>
 
 IngameState IngameState::m_Instance;
@@ -385,7 +384,6 @@ void IngameState::loadWorld(const char *worldName)
 {
     char aName[96];
     sprintf(aName, "worlds/%s.dat", worldName);
-    mkdir("worlds");
     std::fstream worldFile(aName);
 
     if (not worldFile.good())

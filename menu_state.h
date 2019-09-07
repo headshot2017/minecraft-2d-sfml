@@ -6,6 +6,7 @@
 #include "gui/slider.h"
 #include "gui/textinput.h"
 #include "gui/label.h"
+#include "gui/itemlist.h"
 #include <vector>
 
 typedef enum
@@ -57,6 +58,7 @@ private:
 
     Label m_splashtext;
     std::vector<std::string> m_splashtexts;
+    std::vector<std::string> m_worldlist;
 
     float m_splashscale;
     float m_splashscaledir;
@@ -83,6 +85,7 @@ private:
 
     // multiplayer menu
     Button b_connect;
+    ItemList l_test;
 
     // options menu
     Button b_options_player;

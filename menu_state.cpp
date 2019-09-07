@@ -6,8 +6,33 @@
 #include <algorithm>
 #include <stdio.h>
 #include <time.h>
+#include <direct.h>
+#include <dirent.h>
+
 
 MenuState MenuState::m_Instance;
+
+bool has_suffix(const std::string &str, const std::string &suffix)
+{
+    return str.size() >= suffix.size() &&
+           str.compare(str.size() - suffix.size(), suffix.size(), suffix) == 0;
+}
+
+void listWorlds(std::vector<std::string>& strvec)
+{
+    DIR *dir;
+    struct dirent *entry;
+    strvec.clear();
+
+    if ((dir = opendir("worlds")))
+    {
+        while ((entry = readdir(dir)))
+        {
+            if (has_suffix(std::string(entry->d_name), std::string(".dat")))
+                strvec.push_back(std::string(entry->d_name));
+        }
+    }
+}
 
 void MenuState::init(GameEngine* engine)
 {
@@ -75,7 +100,15 @@ void MenuState::init(GameEngine* engine)
     b_world4 = Button(engine, sf::String("World 4"), (windowsize.x/2)-200, (windowsize.y/4)-32+(48*3));
     b_world5 = Button(engine, sf::String("World 5"), (windowsize.x/2)-200, (windowsize.y/4)-32+(48*4));
 
+    std::vector<std::string> test;
+    for (int i=0; i<30; i++)
+    {
+        char aBuf[8];
+        sprintf(aBuf, "%d", i);
+        test.push_back(std::string(aBuf));
+    }
     b_connect = Button(engine, sf::String("Connect"), (windowsize.x/2)-200, (windowsize.y/4)-32+64);
+    l_test = ItemList(engine, (windowsize.x/2)-200, (windowsize.y/4)-32+96, 600, 256, test);
 
     b_options_player = Button(engine, "Player", (windowsize.x/2)-200, 128);
     b_options_graphics = Button(engine, "Graphics", (windowsize.x/2)-200, 128+48);
@@ -182,6 +215,7 @@ void MenuState::setAllPositions(sf::Vector2u& windowsize)
     b_world5.setPosition((windowsize.x/2)-200, (windowsize.y/4)-32+(48*4));
 
     b_connect.setPosition((windowsize.x/2)-200, (windowsize.y/4)-32+64);
+    l_test.setPosition((windowsize.x/2)-300, (windowsize.y/4)-32+128);
 
     b_options_player.setPosition((windowsize.x/2)-200, 128);
     b_options_graphics.setPosition((windowsize.x/2)-200, 128+48);
@@ -301,6 +335,7 @@ void MenuState::event_input(GameEngine* engine, sf::Event& event)
     {
         b_back.process_input(event);
         b_connect.process_input(event);
+        l_test.event_input(event);
     }
     else if (m_submenu == MENU_OPTIONS)
     {
@@ -369,7 +404,10 @@ void MenuState::event_input(GameEngine* engine, sf::Event& event)
     if (m_submenu == MENU_MAINMENU)
     {
         if (b_singleplayer.update())
+        {
             m_submenu = MENU_LOADWORLD;
+            listWorlds(m_worldlist);
+        }
         if (b_multiplayer.update())
             m_submenu = MENU_MULTIPLAYER;
         if (b_options.update())
@@ -414,6 +452,7 @@ void MenuState::event_input(GameEngine* engine, sf::Event& event)
         if (b_back.update())
             m_submenu = MENU_MAINMENU;
         b_connect.update();
+        l_test.update();
     }
     else if (m_submenu == MENU_OPTIONS)
     {
@@ -515,6 +554,7 @@ void MenuState::draw(GameEngine* engine)
     else if (m_submenu == MENU_MULTIPLAYER)
     {
         b_connect.draw();
+        l_test.draw();
         b_back.draw();
     }
     else if (m_submenu == MENU_OPTIONS)
