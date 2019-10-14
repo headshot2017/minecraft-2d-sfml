@@ -112,7 +112,6 @@ int TextInput::process_input(sf::Event& event)
         else
             active = false;
     }
-
     else if (event.type == sf::Event::TextEntered and active)
     {
         typed = 1;
@@ -155,6 +154,8 @@ int TextInput::process_input(sf::Event& event)
             active = false;
             typed = 2;
         }
+        else if (event.key.code == sf::Keyboard::Delete)
+            m_str.erase(m_caret, 1);
     }
 
     return typed;

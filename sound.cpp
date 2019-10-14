@@ -4,14 +4,48 @@
 
 void SoundEngine::init()
 {
+    m_currmusic = -1;
+    m_music.resize(MUSIC_TOTAL);
     m_sounds.resize(SOUND_TOTAL);
     m_samples.resize(SAMPLE_TOTAL);
     BASS_Init(-1, 44100, 0, 0, 0);
+
+    char aFile[128];
+    for (unsigned i=0; i<m_music.size(); i++)
+    {
+        if (i < 3) // calm.ogg
+        {
+            sprintf(aFile, "data/music/calm%d.ogg", i+1);
+            m_music[i] = BASS_StreamCreateFile(false, aFile, 0, 0, 0);
+        }
+        else if (i < 7) // hal.ogg
+        {
+            sprintf(aFile, "data/music/hal%d.ogg", i-3+1);
+            m_music[i] = BASS_StreamCreateFile(false, aFile, 0, 0, 0);
+        }
+        else if (i < 10) // piano.ogg
+        {
+            sprintf(aFile, "data/music/piano%d.ogg", i-7+1);
+            m_music[i] = BASS_StreamCreateFile(false, aFile, 0, 0, 0);
+        }
+        else if (i < 16) // menu.ogg
+        {
+            sprintf(aFile, "data/music/creative/creative%d.ogg", i-10+1);
+            m_music[i] = BASS_StreamCreateFile(false, aFile, 0, 0, 0);
+        }
+        else if (i < 20) // creative.ogg
+        {
+            sprintf(aFile, "data/music/menu/menu%d.ogg", i-16+1);
+            m_music[i] = BASS_StreamCreateFile(false, aFile, 0, 0, 0);
+        }
+    }
     theme_loaded = false;
 }
 
 void SoundEngine::cleanup()
 {
+    for (HSTREAM snd : m_music) BASS_StreamFree(snd);
+    m_currmusic = -1;
     unloadTheme();
     BASS_Free();
     theme_loaded = false;
@@ -75,13 +109,26 @@ bool SoundEngine::unloadTheme()
 {
     if (not theme_loaded) return false;
 
-    for(int i=0; i<SOUND_TOTAL; i++)
-        BASS_StreamFree(m_sounds[i]);
-    for(int i=0; i<SAMPLE_TOTAL; i++)
-        BASS_SampleFree(m_samples[i]);
+    for (HSTREAM snd : m_sounds) BASS_StreamFree(snd);
+    for (HSTREAM snd : m_samples) BASS_StreamFree(snd);
 
     theme_loaded = false;
     return true;
+}
+
+void SoundEngine::playMusic(int music)
+{
+    stopMusic();
+    BASS_ChannelSetAttribute(m_music[music], BASS_ATTRIB_VOL, 1.0f);
+    BASS_ChannelPlay(m_music[music], true);
+    m_currmusic = music;
+}
+
+void SoundEngine::stopMusic()
+{
+    if (m_currmusic < 0) return;
+    BASS_ChannelStop(m_music[m_currmusic]);
+    m_currmusic = -1;
 }
 
 void SoundEngine::playClickSound()

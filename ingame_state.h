@@ -7,6 +7,7 @@
 #include "game/player.h"
 #include "ingame_gui.h"
 #include <fstream>
+#include <vector>
 
 enum
 {
@@ -28,11 +29,16 @@ public:
     void draw(GameEngine* engine);
     void pause();
     void resume();
-    void onResolutionChange(sf::Vector2u res) {}
-    void generateWorld(unsigned int seed, const char *name) {m_world->generateWorld(seed, name);}
-    void loadWorld(const char *worldName);
+    void onResolutionChange(sf::Vector2u res);
+    void generateFlatWorld(const char *name, const std::vector<int>& blocks) {m_world->generateFlatWorld(name, blocks);}
+    void generateWorld(unsigned int seed, const char *name, int biome=-1) {m_world->generateWorld(seed, name, biome);}
+    void loadWorld(const char *worldName, bool force_generate=false, int biome=-1, const std::vector<int>& blocks=std::vector<int>());
 
     void setHotbarSlot(int slot);
+    void randomizeStars();
+    void setStarAlpha(sf::Uint8 alpha);
+
+    unsigned getStarAlpha() {return m_nightstars[0].color.a;}
 
     static IngameState* Instance() {return &m_Instance;}
 
@@ -43,9 +49,16 @@ private:
     GameEngine *m_engine;
     GameGUI *m_gamegui;
 
+    int m_musicticks;
+    int m_flytick;
+    int m_gamemode;
+
     int m_skytime;
-    sf::RectangleShape m_sky;
+    sf::RectangleShape m_daysky;
+    sf::RectangleShape m_nightsky;
     sf::RectangleShape m_blockoutline;
+    sf::VertexArray m_nightstars;
+    std::vector<unsigned> m_stars_y;
     sf::Text text_cam_pos;
 
     float cam_x, cam_y;

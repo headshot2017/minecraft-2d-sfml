@@ -1,6 +1,7 @@
 #include "world.h"
 #include "entities/falling_block.h"
 #include "entities/tnt.h"
+#include "entities/particles/explosion.h"
 #include <fstream>
 #include <stdlib.h>
 #include <math.h>
@@ -80,6 +81,7 @@ void World::updateEntities()
                 {
                     sf::Vector2f pos = m_entities[i]->getPos();
                     setBlock(pos.x/32, pos.y/32+1, m_entities[i]->getBlock());
+                    delete m_entities[i];
                     m_entities.erase(m_entities.begin() + i);
                     i--;
                 }
@@ -114,12 +116,30 @@ void World::updateEntities()
                                 addEntity(tnt);
                             }
 
-                            if (block2 != BLOCK_BEDROCK)
+                            if (block2 != BLOCK_BEDROCK and block2 != BLOCK_OBSIDIAN)
                                 setBlock(pos.x/32+xx, pos.y/32+yy, BLOCK_AIR);
                         }
                     }
+
+                    for (int i=0; i < (8 + (rand() % 5)); i++)
+                    {
+                        float xx = (i) ? pos.x + (-96 + (rand() % 192)) : pos.x;
+                        float yy = (i) ? pos.y + (-96 + (rand() % 192)) : pos.y;
+                        ExplosionParticle *particle = new ExplosionParticle(this, m_engine, xx, yy);
+                        addEntity(particle);
+                    }
                     sf::Vector2f view = m_engine->m_window.getView().getCenter();
                     m_engine->Sound()->playSample(pos.x, pos.y, view.x, view.y, SAMPLE_EXPLODE);
+                    delete m_entities[i];
+                    m_entities.erase(m_entities.begin() + i);
+                    i--;
+                }
+            }
+            else if (m_entities[i]->entityId() == ENT_PARTICLE)
+            {
+                if (m_entities[i]->willDestroy())
+                {
+                    delete m_entities[i];
                     m_entities.erase(m_entities.begin() + i);
                     i--;
                 }
@@ -279,7 +299,39 @@ sf::VertexArray& World::getBlocksFromPoint(int x, int y)
     return m_blocks2[y_ind][x_ind].getVertex();
 }
 
-void World::generateWorld(unsigned int seed, const char *name)
+void World::generateFlatWorld(const char *name, const std::vector<int>& blocks)
+{
+    sprintf(fileName, "worlds/%s.dat", name);
+    loaded = false;
+
+    printf("%d\n", blocks.size());
+    for(int xx=0; xx<WORLD_W*32; xx+=32)
+    {
+        int yy = WORLD_H*32-32;
+        for (unsigned i=0; i<blocks.size(); i++)
+        {
+            //printf("i %d\n", i);
+            setBlock(xx/32, yy/32, blocks[i]);
+            yy -= 32;
+        }
+    }
+
+    saveWorld();
+    printf("lighting up the world...\n");
+    for(int i=0; i<WORLD_W*WORLD_H*4; i++)
+    {
+        int x = i % WORLD_W;
+        int y = i / WORLD_W;
+        updateLighting(x, y);
+    }
+    printf("completed!\n");
+    m_player = new Player(this, m_engine);
+    m_player->move((WORLD_W*32)/2.0f, 32);
+    m_player->moveToGround();
+    loaded = true;
+}
+
+void World::generateWorld(unsigned int seed, const char *name, int biome)
 {
     srand(seed);
     sprintf(fileName, "worlds/%s.dat", name);
@@ -292,9 +344,11 @@ void World::generateWorld(unsigned int seed, const char *name)
     int startingHeight = heights[rand() % 13]*32;
     int alternateHeight = startingHeight;
     int dirtLevel, stoneLevel, altDirtLvl;
-    int biome = rand() % 3;
-    int tree = rand() % 1;
+    int tree = rand() % 2;
     bool hill = aHill[rand() % 3];
+
+    bool mixed_biome = biome == 3;
+    biome = (biome == -1 or mixed_biome) ? rand()%3 : biome;
 
     printf("biome selected: %d\n", biome);
 
@@ -348,7 +402,7 @@ void World::generateWorld(unsigned int seed, const char *name)
                 tree++;
 
             // trees
-            if (tree == 9 and alternateHeight <= waterLevel)
+            if (tree >= 9 and alternateHeight <= waterLevel)
             {
                 int c = cc[rand() % 3];
                 if (c == 1) // put the tree
@@ -465,6 +519,9 @@ void World::generateWorld(unsigned int seed, const char *name)
             int aChoose[3] = {54,108,240};
             alternateHeight += amp*sin((2*pi)/1728*(xx-864))+((8+(rand() % 8))*sin((2*pi)/(aChoose[rand()%3])*xx))+((15+(rand()%2))*sin((2*pi/240)*xx));
         }
+
+        if (mixed_biome and rand() % 1000 >= 980)
+            biome = rand()%3;
     }
 
     saveWorld();

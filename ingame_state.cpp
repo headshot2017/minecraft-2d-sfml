@@ -20,18 +20,33 @@ float numwrap(float number, float minimum, float maximum)
 
 void IngameState::init(GameEngine *engine)
 {
+    m_engine = engine;
+    engine->app.setKeyRepeatEnabled(false);
+
     cam_x = 0;
     cam_y = 0;
+    m_flytick = 0;
+    m_gamemode = 1;
     m_skytime = 0;
-    m_engine = engine;
     m_world = new World(engine);
     m_gamegui = new GameGUI;
+    m_musicticks = 60*5;
 
     m_freecam = false;
     m_showgui = true;
 
-    m_sky = sf::RectangleShape(sf::Vector2f(800, 480));
-    m_sky.setFillColor(sf::Color(154, 190, 255));
+    m_daysky = sf::RectangleShape(sf::Vector2f(800, 480));
+    m_nightsky = sf::RectangleShape(sf::Vector2f(800, 480));
+    m_daysky.setFillColor(sf::Color(154, 190, 255, 255));
+    m_nightsky.setFillColor(sf::Color(14, 20, 33, 0));
+    printf("init stars\n");
+    m_nightstars.setPrimitiveType(sf::Quads);
+    m_nightstars.resize(96*4);
+    printf("init stars y\n");
+    m_stars_y.resize(96);
+    printf("random stars\n");
+    randomizeStars();
+    printf("stars done\n");
 
     m_blockoutline.setSize(sf::Vector2f(31, 31));
     m_blockoutline.setFillColor(sf::Color::Transparent);
@@ -47,6 +62,8 @@ void IngameState::init(GameEngine *engine)
 
 void IngameState::destroy()
 {
+    m_engine->app.setKeyRepeatEnabled(true);
+    m_engine->Sound()->stopMusic();
     m_engine->m_window.setView(m_engine->m_window.getDefaultView());
     delete m_world;
     delete m_gamegui;
@@ -58,6 +75,7 @@ void IngameState::update(GameEngine *engine)
     {
         int leave_type = engine->leavingGame();
         engine->leaveGame(0);
+        engine->Sound()->stopMusic();
         m_world->saveWorld();
 
         if (leave_type == 1) // return to main menu
@@ -72,12 +90,50 @@ void IngameState::update(GameEngine *engine)
         m_world->getPlayer()->update(engine);
         m_world->updateEntities();
         m_gamegui->update(engine);
+
+        m_musicticks--;
+        if (not m_musicticks)
+        {
+            m_musicticks = 60*60*10; // 10 min
+            engine->Sound()->playMusic(rand() % (m_gamemode == 1 ? MUSIC_MENU1 : MUSIC_CREATIVE1));
+        }
+
+        sf::Color daycolor = m_daysky.getFillColor();
+        sf::Color nightcolor = m_nightsky.getFillColor();
+
+        if (engine->m_ticks % 3 == 0)
+        {
+            m_skytime++;
+            if (m_skytime >= 24000) m_skytime = 0;
+            if (m_skytime < 9000) {daycolor = sf::Color(154, 190, 255, 255); nightcolor = sf::Color(14, 20, 33, 0);}
+            if (m_skytime >= 9000 and m_skytime < 12000 and m_skytime % 11 == 0)
+            {
+                if (daycolor.a) daycolor.a--;
+                if (nightcolor.a < 255) nightcolor.a++;
+                printf("%d,%d\n", daycolor.a, nightcolor.a);
+            }
+            //if (m_skytime == 12000) setStarAlpha(255);
+            if (m_skytime >= 12000 and m_skytime < 21000) {daycolor = sf::Color(154, 190, 255, 0); nightcolor = sf::Color(14, 20, 33, 255);}
+            if (m_skytime >= 21000 and m_skytime % 11 == 0)
+            {
+                if (daycolor.a < 255) daycolor.a++;
+                if (nightcolor.a) nightcolor.a--;
+                //if (getStarAlpha()) setStarAlpha(getStarAlpha()-1);
+                printf("%d,%d\n", daycolor.a, nightcolor.a);
+            }
+            m_daysky.setFillColor(daycolor);
+            m_nightsky.setFillColor(nightcolor);
+        }
+
+        if (m_flytick) m_flytick--;
     }
 }
 
 void IngameState::event_input(GameEngine *engine, sf::Event& event)
 {
-    m_world->getPlayer()->event_input(engine, event);
+    Player *aPlayer = m_world->getPlayer();
+
+    aPlayer->event_input(engine, event);
     int guiresult = m_gamegui->event_input(engine, event);
     if (guiresult > -1)
     {
@@ -99,12 +155,12 @@ void IngameState::event_input(GameEngine *engine, sf::Event& event)
         if (not m_gamegui->isOpen())
         {
             m_gamegui->openInventory();
-            m_world->getPlayer()->setCanMove(false);
+            aPlayer->setCanMove(false);
         }
         else
         {
             m_gamegui->closeGUI();
-            m_world->getPlayer()->setCanMove(true);
+            aPlayer->setCanMove(true);
         }
     }
     else if (engine->Settings()->controls()->PressedEvent("drop", event))
@@ -118,6 +174,16 @@ void IngameState::event_input(GameEngine *engine, sf::Event& event)
                 setHotbarSlot(m_hotbarslot);
             }
         }
+    }
+    else if (engine->Settings()->controls()->PressedEvent("jump", event))
+    {
+        if (m_flytick)
+        {
+            aPlayer->setFlying(not aPlayer->isFlying());
+            m_flytick = 0;
+        }
+        else
+            m_flytick = 60*0.25;
     }
     else if (engine->Settings()->controls()->PressedEvent("pick", event))
     {
@@ -177,7 +243,7 @@ void IngameState::event_input(GameEngine *engine, sf::Event& event)
         else if (event.key.code == sf::Keyboard::F4) // freecam
         {
             m_freecam = not m_freecam;
-            m_world->getPlayer()->setCanMove(not m_freecam);
+            aPlayer->setCanMove(not m_freecam);
         }
         else if (event.key.code == sf::Keyboard::Right and m_freecam)
             cam_x = (floor(cam_x/32)*32) + m_freecam_add;
@@ -187,6 +253,13 @@ void IngameState::event_input(GameEngine *engine, sf::Event& event)
             cam_y = (floor(cam_y/32)*32) + m_freecam_add;
         else if (event.key.code == sf::Keyboard::Up and m_freecam)
             cam_y = (floor(cam_y/32)*32) - m_freecam_add;
+
+        else if (event.key.code == sf::Keyboard::F5)
+            m_musicticks = 1;
+        else if (event.key.code == sf::Keyboard::F6)
+        {
+            m_skytime = (m_skytime < 9000 or m_skytime >= 21000) ? 9000 : 21000;
+        }
     }
     else if (event.type == sf::Event::MouseWheelScrolled)
     {
@@ -208,7 +281,7 @@ void IngameState::event_input(GameEngine *engine, sf::Event& event)
 void IngameState::process_input(GameEngine* engine)
 {
     m_world->getPlayer()->process_input(engine);
-    if (m_world->getPlayer()->getCanMove())
+    if (m_world->getPlayer()->getCanMove() and not engine->isPaused())
     {
         sf::Vector2f mousepos = m_world->getPlayer()->getMouse();
         if (engine->Settings()->controls()->Pressed("place") and not rmb)
@@ -262,7 +335,7 @@ void IngameState::process_input(GameEngine* engine)
         if (m_world->getPlayer()->blockCollide(pos.x/32, pos.y/32) or
             m_world->getPlayer()->blockCollide((pos.x-4)/32, pos.y/32) or
             m_world->getPlayer()->blockCollide((pos.x+4)/32, pos.y/32) or
-            (cam_y_dist > 8 or cam_y_dist < -8))
+            (cam_y_dist > 8 or cam_y_dist < -8) or m_world->getPlayer()->isFlying())
             cam_y += cam_y_dist;
     }
 
@@ -279,9 +352,28 @@ void IngameState::draw(GameEngine *engine)
     sf::View m_view(sf::FloatRect(cam_x, cam_y, windowsize.x, windowsize.y));
     engine->m_window.setView(m_view);
 
-    m_sky.setSize(sf::Vector2f(windowsize.x, windowsize.y));
-    m_sky.setPosition(cam_x, cam_y);
-    engine->m_window.draw(m_sky);
+    m_daysky.setSize(sf::Vector2f(windowsize.x, windowsize.y));
+    m_nightsky.setSize(sf::Vector2f(windowsize.x, windowsize.y));
+    m_daysky.setPosition(cam_x, cam_y);
+    m_nightsky.setPosition(cam_x, cam_y);
+    engine->m_window.draw(m_daysky);
+    engine->m_window.draw(m_nightsky);
+    //printf("draw stars\n");
+    //engine->m_window.draw(m_nightstars);
+
+    sf::Sprite spr_sun(engine->m_sun);
+    sf::Sprite spr_moon(engine->m_moon);
+    spr_sun.setScale(8,8);
+    spr_moon.setScale(8,8);
+
+    if (m_skytime < 13000)
+        spr_sun.setPosition(cam_x+(windowsize.x/2)-128, cam_y+(windowsize.y/5) + ((-m_skytime)/25.0f));
+    else
+        spr_sun.setPosition(cam_x+(windowsize.x/2)-128, cam_y+(windowsize.y/5) + ((-m_skytime+24000)/25.0f));
+    spr_moon.setPosition(cam_x+(windowsize.x/2)-128, cam_y+(windowsize.y/5) + ((-m_skytime+12000)/25.0f));
+
+    engine->m_window.draw(spr_sun);
+    if (m_skytime > 1000) engine->m_window.draw(spr_moon);
 
     int xx = (cam_x+(windowsize.x/2))/32;
     int yy = (cam_y+(windowsize.y/2))/32;
@@ -307,7 +399,7 @@ void IngameState::draw(GameEngine *engine)
             if ((xx+(CHUNK_W*xsep))/CHUNK_W < WORLD_W/CHUNK_W+1)
                 engine->m_window.draw(m_world->getBlocksFromPoint(xx+(CHUNK_W*xsep), yy-(CHUNK_H*ysep)), &engine->m_blocks);
 
-            if ((yy+(CHUNK_H*ysep))/CHUNK_H < WORLD_H/CHUNK_H-2)
+            if ((yy+(CHUNK_H*ysep))/CHUNK_H < WORLD_H/CHUNK_H)
             {
                 engine->m_window.draw(m_world->getBlocksFromPoint(xx-(CHUNK_W*xsep), yy+(CHUNK_H*ysep)), &engine->m_blocks);
                 engine->m_window.draw(m_world->getBlocksFromPoint(xx, yy+(CHUNK_H*ysep)), &engine->m_blocks);
@@ -359,7 +451,7 @@ void IngameState::draw(GameEngine *engine)
         }
 
         char aBuf[192];
-        sprintf(aBuf, "%.1f,%.1f\nChunk position: %d,%d\nBuilding layer: %d\nLayer 1 collisions: %s\n", cam_x/32, cam_y/32, xx/CHUNK_W, yy/CHUNK_H, m_world->getPlayer()->getBuildLayer(), m_world->getPlayer()->getLayer1Collisions() ? "Yes" : "No");
+        sprintf(aBuf, "%.1f,%.1f\nChunk position: %d,%d\nBuilding layer: %d\nLayer 1 collisions: %s\nTime: %d", cam_x/32, cam_y/32, xx/CHUNK_W, yy/CHUNK_H, m_world->getPlayer()->getBuildLayer(), m_world->getPlayer()->getLayer1Collisions() ? "Yes" : "No", m_skytime);
         text_cam_pos.setString(sf::String(aBuf));
         text_cam_pos.setPosition(cam_x, cam_y);
         engine->m_window.draw(text_cam_pos);
@@ -370,6 +462,7 @@ void IngameState::draw(GameEngine *engine)
 
 void IngameState::pause()
 {
+    m_engine->app.setKeyRepeatEnabled(true);
     m_engine->setPaused(true);
     m_engine->takeScreenshot(true);
     m_engine->m_window.setView(m_engine->m_window.getDefaultView());
@@ -377,21 +470,28 @@ void IngameState::pause()
 
 void IngameState::resume()
 {
+    m_engine->app.setKeyRepeatEnabled(false);
     m_engine->setPaused(false);
 }
 
-void IngameState::loadWorld(const char *worldName)
+void IngameState::loadWorld(const char *worldName, bool force_generate, int biome, const std::vector<int>& blocks)
 {
     char aName[96];
     sprintf(aName, "worlds/%s.dat", worldName);
     std::fstream worldFile(aName);
 
-    if (not worldFile.good())
+    if (not worldFile.good() or force_generate)
     {
-        printf("world %s does not exist, creating\n", aName);
+        printf("generating world %s\n", aName);
         worldFile.close();
-        srand(time(0));
-        generateWorld(rand(), worldName);
+
+        if (biome != 4)
+        {
+            srand(time(0));
+            generateWorld(rand(), worldName, biome);
+        }
+        else
+            generateFlatWorld(worldName, blocks);
     }
     else
     {
@@ -410,4 +510,30 @@ void IngameState::setHotbarSlot(int slot)
 {
     m_hotbarslot = slot;
     m_world->getPlayer()->setCurrBlock(m_inventory[slot][0]);
+}
+
+void IngameState::onResolutionChange(sf::Vector2u res)
+{
+    randomizeStars();
+}
+
+void IngameState::randomizeStars()
+{
+    sf::Vector2u size = m_engine->app.getSize();
+    for (unsigned i=0; i<m_nightstars.getVertexCount(); i+=4)
+    {
+        float star_x = rand() % size.x;
+        float star_y = rand() % (size.y + 256);
+        m_nightstars[i+0].position = sf::Vector2f(star_x - 2, star_y - 2);
+        m_nightstars[i+1].position = sf::Vector2f(star_x + 2, star_y - 2);
+        m_nightstars[i+2].position = sf::Vector2f(star_x + 2, star_y + 2);
+        m_nightstars[i+3].position = sf::Vector2f(star_x - 2, star_y + 2);
+        m_stars_y[i] = star_y;
+    }
+}
+
+void IngameState::setStarAlpha(sf::Uint8 alpha)
+{
+    for (unsigned i=0; i<m_nightstars.getVertexCount(); i++)
+        m_nightstars[i].color = sf::Color(144, 144, 144, alpha);
 }

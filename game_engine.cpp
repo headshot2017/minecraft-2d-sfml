@@ -14,6 +14,9 @@ void GameEngine::init()
     setResolution(sf::Vector2u(m_settings.m_screenwidth, m_settings.m_screenheight), flags);
 
     m_blocks.loadFromFile("data/blocks.png");
+    m_explosion.loadFromFile("data/entity/explosion.png");
+    m_sun.loadFromFile("data/environment/sun.png");
+    m_moon.loadFromFile("data/environment/moon.png");
 
     mc_font.loadFromFile("data/font/Minecraftia.ttf");
 
@@ -72,8 +75,6 @@ void GameEngine::update()
 
 void GameEngine::process_input()
 {
-    states.back()->process_input(this);
-
     sf::Event event;
     while (app.pollEvent(event))
     {
@@ -106,6 +107,8 @@ void GameEngine::process_input()
 
         states.back()->event_input(this, event);
     }
+
+    states.back()->process_input(this);
 }
 
 void GameEngine::draw()

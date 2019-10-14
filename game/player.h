@@ -36,6 +36,7 @@ public:
 
     void setCanMove(bool t) {can_move = t;}
     void setPlayer(bool t) {m_isPlayer = t;}
+    void setFlying(bool t) {m_fly = t;}
     void setCurrBlock(int t) {m_currblock = t;}
     void setAngle(float t) {m_angle = t;}
     void setLayer1Collisions(bool t) {m_layer1_collide = t;}
@@ -43,6 +44,7 @@ public:
     int getCurrBlock() {return m_currblock;}
     bool getLayer1Collisions() {return m_layer1_collide;}
     bool isPlayer() {return m_isPlayer;}
+    bool isFlying() {return m_fly;}
     bool blockCollide(int x, int y);
     bool groundCollide();
     void knockBack(float xx, float yy, int maxdist);
@@ -71,7 +73,7 @@ private:
     int m_layer = LAYER_BUILD;
     bool m_sneak = false;
 
-    bool m_isPlayer = false, can_move = true, m_layer1_collide = false;
+    bool m_isPlayer = false, can_move = true, m_layer1_collide = false, m_fly = false;
     double m_footstepticks = 0.0; // for footstep animations
     int m_ticks = 0; // ticks elapsed since creation (mainly for footstep sounds)
     int m_armtick = 0; // arm swing (when clicking)

@@ -44,6 +44,9 @@ public:
     sf::Texture m_screenshot;
 
     sf::Texture m_blocks;
+    sf::Texture m_explosion;
+    sf::Texture m_sun;
+    sf::Texture m_moon;
 
     sf::RenderWindow app;
     sf::Font mc_font;

@@ -16,6 +16,7 @@ Player::Player(World* world, GameEngine *engine)
     m_world = world;
     m_engine = engine;
     m_layer1_collide = false;
+    m_fly = false;
 
     m_skinvertex.resize(7*4);
     m_skinvertex.setPrimitiveType(sf::Quads);
@@ -179,6 +180,10 @@ void Player::update(GameEngine *engine)
             moveToGround();
             gravity = 0.f;
             vspeed = 0.f;
+            m_fly = false;
+            int block = m_world->getBlock(x/32, y/32);
+            sf::Vector2f view = engine->m_window.getView().getCenter();
+            engine->Sound()->playFootstepSound(x, y, view.x, view.y, block);
         }
         else if (vspeed < 0)
         {
@@ -187,7 +192,9 @@ void Player::update(GameEngine *engine)
         }
     }
     else
-        gravity = 0.25f;
+    {
+        gravity = (not m_fly) ? 0.25f : 0.f;
+    }
 
     hspeed += x_acc;
     vspeed += gravity;
@@ -227,7 +234,7 @@ void Player::update(GameEngine *engine)
     {
         m_ticks++;
         float armswing = abs(hspeed);
-        if (hspeed > 5)
+        if (abs(hspeed) > 5)
             armswing = 5;
         m_footstepticks += (armswing*2.5f);
 
@@ -244,8 +251,7 @@ void Player::update(GameEngine *engine)
         if (m_footstepwait) m_footstepwait--;
     }
 
-    if (m_armtick)
-        m_armtick-=10;
+    if (m_armtick) m_armtick-=10;
 }
 
 void Player::event_input(GameEngine *engine, sf::Event &event)
@@ -284,9 +290,15 @@ void Player::process_input(GameEngine *engine)
         m_sneak = engine->Settings()->controls()->Pressed("sneak");
         float spd;
         if (not m_sneak)
-            spd = (engine->Settings()->controls()->Pressed("run")) ? 4 : 3;
+        {
+            spd = (engine->Settings()->controls()->Pressed("run")) ? ((m_fly) ? 10 : 4) : ((m_fly) ? 5 : 3);
+            if (m_fly) vspeed = 0;
+        }
         else
+        {
             spd = 1.5f;
+            if (m_fly) vspeed = 4.5f;
+        }
 
         if (engine->Settings()->controls()->Pressed("left"))
             x_acc = (hspeed > 0) ? -0.5f : -0.25f;
@@ -295,9 +307,9 @@ void Player::process_input(GameEngine *engine)
         else
         {
             if (hspeed > 0)
-                x_acc = -0.25f;
+                x_acc = (m_fly) ? -0.1 : -0.25f;
             else if (hspeed < 0)
-                x_acc = +0.25f;
+                x_acc = (m_fly) ? 0.1 : 0.25f;
             else
                 x_acc = 0.f;
         }
@@ -306,11 +318,24 @@ void Player::process_input(GameEngine *engine)
         if (hspeed < -spd)
             hspeed = -spd;
 
-        if (engine->Settings()->controls()->Pressed("jump") and
-            (blockCollide(x/32, y/32) or
-            blockCollide((x-4)/32, y/32) or
-            blockCollide((x+4)/32, y/32)))
-            vspeed = -4.5f;
+        if (engine->Settings()->controls()->Pressed("jump"))
+        {
+            if (not m_fly)
+            {
+                if (blockCollide(x/32, (y-vspeed)/32) or
+                    blockCollide((x-4)/32, (y-vspeed)/32) or
+                    blockCollide((x+4)/32, (y-vspeed)/32))
+                {
+                    vspeed = -4.5f;
+                }
+            }
+            else
+                vspeed = -4.5f;
+        }
+        else
+        {
+            if (m_fly and not m_sneak) vspeed = 0;
+        }
     }
     else
     {
@@ -330,11 +355,15 @@ void Player::draw(GameEngine *engine)
     sf::RenderStates state;
     state.texture = &m_skin;
 
+    int spdsign = (hspeed > 0) ? 1 :
+                  (hspeed < 0) ? -1 :
+                  0;
+
     int sneakangle = (m_sneak) ? 20*m_dir : 0;
     int x_sneak = (m_sneak) ? 8*(-m_dir) : 0;
     int y_sneak = (m_sneak) ? 6 : 0;
     int block_hand_angle = (m_currblock) ? -20*m_dir : 0;
-    float armswing = (hspeed > 5) ? 5 : hspeed;
+    float armswing = (abs(hspeed) > 5) ? 5*spdsign : hspeed;
     float maxangle = armswing*9.0f;
     float angle = sin(m_footstepticks/60.0f) * maxangle;
 

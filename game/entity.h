@@ -7,7 +7,8 @@
 enum
 {
     ENT_FALLINGBLOCK,
-    ENT_TNT
+    ENT_TNT,
+    ENT_PARTICLE
 };
 
 class World;
@@ -17,6 +18,7 @@ class Entity
 public:
     Entity() {}
     Entity(World *world, GameEngine *engine);
+    virtual ~Entity() {}
 
     virtual sf::Vector2u getSize() = 0;
     virtual bool groundCollide() = 0;
@@ -30,6 +32,7 @@ public:
     int getBlock() {return m_block;}
     int getTicks() {return m_ticks;}
     int getTicksLeft() {return m_ticksleft;}
+    bool willDestroy() {return m_destroy;}
     sf::Vector2f getPos() {return sf::Vector2f(x,y);}
 
 protected:
@@ -37,6 +40,7 @@ protected:
     int m_entityid;
     int m_block;
     int m_ticks, m_ticksleft;
+    bool m_destroy;
     GameEngine *m_engine;
     World *m_world;
 };

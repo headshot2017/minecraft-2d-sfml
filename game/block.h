@@ -66,5 +66,10 @@ private:
     int m_layer = LAYER_BUILD;
 };
 
+namespace Blocks
+{
+    const char * getBlockName(int num);
+};
+
 
 #endif // BLOCK_H_INCLUDED

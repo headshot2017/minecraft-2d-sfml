@@ -16,6 +16,11 @@ typedef enum
     MENU_MULTIPLAYER,
     MENU_OPTIONS,
 
+    MENU_CREATEWORLD,
+    MENU_RENAMEWORLD,
+    MENU_CONFIRMDELETE,
+    MENU_SUPERFLAT_SETUP,
+
     MENU_OPTIONS_GRAPHICS,
     MENU_OPTIONS_CONTROLS,
     MENU_OPTIONS_PLAYER,
@@ -47,6 +52,8 @@ private:
     SUB_MENUS m_submenu = MENU_MAINMENU;
     GameEngine *m_engine;
 
+    int m_musicticks;
+
     sf::Sprite dirt_tile;
     sf::Sprite minecraft_logo;
     sf::VertexArray parallax_bg;
@@ -77,11 +84,31 @@ private:
     Button b_quit;
 
     // singleplayer menu
-    Button b_world1;
-    Button b_world2;
-    Button b_world3;
-    Button b_world4;
-    Button b_world5;
+    Label l_selectworld;
+    ItemList l_worlds;
+    Button b_playworld;
+    Button b_createworld_list;
+    Button b_renameworld;
+    Button b_deleteworld;
+    Button b_recreate_world;
+    Button b_cancel_list;
+
+    Label label_confirm_delete;
+    Button b_delete_yes;
+    Button b_delete_no;
+
+    Label label_renameworld;
+    Button b_confirmrename;
+    Button b_cancelrename;
+
+    Label label_createworld;
+    Label label_worldname;
+    TextInput input_worldname;
+    Button b_worldbiome;
+    Button b_confirmcreate;
+    Button b_cancelcreate;
+    int selected_biome = -1;
+    std::vector<int> superflat_blocks;
 
     // multiplayer menu
     Button b_connect;

@@ -12,6 +12,28 @@
 
 MenuState MenuState::m_Instance;
 
+bool replaceStr(std::string& str, const std::string& from, const std::string& to)
+{
+    std::size_t start_pos = str.find(from);
+    if (start_pos == std::string::npos)
+        return false;
+    str.replace(start_pos, from.length(), to);
+    return true;
+}
+
+void tokenize(std::string const &str, const char* delim,
+			std::vector<std::string> &out)
+{
+	size_t start;
+	size_t end = 0;
+
+	while ((start = str.find_first_not_of(delim, end)) != std::string::npos)
+	{
+		end = str.find(delim, start);
+		out.push_back(str.substr(start, end - start));
+	}
+}
+
 bool has_suffix(const std::string &str, const std::string &suffix)
 {
     return str.size() >= suffix.size() &&
@@ -28,20 +50,29 @@ void listWorlds(std::vector<std::string>& strvec)
     {
         while ((entry = readdir(dir)))
         {
-            if (has_suffix(std::string(entry->d_name), std::string(".dat")))
-                strvec.push_back(std::string(entry->d_name));
+            std::string worldname(entry->d_name);
+            if (has_suffix(worldname, std::string(".dat")))
+            {
+                replaceStr(worldname, ".dat", "");
+                strvec.push_back(worldname);
+            }
         }
     }
+    else
+        mkdir("worlds");
 }
 
 void MenuState::init(GameEngine* engine)
 {
     m_engine = engine;
+    srand(time(0));
 
     if (not engine->isPaused())
         m_submenu = MENU_MAINMENU;
     else
         m_submenu = MENU_OPTIONS;
+
+    m_musicticks = 60*5;
 
     sf::Vector2u windowsize = engine->app.getSize();
 
@@ -75,7 +106,6 @@ void MenuState::init(GameEngine* engine)
     m_splashscale = 0.2;
     m_splashscaledir = 0.002;
 
-    srand(time(0));
     m_splashtext = Label(engine, "ara ara", 0, 0, 0, 0);
     m_splashtext.setHAlign(1);
     m_splashtext.setColor(sf::Color::Yellow);
@@ -94,11 +124,35 @@ void MenuState::init(GameEngine* engine)
     b_options = Button(engine, sf::String("Options"), (windowsize.x/2)-200, b_multiplayer.getPos().y + 64);
     b_quit = Button(engine, sf::String("Quit"), (windowsize.x/2)-200, b_options.getPos().y + 64);
 
-    b_world1 = Button(engine, sf::String("World 1"), (windowsize.x/2)-200, (windowsize.y/4)-32);
-    b_world2 = Button(engine, sf::String("World 2"), (windowsize.x/2)-200, (windowsize.y/4)-32+48);
-    b_world3 = Button(engine, sf::String("World 3"), (windowsize.x/2)-200, (windowsize.y/4)-32+(48*2));
-    b_world4 = Button(engine, sf::String("World 4"), (windowsize.x/2)-200, (windowsize.y/4)-32+(48*3));
-    b_world5 = Button(engine, sf::String("World 5"), (windowsize.x/2)-200, (windowsize.y/4)-32+(48*4));
+    l_selectworld = Label(engine, "Select World", windowsize.x/2, 48, 1, 1);
+    l_worlds = ItemList(engine, (windowsize.x/2)-200, (windowsize.y/4)-32+(48*2), 400, 192, m_worldlist);
+    b_playworld = Button(engine, "Play Selected World", (windowsize.x/2)-300-8, windowsize.y-96, 300);
+    b_createworld_list = Button(engine, "Create New World", (windowsize.x/2)+8, windowsize.y-96, 300);
+    b_renameworld = Button(engine, "Rename", b_playworld.getPos().x, windowsize.y-48, 144);
+    b_deleteworld = Button(engine, "Delete", (windowsize.x/2)-144-8, windowsize.y-48, 144);
+    b_recreate_world = Button(engine, "Re-Create", (windowsize.x/2)+8, windowsize.y-48, 144);
+    b_cancel_list = Button(engine, "Cancel", b_recreate_world.getPos().x+144+12, windowsize.y-48, 144);
+
+    label_createworld = Label(engine, "Create New World", windowsize.x/2, 48, 1, 1);
+    label_worldname = Label(engine, "World name", (windowsize.x/2)-200, 96);
+    input_worldname = TextInput(engine, "New World", sf::Vector2f((windowsize.x/2)-200, 96+24), 96);
+    b_worldbiome = Button(engine, "Biome: Random", (windowsize.x/2)-200, 96+88);
+    b_confirmcreate = Button(engine, "Create New World", (windowsize.x/2)-300-8, windowsize.y-48, 300);
+    b_cancelcreate = Button(engine, "Cancel", (windowsize.x/2)+8, windowsize.y-48, 300);
+
+    superflat_blocks.push_back(BLOCK_BEDROCK);
+    superflat_blocks.push_back(BLOCK_BEDROCK);
+    for(int i=0; i<5; i++) superflat_blocks.push_back(BLOCK_STONE);
+    for(int i=0; i<3; i++) superflat_blocks.push_back(BLOCK_DIRT);
+    superflat_blocks.push_back(BLOCK_GRASS);
+
+    label_confirm_delete = Label(engine, "Ara (ara) you sure?", windowsize.x/2, windowsize.y/2-96, 1);
+    b_delete_yes = Button(engine, "Delete", (windowsize.x/2)-300-8, windowsize.y/2+16, 300);
+    b_delete_no = Button(engine, "Cancel", (windowsize.x/2)+8, windowsize.y/2+16, 300);
+
+    label_renameworld = Label(engine, "Rename World", windowsize.x/2, 48, 1, 1);
+    b_cancelrename = Button(engine, "Cancel", windowsize.x/2-200, windowsize.y-40-32);
+    b_confirmrename = Button(engine, "Rename", windowsize.x/2-200, b_cancelrename.getPos().y-48);
 
     std::vector<std::string> test;
     for (int i=0; i<30; i++)
@@ -108,16 +162,16 @@ void MenuState::init(GameEngine* engine)
         test.push_back(std::string(aBuf));
     }
     b_connect = Button(engine, sf::String("Connect"), (windowsize.x/2)-200, (windowsize.y/4)-32+64);
-    l_test = ItemList(engine, (windowsize.x/2)-200, (windowsize.y/4)-32+96, 600, 256, test);
+    l_test = ItemList(engine, (windowsize.x/2)-150, (windowsize.y/4)-32+128, 300, 192, test);
 
     b_options_player = Button(engine, "Player", (windowsize.x/2)-200, 128);
     b_options_graphics = Button(engine, "Graphics", (windowsize.x/2)-200, 128+48);
     b_options_controls = Button(engine, "Controls", (windowsize.x/2)-200, 128+96);
 
     label_playername = Label(engine, "Player name", (windowsize.x/2)-200, 96);
-    input_playername = TextInput(engine, engine->Settings()->m_playername, sf::Vector2f((windowsize.x/2)-200, 96+24), sizeof(engine->Settings()->m_playername));
+    input_playername = TextInput(engine, engine->Settings()->m_playername, sf::Vector2f((windowsize.x/2)-200, 96+24), 24);
     label_playerskin = Label(engine, "Player skin", (windowsize.x/2)-200, 96+88);
-    input_playerskin = TextInput(engine, engine->Settings()->m_playerskin, sf::Vector2f((windowsize.x/2)-200, 96+112), sizeof(engine->Settings()->m_playerskin));
+    input_playerskin = TextInput(engine, engine->Settings()->m_playerskin, sf::Vector2f((windowsize.x/2)-200, 96+112), 64);
     char skin[64];
     sprintf(skin, "data/skins/%s.png", input_playerskin.getString().toAnsiString().c_str());
     txt_playerskin.loadFromFile(skin);
@@ -208,14 +262,33 @@ void MenuState::setAllPositions(sf::Vector2u& windowsize)
     b_options.setPosition((windowsize.x/2)-200, b_multiplayer.getPos().y + 64);
     b_quit.setPosition((windowsize.x/2)-200, b_options.getPos().y + 64);
 
-    b_world1.setPosition((windowsize.x/2)-200, (windowsize.y/4)-32);
-    b_world2.setPosition((windowsize.x/2)-200, (windowsize.y/4)-32+48);
-    b_world3.setPosition((windowsize.x/2)-200, (windowsize.y/4)-32+(48*2));
-    b_world4.setPosition((windowsize.x/2)-200, (windowsize.y/4)-32+(48*3));
-    b_world5.setPosition((windowsize.x/2)-200, (windowsize.y/4)-32+(48*4));
+    l_worlds.setPosition(64, (windowsize.y/4)-32);
+    l_worlds.setSize(windowsize.x-128, b_back.getPos().y - l_worlds.getPosition().y - 64);
+    l_selectworld.setPosition(windowsize.x/2, 48);
+    b_playworld.setPosition((windowsize.x/2)-300-8, windowsize.y-96);
+    b_createworld_list.setPosition((windowsize.x/2)+8, windowsize.y-96);
+    b_renameworld.setPosition(b_playworld.getPos().x, windowsize.y-48);
+    b_deleteworld.setPosition((windowsize.x/2)-144-8, windowsize.y-48);
+    b_recreate_world.setPosition((windowsize.x/2)+8, windowsize.y-48);
+    b_cancel_list.setPosition(b_recreate_world.getPos().x+144+12, windowsize.y-48);
+
+    label_createworld.setPosition(windowsize.x/2, 48);
+    label_worldname.setPosition((windowsize.x/2)-200, 96);
+    input_worldname.setPosition((windowsize.x/2)-200, 96+24);
+    b_worldbiome.setPosition((windowsize.x/2)-200, 96+88);
+    b_confirmcreate.setPosition((windowsize.x/2)-300-8, windowsize.y-48);
+    b_cancelcreate.setPosition((windowsize.x/2)+8, windowsize.y-48);
+
+    label_confirm_delete.setPosition(windowsize.x/2, windowsize.y/2-96);
+    b_delete_yes.setPosition((windowsize.x/2)-300-8, windowsize.y/2+16);
+    b_delete_no.setPosition((windowsize.x/2)+8, windowsize.y/2+16);
+
+    label_renameworld.setPosition(windowsize.x/2, 48);
+    b_cancelrename.setPosition(windowsize.x/2-200, windowsize.y-40-32);
+    b_confirmrename.setPosition(windowsize.x/2-200, b_cancelrename.getPos().y-48);
 
     b_connect.setPosition((windowsize.x/2)-200, (windowsize.y/4)-32+64);
-    l_test.setPosition((windowsize.x/2)-300, (windowsize.y/4)-32+128);
+    l_test.setPosition((windowsize.x/2)-150, (windowsize.y/4)-32+128);
 
     b_options_player.setPosition((windowsize.x/2)-200, 128);
     b_options_graphics.setPosition((windowsize.x/2)-200, 128+48);
@@ -293,6 +366,17 @@ void MenuState::update(GameEngine* engine)
 
     sprintf(aBuf, "Fullscreen: %s", fullscreen ? "YES" : "NO");
     b_fullscreen.setText(aBuf);
+
+    if (not engine->isPaused())
+    {
+        m_musicticks--;
+        if (not m_musicticks)
+        {
+            engine->Sound()->playMusic(MUSIC_MENU1 + (rand() % 4));
+            HSTREAM menu_music = engine->Sound()->getCurrentMusic();
+            m_musicticks = 60 * (BASS_ChannelBytes2Seconds(menu_music, BASS_ChannelGetLength(menu_music, BASS_POS_BYTE)) + 5);
+        }
+    }
 }
 
 void MenuState::event_input(GameEngine* engine, sf::Event& event)
@@ -313,6 +397,8 @@ void MenuState::event_input(GameEngine* engine, sf::Event& event)
                 setSplashText(); // minecraft does this too.
             }
         }
+        else if (event.key.code == sf::Keyboard::F5)
+            m_musicticks = 1;
     }
 
     if (m_submenu == MENU_MAINMENU)
@@ -324,12 +410,13 @@ void MenuState::event_input(GameEngine* engine, sf::Event& event)
     }
     else if (m_submenu == MENU_LOADWORLD)
     {
-        b_back.process_input(event);
-        b_world1.process_input(event);
-        b_world2.process_input(event);
-        b_world3.process_input(event);
-        b_world4.process_input(event);
-        b_world5.process_input(event);
+        l_worlds.event_input(event);
+        b_playworld.process_input(event);
+        b_createworld_list.process_input(event);
+        b_renameworld.process_input(event);
+        b_deleteworld.process_input(event);
+        b_recreate_world.process_input(event);
+        b_cancel_list.process_input(event);
     }
     else if (m_submenu == MENU_MULTIPLAYER)
     {
@@ -337,6 +424,26 @@ void MenuState::event_input(GameEngine* engine, sf::Event& event)
         b_connect.process_input(event);
         l_test.event_input(event);
     }
+
+    else if (m_submenu == MENU_CREATEWORLD)
+    {
+        input_worldname.process_input(event);
+        b_worldbiome.process_input(event);
+        b_confirmcreate.process_input(event);
+        b_cancelcreate.process_input(event);
+    }
+    else if (m_submenu == MENU_CONFIRMDELETE)
+    {
+        b_delete_yes.process_input(event);
+        b_delete_no.process_input(event);
+    }
+    else if (m_submenu == MENU_RENAMEWORLD)
+    {
+        input_worldname.process_input(event);
+        b_confirmrename.process_input(event);
+        b_cancelrename.process_input(event);
+    }
+
     else if (m_submenu == MENU_OPTIONS)
     {
         b_back.process_input(event);
@@ -350,11 +457,10 @@ void MenuState::event_input(GameEngine* engine, sf::Event& event)
             sprintf(engine->Settings()->m_playername, "%s", input_playername.getString().toAnsiString().c_str());
         if (input_playerskin.process_input(event) == 2) // enter key
         {
-            const char *newskin = input_playerskin.getString().toAnsiString().c_str();
             char skin[64];
-            sprintf(skin, "data/skins/%s.png", newskin);
+            sprintf(skin, "data/skins/%s.png", input_playerskin.getString().toAnsiString().c_str());
             if (txt_playerskin.loadFromFile(skin)) //success
-                sprintf(engine->Settings()->m_playerskin, "%s", newskin);
+                sprintf(engine->Settings()->m_playerskin, "%s", input_playerskin.getString().toAnsiString().c_str());
             else
                 input_playerskin.setText(engine->Settings()->m_playerskin);
         }
@@ -407,6 +513,7 @@ void MenuState::event_input(GameEngine* engine, sf::Event& event)
         {
             m_submenu = MENU_LOADWORLD;
             listWorlds(m_worldlist);
+            l_worlds.setItems(m_worldlist);
         }
         if (b_multiplayer.update())
             m_submenu = MENU_MULTIPLAYER;
@@ -417,34 +524,42 @@ void MenuState::event_input(GameEngine* engine, sf::Event& event)
     }
     else if (m_submenu == MENU_LOADWORLD)
     {
-        int world = 0;
-        if (b_back.update())
+        int world = -1;
+        if (b_cancel_list.update())
             m_submenu = MENU_MAINMENU;
-        if (b_world1.update())
-            world = 1;
-        if (b_world2.update())
-            world = 2;
-        if (b_world3.update())
-            world = 3;
-        if (b_world4.update())
-            world = 4;
-        if (b_world5.update())
-            world = 5;
 
-        if (world > 0) // world selected
+        l_worlds.update();
+        if (b_playworld.update() and l_worlds.isSelected())
+            world = l_worlds.getSelected();
+        if (b_createworld_list.update())
         {
+            m_submenu = MENU_CREATEWORLD;
+            input_worldname.setText("New World");
+        }
+        if (b_renameworld.update() and l_worlds.isSelected())
+        {
+            m_submenu = MENU_RENAMEWORLD;
+            input_worldname.setText(l_worlds.getSelectedItem().c_str());
+        }
+        if (b_deleteworld.update() and l_worlds.isSelected())
+        {
+            m_submenu = MENU_CONFIRMDELETE;
+            char aBuf[256];
+            sprintf(aBuf, "Are you sure you want to delete this world?\n\n'%s' will be lost forever! (A long time!)", l_worlds.getSelectedItem().c_str());
+            label_confirm_delete.setText(aBuf);
+        }
+        if (b_recreate_world.update() and l_worlds.isSelected())
+        {
+            m_submenu = MENU_CREATEWORLD;
+            input_worldname.setText(l_worlds.getSelectedItem().c_str());
+        }
+
+        if (world >= 0) // world selected
+        {
+            engine->Sound()->stopMusic();
             IngameState* state = IngameState::Instance();
             engine->changeState(state);
-            if (world == 1)
-                state->loadWorld("world 1");
-            if (world == 2)
-                state->loadWorld("world 2");
-            if (world == 3)
-                state->loadWorld("world 3");
-            if (world == 4)
-                state->loadWorld("world 4");
-            if (world == 5)
-                state->loadWorld("world 5");
+            state->loadWorld(l_worlds.getSelectedItem().c_str());
         }
     }
     else if (m_submenu == MENU_MULTIPLAYER)
@@ -470,6 +585,63 @@ void MenuState::event_input(GameEngine* engine, sf::Event& event)
         if (b_options_graphics.update())
             m_submenu = MENU_OPTIONS_GRAPHICS;
     }
+
+    else if (m_submenu == MENU_CREATEWORLD)
+    {
+        input_worldname.update();
+        if (b_worldbiome.update())
+        {
+            selected_biome++;
+            if (selected_biome > 4) selected_biome = -1;
+            b_worldbiome.setText( (selected_biome == -1) ? "Biome: Random" :
+                                  (selected_biome == 0) ? "Biome: Plains" :
+                                  (selected_biome == 1) ? "Biome: Plains With Trees" :
+                                  (selected_biome == 2) ? "Biome: Desert" :
+                                  (selected_biome == 3) ? "Biome: Mixed" :
+                                  (selected_biome == 4) ? "Biome: Superflat" :
+                                  "Biome: ???" );
+        }
+        if (b_confirmcreate.update())
+        {
+            engine->Sound()->stopMusic();
+            IngameState* state = IngameState::Instance();
+            engine->changeState(state);
+            state->loadWorld(input_worldname.getString().toAnsiString().c_str(), true, selected_biome, superflat_blocks);
+        }
+        if (b_cancelcreate.update())
+            m_submenu = MENU_LOADWORLD;
+    }
+    else if (m_submenu == MENU_CONFIRMDELETE)
+    {
+        if (b_delete_yes.update())
+        {
+            char aBuf[256];
+            sprintf(aBuf, "worlds/%s.dat", l_worlds.getSelectedItem().c_str());
+            remove(aBuf);
+            m_submenu = MENU_LOADWORLD;
+            listWorlds(m_worldlist);
+            l_worlds.setItems(m_worldlist);
+        }
+        if (b_delete_no.update())
+            m_submenu = MENU_LOADWORLD;
+    }
+    else if (m_submenu == MENU_RENAMEWORLD)
+    {
+        input_worldname.update();
+        if (b_confirmrename.update())
+        {
+            char aBuf[256], aBuf2[256];
+            sprintf(aBuf, "worlds/%s.dat", l_worlds.getSelectedItem().c_str());
+            sprintf(aBuf2, "worlds/%s.dat", input_worldname.getString().toAnsiString().c_str());
+            rename(aBuf, aBuf2);
+            m_submenu = MENU_LOADWORLD;
+            listWorlds(m_worldlist);
+            l_worlds.setItems(m_worldlist);
+        }
+        if (b_cancelrename.update())
+            m_submenu = MENU_LOADWORLD;
+    }
+
     else if (m_submenu == MENU_OPTIONS_PLAYER)
     {
         input_playername.update();
@@ -544,12 +716,14 @@ void MenuState::draw(GameEngine* engine)
     }
     else if (m_submenu == MENU_LOADWORLD)
     {
-        b_world1.draw();
-        b_world2.draw();
-        b_world3.draw();
-        b_world4.draw();
-        b_world5.draw();
-        b_back.draw();
+        l_selectworld.draw();
+        l_worlds.draw();
+        b_playworld.draw();
+        b_createworld_list.draw();
+        b_renameworld.draw();
+        b_deleteworld.draw();
+        b_recreate_world.draw();
+        b_cancel_list.draw();
     }
     else if (m_submenu == MENU_MULTIPLAYER)
     {
@@ -564,6 +738,30 @@ void MenuState::draw(GameEngine* engine)
         b_options_controls.draw();
         b_back.draw();
     }
+
+    else if (m_submenu == MENU_CREATEWORLD)
+    {
+        label_createworld.draw();
+        label_worldname.draw();
+        input_worldname.draw();
+        b_worldbiome.draw();
+        b_confirmcreate.draw();
+        b_cancelcreate.draw();
+    }
+    else if (m_submenu == MENU_CONFIRMDELETE)
+    {
+        label_confirm_delete.draw();
+        b_delete_yes.draw();
+        b_delete_no.draw();
+    }
+    else if (m_submenu == MENU_RENAMEWORLD)
+    {
+        label_worldname.draw();
+        input_worldname.draw();
+        b_confirmrename.draw();
+        b_cancelrename.draw();
+    }
+
     else if (m_submenu == MENU_OPTIONS_PLAYER)
     {
         sf::Sprite skin(txt_playerskin);
