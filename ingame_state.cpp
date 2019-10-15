@@ -31,9 +31,15 @@ void IngameState::init(GameEngine *engine)
     m_world = new World(engine);
     m_gamegui = new GameGUI;
     m_musicticks = 60*5;
+    for (int i=0; i<INV_TOTAL; i++)
+    {
+        m_inventory[i][0] = 0;
+        m_inventory[i][1] = 0;
+    }
 
     m_freecam = false;
     m_showgui = true;
+    m_showdebug = true;
 
     m_daysky = sf::RectangleShape(sf::Vector2f(800, 480));
     m_nightsky = sf::RectangleShape(sf::Vector2f(800, 480));
