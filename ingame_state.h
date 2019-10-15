@@ -36,9 +36,6 @@ public:
 
     void setHotbarSlot(int slot);
     void randomizeStars();
-    void setStarAlpha(sf::Uint8 alpha);
-
-    unsigned getStarAlpha() {return m_nightstars[0].color.a;}
 
     static IngameState* Instance() {return &m_Instance;}
 
@@ -57,8 +54,10 @@ private:
     sf::RectangleShape m_daysky;
     sf::RectangleShape m_nightsky;
     sf::RectangleShape m_blockoutline;
-    sf::VertexArray m_nightstars;
-    std::vector<unsigned> m_stars_y;
+    sf::Texture m_nightstars;
+    int m_starflip, m_starflipvert;
+    sf::Uint8 m_staralpha;
+    unsigned m_star_x;
     sf::Text text_cam_pos;
 
     float cam_x, cam_y;

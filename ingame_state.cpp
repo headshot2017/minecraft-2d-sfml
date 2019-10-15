@@ -40,10 +40,10 @@ void IngameState::init(GameEngine *engine)
     m_daysky.setFillColor(sf::Color(154, 190, 255, 255));
     m_nightsky.setFillColor(sf::Color(14, 20, 33, 0));
     printf("init stars\n");
-    m_nightstars.setPrimitiveType(sf::Quads);
-    m_nightstars.resize(96*4);
-    printf("init stars y\n");
-    m_stars_y.resize(96);
+    m_nightstars.loadFromFile("data/environment/stars.png");
+    m_starflip = 1;
+    m_starflipvert = 1;
+    m_staralpha = 0;
     printf("random stars\n");
     randomizeStars();
     printf("stars done\n");
@@ -105,20 +105,20 @@ void IngameState::update(GameEngine *engine)
         {
             m_skytime++;
             if (m_skytime >= 24000) m_skytime = 0;
-            if (m_skytime < 9000) {daycolor = sf::Color(154, 190, 255, 255); nightcolor = sf::Color(14, 20, 33, 0);}
+            if (m_skytime < 9000) {daycolor = sf::Color(154, 190, 255, 255); nightcolor = sf::Color(14, 20, 33, 0); m_staralpha = 0;}
             if (m_skytime >= 9000 and m_skytime < 12000 and m_skytime % 11 == 0)
             {
                 if (daycolor.a) daycolor.a--;
                 if (nightcolor.a < 255) nightcolor.a++;
+                if (m_staralpha < 255) m_staralpha++;
                 printf("%d,%d\n", daycolor.a, nightcolor.a);
             }
-            //if (m_skytime == 12000) setStarAlpha(255);
-            if (m_skytime >= 12000 and m_skytime < 21000) {daycolor = sf::Color(154, 190, 255, 0); nightcolor = sf::Color(14, 20, 33, 255);}
+            if (m_skytime >= 12000 and m_skytime < 21000) {daycolor = sf::Color(154, 190, 255, 0); nightcolor = sf::Color(14, 20, 33, 255); m_staralpha = 255;}
             if (m_skytime >= 21000 and m_skytime % 11 == 0)
             {
                 if (daycolor.a < 255) daycolor.a++;
                 if (nightcolor.a) nightcolor.a--;
-                //if (getStarAlpha()) setStarAlpha(getStarAlpha()-1);
+                if (m_staralpha) m_staralpha--;
                 printf("%d,%d\n", daycolor.a, nightcolor.a);
             }
             m_daysky.setFillColor(daycolor);
@@ -352,14 +352,17 @@ void IngameState::draw(GameEngine *engine)
     sf::View m_view(sf::FloatRect(cam_x, cam_y, windowsize.x, windowsize.y));
     engine->m_window.setView(m_view);
 
+    sf::Sprite spr_stars(m_nightstars);
+    spr_stars.setScale(3,3);
     m_daysky.setSize(sf::Vector2f(windowsize.x, windowsize.y));
     m_nightsky.setSize(sf::Vector2f(windowsize.x, windowsize.y));
     m_daysky.setPosition(cam_x, cam_y);
     m_nightsky.setPosition(cam_x, cam_y);
+    spr_stars.setPosition(cam_x - m_star_x, cam_y + ((-m_skytime)/30));
+    spr_stars.setColor(sf::Color(255, 255, 255, m_staralpha));
     engine->m_window.draw(m_daysky);
     engine->m_window.draw(m_nightsky);
-    //printf("draw stars\n");
-    //engine->m_window.draw(m_nightstars);
+    engine->m_window.draw(spr_stars);
 
     sf::Sprite spr_sun(engine->m_sun);
     sf::Sprite spr_moon(engine->m_moon);
@@ -519,21 +522,5 @@ void IngameState::onResolutionChange(sf::Vector2u res)
 
 void IngameState::randomizeStars()
 {
-    sf::Vector2u size = m_engine->app.getSize();
-    for (unsigned i=0; i<m_nightstars.getVertexCount(); i+=4)
-    {
-        float star_x = rand() % size.x;
-        float star_y = rand() % (size.y + 256);
-        m_nightstars[i+0].position = sf::Vector2f(star_x - 2, star_y - 2);
-        m_nightstars[i+1].position = sf::Vector2f(star_x + 2, star_y - 2);
-        m_nightstars[i+2].position = sf::Vector2f(star_x + 2, star_y + 2);
-        m_nightstars[i+3].position = sf::Vector2f(star_x - 2, star_y + 2);
-        m_stars_y[i] = star_y;
-    }
-}
-
-void IngameState::setStarAlpha(sf::Uint8 alpha)
-{
-    for (unsigned i=0; i<m_nightstars.getVertexCount(); i++)
-        m_nightstars[i].color = sf::Color(144, 144, 144, alpha);
+    m_star_x = rand() % (m_nightstars.getSize().x * 2);
 }
