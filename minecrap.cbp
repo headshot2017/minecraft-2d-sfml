@@ -13,12 +13,14 @@
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-g" />
+					<Add directory="C:/Users/Mauricio/Desktop/Juan Pablo/SFML-2.5.1/include" />
 				</Compiler>
 				<Linker>
 					<Add library="sfml-graphics-d" />
 					<Add library="sfml-window-d" />
 					<Add library="sfml-system-d" />
 					<Add library="lib/bass.lib" />
+					<Add directory="C:/Users/Mauricio/Desktop/Juan Pablo/SFML-2.5.1/lib" />
 				</Linker>
 			</Target>
 		</Build>
@@ -34,13 +36,20 @@
 			<Add library="dxguid" />
 			<Add directory="F:/SFML-2.5.1/lib" />
 		</Linker>
+		<Unit filename="animated_sprite.cpp" />
+		<Unit filename="animated_sprite.h" />
 		<Unit filename="controls.cpp" />
 		<Unit filename="controls.h" />
+		<Unit filename="game/block.cpp" />
 		<Unit filename="game/block.h" />
 		<Unit filename="game/chunk.cpp" />
 		<Unit filename="game/chunk.h" />
 		<Unit filename="game/entities/falling_block.cpp" />
 		<Unit filename="game/entities/falling_block.h" />
+		<Unit filename="game/entities/particle.cpp" />
+		<Unit filename="game/entities/particle.h" />
+		<Unit filename="game/entities/particles/explosion.cpp" />
+		<Unit filename="game/entities/particles/explosion.h" />
 		<Unit filename="game/entities/tnt.cpp" />
 		<Unit filename="game/entities/tnt.h" />
 		<Unit filename="game/entity.cpp" />
@@ -54,6 +63,8 @@
 		<Unit filename="game_state.h" />
 		<Unit filename="gui/button.cpp" />
 		<Unit filename="gui/button.h" />
+		<Unit filename="gui/itemlist.cpp" />
+		<Unit filename="gui/itemlist.h" />
 		<Unit filename="gui/label.cpp" />
 		<Unit filename="gui/label.h" />
 		<Unit filename="gui/slider.cpp" />
