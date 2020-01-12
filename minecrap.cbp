@@ -13,14 +13,14 @@
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-g" />
-					<Add directory="C:/Users/Mauricio/Desktop/Juan Pablo/SFML-2.5.1/include" />
+					<Add directory="C:/Users/Mauricio/Desktop/JuanPablo/SFML-2.5.1/include" />
 				</Compiler>
 				<Linker>
 					<Add library="sfml-graphics-d" />
 					<Add library="sfml-window-d" />
 					<Add library="sfml-system-d" />
 					<Add library="lib/bass.lib" />
-					<Add directory="C:/Users/Mauricio/Desktop/Juan Pablo/SFML-2.5.1/lib" />
+					<Add directory="C:/Users/Mauricio/Desktop/JuanPablo/SFML-2.5.1/lib" />
 				</Linker>
 			</Target>
 		</Build>
