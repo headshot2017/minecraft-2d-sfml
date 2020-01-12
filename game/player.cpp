@@ -88,7 +88,7 @@ bool Player::blockCollide(int x, int y)
 
 bool Player::inWater()
 {
-    return m_world->getBlock(x/32, (y-1)/32) == BLOCK_WATER;
+    return m_world->getBlock(x/32, (y-1)/32) == BLOCK_WATER or m_world->getBlock(x/32, (y-33)/32) == BLOCK_WATER;
 }
 
 bool Player::groundCollide()
