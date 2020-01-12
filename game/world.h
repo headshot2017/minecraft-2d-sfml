@@ -27,6 +27,7 @@ public:
     void setBlock(int x, int y, int block, int layer=LAYER_BUILD);
     int getBlock(int x, int y);
     int getBlockLayer(int x, int y);
+    int getBlockFlags(int x, int y);
 
     void updateLighting(int x, int y);
 
@@ -41,7 +42,7 @@ public:
     void saveWorld();
 
     Player* getPlayer() {return m_player;}
-    sf::VertexArray& getBlocksFromPoint(int x, int y);
+    sf::VertexArray& getBlocksFromPoint(int x, int y, bool front=false);
     std::vector<std::vector<Chunk>>* getBlocks() {return &m_blocks2;}
 
 private:

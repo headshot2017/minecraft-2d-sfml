@@ -72,6 +72,8 @@ private:
     int m_freecam_add = 32;
     int lmb_tick = 0;
 
+    void drawWorld(bool front);
+
 protected:
     IngameState() {}
 };

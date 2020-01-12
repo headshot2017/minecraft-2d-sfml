@@ -47,6 +47,7 @@ public:
     bool isFlying() {return m_fly;}
     bool blockCollide(int x, int y);
     bool groundCollide();
+    bool inWater();
     void knockBack(float xx, float yy, int maxdist);
 
     bool getCanMove() {return can_move;}

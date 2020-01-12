@@ -28,8 +28,9 @@ const char* Blocks::getBlockName(int num)
            (num == 23) ? "Iron Ore" :
            (num == 24) ? "Gold Ore" :
            (num == 25) ? "Diamond Ore" :
-           (num == 26) ? "Stone" :
-           (num == 27) ? "Obsidian" :
-           (num == 28) ? "Bedrock" :
+           (num == 26) ? "Water" :
+           (num == 27) ? "Stone" :
+           (num == 28) ? "Obsidian" :
+           (num == 29) ? "Bedrock" :
            "???";
 }

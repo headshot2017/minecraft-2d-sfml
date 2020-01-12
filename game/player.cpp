@@ -83,7 +83,12 @@ void Player::moveToRoof()
 
 bool Player::blockCollide(int x, int y)
 {
-    return m_world->getBlock(x, y) != BLOCK_AIR and (m_world->getBlockLayer(x, y) == LAYER_BUILD or (m_world->getBlockLayer(x, y) == LAYER_NONSOLID and m_layer1_collide));
+    return m_world->getBlock(x, y) != BLOCK_AIR and !(m_world->getBlockFlags(x,y)&BLOCKFLAG_FRONT) and (m_world->getBlockLayer(x, y) == LAYER_BUILD or (m_world->getBlockLayer(x, y) == LAYER_NONSOLID and m_layer1_collide));
+}
+
+bool Player::inWater()
+{
+    return m_world->getBlock(x/32, (y-1)/32) == BLOCK_WATER;
 }
 
 bool Player::groundCollide()
@@ -193,11 +198,25 @@ void Player::update(GameEngine *engine)
     }
     else
     {
-        gravity = (not m_fly) ? 0.25f : 0.f;
+        if (not m_fly)
+        {
+            if (inWater())
+            {
+                gravity = engine->Settings()->controls()->Pressed("jump") ? -0.2f : 0.1f;
+            }
+            else
+                gravity = 0.25f;
+        }
+        else
+            gravity = 0.f;
     }
 
     hspeed += x_acc;
     vspeed += gravity;
+    if (inWater() and not m_fly)
+    {
+        vspeed = (vspeed > 2.f) ? 2.f : (vspeed < -2.f) ? -2.f : vspeed;
+    }
 
     if (hspeed != 0)
     {
@@ -291,12 +310,12 @@ void Player::process_input(GameEngine *engine)
         float spd;
         if (not m_sneak)
         {
-            spd = (engine->Settings()->controls()->Pressed("run")) ? ((m_fly) ? 10 : 4) : ((m_fly) ? 5 : 3);
+            spd = (engine->Settings()->controls()->Pressed("run")) ? ((m_fly) ? 10 : (inWater()) ? 2 : 4) : ((m_fly) ? 5 : (inWater()) ? 1.5f : 3);
             if (m_fly) vspeed = 0;
         }
         else
         {
-            spd = 1.5f;
+            spd = (inWater()) ? 1.f : 1.5f;
             if (m_fly) vspeed = 4.5f;
         }
 
@@ -330,7 +349,10 @@ void Player::process_input(GameEngine *engine)
                 }
             }
             else
-                vspeed = -4.5f;
+            {
+                if (m_fly)
+                    vspeed = -4.5f;
+            }
         }
         else
         {

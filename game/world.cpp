@@ -241,6 +241,22 @@ int World::getBlock(int x, int y)
     return block;
 }
 
+int World::getBlockFlags(int x, int y)
+{
+    if (x < 0) x = 0;
+    if (y < 0) y = 0;
+    if (x >= WORLD_W) x = WORLD_W-1;
+    if (y >= WORLD_H) y = WORLD_H-1;
+
+    int x_ind = x/CHUNK_W;
+    int y_ind = y/CHUNK_H;
+    int x_block_chunk = x % CHUNK_W;
+    int y_block_chunk = y % CHUNK_H;
+
+    int block = m_blocks2[y_ind][x_ind].getBlockFlags(x_block_chunk, y_block_chunk);
+    return block;
+}
+
 int World::getBlockLayer(int x, int y)
 {
     if (x < 0) x = 0;
@@ -286,7 +302,7 @@ void World::updateLighting(int x, int y)
     }
 }
 
-sf::VertexArray& World::getBlocksFromPoint(int x, int y)
+sf::VertexArray& World::getBlocksFromPoint(int x, int y, bool front)
 {
     int x_ind = x/CHUNK_W;
     int y_ind = y/CHUNK_H;
@@ -296,7 +312,7 @@ sf::VertexArray& World::getBlocksFromPoint(int x, int y)
     if (x_ind < 0) x_ind = 0;
     if (y_ind < 0) y_ind = 0;
 
-    return m_blocks2[y_ind][x_ind].getVertex();
+    return (not front) ? m_blocks2[y_ind][x_ind].getVertex() : m_blocks2[y_ind][x_ind].getVertexFront();
 }
 
 void World::generateFlatWorld(const char *name, const std::vector<int>& blocks)
