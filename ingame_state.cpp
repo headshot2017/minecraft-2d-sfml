@@ -341,7 +341,7 @@ void IngameState::process_input(GameEngine* engine)
         if (m_world->getPlayer()->blockCollide(pos.x/32, pos.y/32) or
             m_world->getPlayer()->blockCollide((pos.x-4)/32, pos.y/32) or
             m_world->getPlayer()->blockCollide((pos.x+4)/32, pos.y/32) or
-            (cam_y_dist > 8 or cam_y_dist < -8) or m_world->getPlayer()->isFlying())
+            (cam_y_dist > 8 or cam_y_dist < -8) or m_world->getPlayer()->isFlying() or m_world->getPlayer()->inWater())
             cam_y += cam_y_dist;
     }
 
