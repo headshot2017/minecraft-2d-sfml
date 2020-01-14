@@ -15,6 +15,9 @@ void SettingsManager::generateSettings()
     m_fullscreen = false;
     m_screenwidth = 800;
     m_screenheight = 480;
+    m_mastervol = 100;
+    m_musicvol = 100;
+    m_soundvol = 100;
     saveSettings();
 }
 
@@ -45,6 +48,12 @@ void SettingsManager::loadSettings()
                 m_screenwidth = std::atoi(value.c_str());
             else if (strcmp(name.c_str(), "screen_height") == 0)
                 m_screenheight = std::atoi(value.c_str());
+            else if (strcmp(name.c_str(), "master_volume") == 0)
+                m_mastervol = std::atoi(value.c_str());
+            else if (strcmp(name.c_str(), "music_volume") == 0)
+                m_musicvol = std::atoi(value.c_str());
+            else if (strcmp(name.c_str(), "sound_volume") == 0)
+                m_soundvol = std::atoi(value.c_str());
 
             else if (strcmp(name.c_str(), "control_destroy") == 0)
             {
@@ -177,6 +186,9 @@ void SettingsManager::saveSettings()
     configfile << "fullscreen: " << ((m_fullscreen) ? "1" : "0") << "\n";
     configfile << "screen_width: " << m_screenwidth << "\n";
     configfile << "screen_height: " << m_screenheight << "\n";
+    configfile << "master_volume: " << m_mastervol << "\n";
+    configfile << "music_volume: " << m_musicvol << "\n";
+    configfile << "sound_volume: " << m_soundvol << "\n";
 
     auto keys = m_controls.getKeys();
     int maxkeys = static_cast<int>(sf::Keyboard::KeyCount);

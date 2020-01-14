@@ -8,7 +8,7 @@
 class Slider
 {
 public:
-    Slider() {}
+    Slider();
     Slider(GameEngine *engine, const char *text, sf::Vector2f pos, float length = 400);
     Slider(GameEngine *engine, sf::String text, sf::Vector2f pos, float length = 400);
     Slider(GameEngine *engine, const char *text, float x, float y, float length = 400);
@@ -18,11 +18,12 @@ public:
     float getMinValue() const {return m_minvalue;}
     float getMaxValue() const {return m_maxvalue;}
 
-	void setValue(float value);
+	bool setValue(float value);
 	void setMinValue(float value);
 	void setMaxValue(float value);
 	void setValueRange(float minvalue, float maxvalue);
 	void setFloatValue(bool use) {m_floats = use;}
+	void setAutoUpdateText(bool use) {m_autoupdate = use;}
 
 	void setWidth(float length);
 	void setPosition(sf::Vector2f pos);
@@ -32,20 +33,22 @@ public:
 
 
 	// callbacks ---------------------------------------------------------------
-	void onMousePressed(float x, float y);
+	bool onMousePressed(float x, float y);
 	void onMouseReleased(float x, float y);
-	void onMouseWheelMoved(int delta);
+	bool onMouseWheelMoved(int delta);
 
-	void update();
+	bool update();
 	void process_input(sf::Event &event);
 	void draw();
 
 private:
 	void updateHandlePosition();
+	void _autoUpdate(sf::String text);
 
 	GameEngine *m_engine;
-	bool m_holding = false;
-	bool m_floats = false;
+	bool m_holding;
+	bool m_floats;
+	bool m_autoupdate;
 	float m_length;
 	float m_value;
 	float m_minvalue;

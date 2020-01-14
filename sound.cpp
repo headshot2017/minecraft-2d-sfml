@@ -2,8 +2,10 @@
 #include <stdio.h>
 #include "math.h"
 
-void SoundEngine::init()
+void SoundEngine::init(SettingsManager *settings)
 {
+    m_settings = settings;
+
     m_currmusic = -1;
     m_music.resize(MUSIC_TOTAL);
     m_sounds.resize(SOUND_TOTAL);
@@ -118,8 +120,11 @@ bool SoundEngine::unloadTheme()
 
 void SoundEngine::playMusic(int music)
 {
+    float m_mastervol = m_settings->m_mastervol / 100.f;
+    float m_musicvol = m_settings->m_musicvol / 100.f;
+
     stopMusic();
-    BASS_ChannelSetAttribute(m_music[music], BASS_ATTRIB_VOL, 1.0f);
+    BASS_ChannelSetAttribute(m_music[music], BASS_ATTRIB_VOL, m_mastervol * m_musicvol);
     BASS_ChannelPlay(m_music[music], true);
     m_currmusic = music;
 }
@@ -133,7 +138,10 @@ void SoundEngine::stopMusic()
 
 void SoundEngine::playClickSound()
 {
-    BASS_ChannelSetAttribute(m_sounds[SOUND_CLICK], BASS_ATTRIB_VOL, 1.0f);
+    float m_mastervol = m_settings->m_mastervol / 100.f;
+    float m_soundvol = m_settings->m_soundvol / 100.f;
+
+    BASS_ChannelSetAttribute(m_sounds[SOUND_CLICK], BASS_ATTRIB_VOL, m_mastervol * m_soundvol);
     BASS_ChannelSetAttribute(m_sounds[SOUND_CLICK], BASS_ATTRIB_PAN, 0.f);
     BASS_ChannelPlay(m_sounds[SOUND_CLICK], true);
 }
@@ -186,6 +194,9 @@ void SoundEngine::playFootstepSound(float player_x, float player_y, float x, flo
 
 void SoundEngine::playGameSound(float player_x, float player_y, float x, float y, int type, int multi)
 {
+    float m_mastervol = m_settings->m_mastervol / 100.f;
+    float m_soundvol = m_settings->m_soundvol / 100.f;
+
     float vol, pan, dist;
     dist = sqrt(pow(x - player_x, 2) + pow(y - player_y, 2));
 
@@ -197,13 +208,16 @@ void SoundEngine::playGameSound(float player_x, float player_y, float x, float y
     pan = (-x + player_x) / 500.0f;
 
     int ind = (multi) ? rand() % multi : 0;
-    BASS_ChannelSetAttribute(m_sounds[type+ind], BASS_ATTRIB_VOL, vol);
+    BASS_ChannelSetAttribute(m_sounds[type+ind], BASS_ATTRIB_VOL, vol * m_mastervol * m_soundvol);
     BASS_ChannelSetAttribute(m_sounds[type+ind], BASS_ATTRIB_PAN, pan);
     BASS_ChannelPlay(m_sounds[type+ind], true);
 }
 
 void SoundEngine::playSample(float player_x, float player_y, float x, float y, int type, int multi)
 {
+    float m_mastervol = m_settings->m_mastervol / 100.f;
+    float m_soundvol = m_settings->m_soundvol / 100.f;
+
     float vol, pan, dist;
     dist = sqrt(pow(x - player_x, 2) + pow(y - player_y, 2));
 
@@ -217,7 +231,14 @@ void SoundEngine::playSample(float player_x, float player_y, float x, float y, i
     int ind = (multi) ? rand() % multi : 0;
 
     HCHANNEL channel = BASS_SampleGetChannel(m_samples[type+ind], false);
-    BASS_ChannelSetAttribute(channel, BASS_ATTRIB_VOL, vol);
+    BASS_ChannelSetAttribute(channel, BASS_ATTRIB_VOL, vol * m_mastervol * m_soundvol);
     BASS_ChannelSetAttribute(channel, BASS_ATTRIB_PAN, pan);
     BASS_ChannelPlay(channel, false);
+}
+
+void SoundEngine::updateVolume()
+{
+    float m_mastervol = m_settings->m_mastervol / 100.f;
+    float m_musicvol = m_settings->m_musicvol / 100.f;
+    BASS_ChannelSetAttribute(getCurrentMusic(), BASS_ATTRIB_VOL, m_mastervol * m_musicvol);
 }

@@ -21,7 +21,7 @@ void GameEngine::init()
     mc_font.loadFromFile("data/font/Minecraftia.ttf");
 
     m_sound = new SoundEngine;
-    m_sound->init();
+    m_sound->init(&m_settings);
     m_sound->loadTheme("default");
 
     sf::Image widgets;

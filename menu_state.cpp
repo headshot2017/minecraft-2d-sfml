@@ -164,9 +164,10 @@ void MenuState::init(GameEngine* engine)
     b_connect = Button(engine, sf::String("Connect"), (windowsize.x/2)-200, (windowsize.y/4)-32+64);
     l_test = ItemList(engine, (windowsize.x/2)-150, (windowsize.y/4)-32+128, 300, 192, test);
 
-    b_options_player = Button(engine, "Player", (windowsize.x/2)-200, 128);
-    b_options_graphics = Button(engine, "Graphics", (windowsize.x/2)-200, 128+48);
-    b_options_controls = Button(engine, "Controls", (windowsize.x/2)-200, 128+96);
+    b_options_player = Button(engine, "Player", (windowsize.x/2)-200, 128+(48*0));
+    b_options_graphics = Button(engine, "Graphics", (windowsize.x/2)-200, 128+(48*1));
+    b_options_sound = Button(engine, "Sound", (windowsize.x/2)-200, 128+(48*2));
+    b_options_controls = Button(engine, "Controls", (windowsize.x/2)-200, 128+(48*3));
 
     label_playername = Label(engine, "Player name", (windowsize.x/2)-200, 96);
     input_playername = TextInput(engine, engine->Settings()->m_playername, sf::Vector2f((windowsize.x/2)-200, 96+24), 24);
@@ -199,8 +200,22 @@ void MenuState::init(GameEngine* engine)
     s_videores = Slider(engine, "Resolution:", (windowsize.x/2)-300-8, 64+(48*0), 300);
     s_videores.setMaxValue(modes.size()-1);
     s_videores.setFloatValue(false);
+    s_videores.setAutoUpdateText(false);
     b_fullscreen = Button(engine, "Fullscreen:", (windowsize.x/2)+8, 64+(48*0), 300);
     b_applyvideo = Button(engine, "Apply", (windowsize.x/2)-200, windowsize.y-112);
+
+    s_mastervol = Slider(engine, "Master Volume:", (windowsize.x/2)-300-8, 64+(48*0), 616);
+    s_mastervol.setMaxValue(100);
+    s_mastervol.setValue(100);
+    s_mastervol.setFloatValue(false);
+    s_musicvol = Slider(engine, "Music Volume:", (windowsize.x/2)-300-8, 64+(48*1), 300);
+    s_musicvol.setMaxValue(100);
+    s_musicvol.setValue(100);
+    s_musicvol.setFloatValue(false);
+    s_soundvol = Slider(engine, "Sound Volume:", (windowsize.x/2)+8, 64+(48*1), 300);
+    s_soundvol.setMaxValue(100);
+    s_soundvol.setValue(100);
+    s_soundvol.setFloatValue(false);
 
     sf::Vector2u res = engine->app.getSize();
     setAllPositions(res);
@@ -292,7 +307,8 @@ void MenuState::setAllPositions(sf::Vector2u& windowsize)
 
     b_options_player.setPosition((windowsize.x/2)-200, 128);
     b_options_graphics.setPosition((windowsize.x/2)-200, 128+48);
-    b_options_controls.setPosition((windowsize.x/2)-200, 128+96);
+    b_options_sound.setPosition((windowsize.x/2)-200, 128+(48*2));
+    b_options_controls.setPosition((windowsize.x/2)-200, 128+(48*3));
 
     label_playername.setPosition((windowsize.x/2)-200, 96);
     input_playername.setPosition((windowsize.x/2)-200, 96+24);
@@ -313,6 +329,10 @@ void MenuState::setAllPositions(sf::Vector2u& windowsize)
     b_screenshot.setPosition((windowsize.x/2)+8, 64+(48*4));
     b_fullscreen_control.setPosition((windowsize.x/2)+8, 64+(48*5));
     b_layer1_collide.setPosition((windowsize.x/2)+8, 64+(48*6));
+
+    s_mastervol.setPosition((windowsize.x/2)-300-8, 64+(48*0));
+    s_musicvol.setPosition((windowsize.x/2)-300-8, 64+(48*1));
+    s_soundvol.setPosition((windowsize.x/2)+8, 64+(48*1));
 
     l_pressakey.setPosition(windowsize.x/2, windowsize.y/2-48);
 
@@ -363,6 +383,13 @@ void MenuState::update(GameEngine* engine)
     sf::VideoMode mode = engine->getResolutions()[s_videores.getValue()];
     sprintf(aBuf, "Resolution: %dx%d", mode.width, mode.height);
     s_videores.setText(aBuf);
+
+    //sprintf(aBuf, "Master Volume: %d%%", (int)s_mastervol.getValue());
+    //s_mastervol.setText(aBuf);
+    //sprintf(aBuf, "Music Volume: %d%%", (int)s_musicvol.getValue());
+    //s_musicvol.setText(aBuf);
+    //sprintf(aBuf, "Sound Volume: %d%%", (int)s_soundvol.getValue());
+    //s_soundvol.setText(aBuf);
 
     sprintf(aBuf, "Fullscreen: %s", fullscreen ? "YES" : "NO");
     b_fullscreen.setText(aBuf);
@@ -450,6 +477,7 @@ void MenuState::event_input(GameEngine* engine, sf::Event& event)
         b_options_player.process_input(event);
         b_options_controls.process_input(event);
         b_options_graphics.process_input(event);
+        b_options_sound.process_input(event);
     }
     else if (m_submenu == MENU_OPTIONS_PLAYER)
     {
@@ -471,6 +499,13 @@ void MenuState::event_input(GameEngine* engine, sf::Event& event)
         s_videores.process_input(event);
         b_fullscreen.process_input(event);
         b_applyvideo.process_input(event);
+        b_back_options.process_input(event);
+    }
+    else if (m_submenu == MENU_OPTIONS_SOUND)
+    {
+        s_mastervol.process_input(event);
+        s_musicvol.process_input(event);
+        s_soundvol.process_input(event);
         b_back_options.process_input(event);
     }
     else if (m_submenu == MENU_OPTIONS_CONTROLS)
@@ -584,6 +619,8 @@ void MenuState::event_input(GameEngine* engine, sf::Event& event)
             m_submenu = MENU_OPTIONS_CONTROLS;
         if (b_options_graphics.update())
             m_submenu = MENU_OPTIONS_GRAPHICS;
+        if (b_options_sound.update())
+            m_submenu = MENU_OPTIONS_SOUND;
     }
 
     else if (m_submenu == MENU_CREATEWORLD)
@@ -664,6 +701,26 @@ void MenuState::event_input(GameEngine* engine, sf::Event& event)
         if (b_back_options.update())
             m_submenu = MENU_OPTIONS;
     }
+    else if (m_submenu == MENU_OPTIONS_SOUND)
+    {
+        if (s_mastervol.update())
+        {
+            m_engine->Settings()->m_mastervol = (int)s_mastervol.getValue();
+            m_engine->Sound()->updateVolume();
+        }
+        if (s_musicvol.update())
+        {
+            m_engine->Settings()->m_musicvol = (int)s_musicvol.getValue();
+            m_engine->Sound()->updateVolume();
+        }
+        if (s_soundvol.update())
+        {
+            m_engine->Settings()->m_soundvol = (int)s_soundvol.getValue();
+            m_engine->Sound()->updateVolume();
+        }
+        if (b_back_options.update())
+            m_submenu = MENU_OPTIONS;
+    }
     else if (m_submenu == MENU_OPTIONS_CONTROLS)
     {
         if (b_moveleft.update())
@@ -736,6 +793,7 @@ void MenuState::draw(GameEngine* engine)
         b_options_player.draw();
         b_options_graphics.draw();
         b_options_controls.draw();
+        b_options_sound.draw();
         b_back.draw();
     }
 
@@ -780,6 +838,13 @@ void MenuState::draw(GameEngine* engine)
         s_videores.draw();
         b_fullscreen.draw();
         b_applyvideo.draw();
+        b_back_options.draw();
+    }
+    else if (m_submenu == MENU_OPTIONS_SOUND)
+    {
+        s_mastervol.draw();
+        s_musicvol.draw();
+        s_soundvol.draw();
         b_back_options.draw();
     }
     else if (m_submenu == MENU_OPTIONS_CONTROLS)

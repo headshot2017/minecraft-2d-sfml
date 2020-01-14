@@ -2,6 +2,7 @@
 #define SOUND_H_INCLUDED
 
 #include "bass.h"
+#include "settings_manager.h"
 #include "game/block.h"
 #include <vector>
 
@@ -63,10 +64,11 @@ enum
 class SoundEngine
 {
 public:
-    void init();
+    void init(SettingsManager *settings);
     void cleanup();
     bool loadTheme(const char *theme);
     bool unloadTheme();
+    void updateVolume();
 
     HSTREAM getCurrentMusic() {return (m_currmusic > -1) ? m_music[m_currmusic] : HSTREAM(0);}
 
@@ -84,7 +86,7 @@ private:
     std::vector<HSTREAM> m_sounds;
     std::vector<HSTREAM> m_music;
     std::vector<HSAMPLE> m_samples;
-    //GameEngine* m_engine;
+    SettingsManager* m_settings;
     bool theme_loaded = false;
     int m_currmusic;
 };

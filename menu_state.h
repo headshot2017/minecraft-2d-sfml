@@ -24,6 +24,7 @@ typedef enum
     MENU_OPTIONS_GRAPHICS,
     MENU_OPTIONS_CONTROLS,
     MENU_OPTIONS_PLAYER,
+    MENU_OPTIONS_SOUND,
 
     MENU_OPTIONS_CONTROLS_CHANGE
 } SUB_MENUS;
@@ -118,6 +119,7 @@ private:
     Button b_options_player;
     Button b_options_graphics;
     Button b_options_controls;
+    Button b_options_sound;
 
     // player options menu
     Label label_playername;
@@ -125,6 +127,11 @@ private:
     TextInput input_playername;
     TextInput input_playerskin;
     sf::Texture txt_playerskin;
+
+    // sound options menu
+    Slider s_mastervol;
+    Slider s_musicvol;
+    Slider s_soundvol;
 
     // video options menu
     bool fullscreen;

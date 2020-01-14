@@ -1,6 +1,8 @@
 #ifndef GAME_ENGINE_H_INCLUDED
 #define GAME_ENGINE_H_INCLUDED
 
+class SoundEngine;
+
 #include <SFML/Graphics.hpp>
 #include <vector>
 #include "bass.h"

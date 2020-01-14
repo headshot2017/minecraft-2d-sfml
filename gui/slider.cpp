@@ -1,14 +1,23 @@
 #include "slider.h"
 #include "math.h"
 
+Slider::Slider()
+{
+
+}
+
 Slider::Slider(GameEngine *engine, const char *text, sf::Vector2f pos, float length)
 {
     m_engine = engine;
     m_handletex = &m_engine->m_button;
     m_minvalue = 0;
-    m_maxvalue = 10;
+    m_maxvalue = 100;
     m_value = 0;
     m_pos = pos;
+
+    m_holding = false;
+	m_floats = false;
+	m_autoupdate = true;
 
     m_box.setPrimitiveType(sf::Quads);
     m_box.resize(8);
@@ -35,9 +44,13 @@ Slider::Slider(GameEngine *engine, sf::String text, sf::Vector2f pos, float leng
     m_engine = engine;
     m_handletex = &m_engine->m_button;
     m_minvalue = 0;
-    m_maxvalue = 10;
+    m_maxvalue = 100;
     m_value = 0;
     m_pos = pos;
+
+    m_holding = false;
+	m_floats = false;
+	m_autoupdate = true;
 
     m_box.setPrimitiveType(sf::Quads);
     m_box.resize(8);
@@ -64,11 +77,15 @@ Slider::Slider(GameEngine *engine, const char *text, float x, float y, float len
     m_engine = engine;
     m_handletex = &m_engine->m_button;
     m_minvalue = 0;
-    m_maxvalue = 10;
+    m_maxvalue = 100;
     m_value = 0;
     m_pos = sf::Vector2f(x,y);
     m_label = Label(engine, text, x+(length/2), y+10, 1);
     m_text = sf::String(text);
+
+    m_holding = false;
+	m_floats = false;
+	m_autoupdate = true;
 
     m_box.setPrimitiveType(sf::Quads);
     m_box.resize(8);
@@ -93,11 +110,15 @@ Slider::Slider(GameEngine *engine, sf::String text, float x, float y, float leng
     m_engine = engine;
     m_handletex = &m_engine->m_button;
     m_minvalue = 0;
-    m_maxvalue = 10;
+    m_maxvalue = 100;
     m_value = 0;
     m_pos = sf::Vector2f(x,y);
     m_label = Label(engine, text, x+(length/2), y+10, 1);
     m_text = sf::String(text);
+
+    m_holding = false;
+	m_floats = false;
+	m_autoupdate = true;
 
     m_box.setPrimitiveType(sf::Quads);
     m_box.resize(8);
@@ -170,8 +191,10 @@ void Slider::updateHandlePosition()
     m_handle[7].position = sf::Vector2f(m_pos.x+x+8, m_pos.y+40);
 }
 
-void Slider::setValue(float value)
+bool Slider::setValue(float value)
 {
+    bool ret = false;
+
     if (value < m_minvalue)
 		value = m_minvalue;
 	else if (value > m_maxvalue)
@@ -179,11 +202,14 @@ void Slider::setValue(float value)
 
     if (value != m_value)
 	{
+	    ret = true;
 		m_value = value;
 
 		// Move the handle on the slider
 		updateHandlePosition();
     }
+
+    return ret;
 }
 
 void Slider::setMaxValue(float value)
@@ -212,21 +238,21 @@ void Slider::setText(sf::String text)
     setWidth(m_length);
 }
 
-void Slider::onMousePressed(float x, float y)
+bool Slider::onMousePressed(float x, float y)
 {
     float scale = x / m_length;
     if (not m_floats)
-        setValue(floor(scale * (m_maxvalue - m_minvalue) + m_minvalue));
+        return setValue(floor(scale * (m_maxvalue - m_minvalue) + m_minvalue));
     else
-        setValue(scale * (m_maxvalue - m_minvalue) + m_minvalue);
+        return setValue(scale * (m_maxvalue - m_minvalue) + m_minvalue);
 }
 
-void Slider::onMouseWheelMoved(int delta)
+bool Slider::onMouseWheelMoved(int delta)
 {
-	setValue(m_value + (delta > 0 ? 1 : -1));
+	return setValue(m_value + (delta > 0 ? 1 : -1));
 }
 
-void Slider::update()
+bool Slider::update()
 {
     sf::Vector2i mouse = sf::Mouse::getPosition(m_engine->app);
 
@@ -236,10 +262,22 @@ void Slider::update()
     else
         m_handletex = &m_engine->m_button;
 
+    if (m_autoupdate)
+    {
+        char aBuf[192];
+        if (m_floats)
+            sprintf(aBuf, "%s %.2f", m_text.toAnsiString().c_str(), m_value);
+        else
+            sprintf(aBuf, "%s %d", m_text.toAnsiString().c_str(), (int)m_value);
+
+        _autoUpdate(sf::String(aBuf));
+    }
+
     if (m_holding)
     {
-        onMousePressed(mouse.x+8-m_pos.x, mouse.y-m_pos.y);
+        return onMousePressed(mouse.x+8-m_pos.x, mouse.y-m_pos.y);
     }
+    return false;
 }
 
 void Slider::process_input(sf::Event &event)
@@ -263,4 +301,10 @@ void Slider::draw()
     m_engine->m_window.draw(m_box, &m_engine->m_button_locked);
     m_engine->m_window.draw(m_handle, m_handletex);
     m_label.draw();
+}
+
+void Slider::_autoUpdate(sf::String text)
+{
+    m_label.setText(text);
+    setWidth(m_length);
 }
