@@ -63,6 +63,7 @@ private:
     sf::Texture m_minecraft_logo;
     sf::Texture m_parallax_bg;
     float m_parallax_x;
+    sf::VertexArray m_gamescreen;
 
     Label m_splashtext;
     std::vector<std::string> m_splashtexts;

@@ -91,6 +91,16 @@ void MenuState::init(GameEngine* engine)
     dirt_tile.setScale(4.0f, 4.0f);
     dirt_tile.setColor(sf::Color(128, 128, 128));
 
+    m_gamescreen = engine->getGUIWindow(sf::Vector2f(windowsize.x, windowsize.y));
+    m_gamescreen[0].texCoords = sf::Vector2f(0, 0);
+    m_gamescreen[1].texCoords = sf::Vector2f(windowsize.x, 0);
+    m_gamescreen[2].texCoords = sf::Vector2f(windowsize.x, windowsize.y);
+    m_gamescreen[3].texCoords = sf::Vector2f(0, windowsize.y);
+    m_gamescreen[0].color = sf::Color(128, 128, 128);
+    m_gamescreen[1].color = sf::Color(128, 128, 128);
+    m_gamescreen[2].color = sf::Color(128, 128, 128+64);
+    m_gamescreen[3].color = sf::Color(128, 128, 128+64);
+
     m_minecraft_logo.loadFromImage(m_minecraft_logo_final);
     minecraft_logo.setTexture(m_minecraft_logo);
     minecraft_logo.setPosition((windowsize.x/2) - 274.0f, (windowsize.y/4)-64);
@@ -758,7 +768,13 @@ void MenuState::event_input(GameEngine* engine, sf::Event& event)
 
 void MenuState::draw(GameEngine* engine)
 {
-    engine->m_window.draw(dirt_tile);
+    if (engine->isPaused())
+    {
+        engine->m_window.draw(m_gamescreen, &engine->m_screenshot);
+    }
+    else
+        engine->m_window.draw(dirt_tile);
+
     if (m_submenu == MENU_MAINMENU)
     {
         engine->m_window.draw(parallax_bg, &m_parallax_bg);
@@ -881,6 +897,11 @@ void MenuState::resume()
 
 void MenuState::onResolutionChange(sf::Vector2u res)
 {
+    m_gamescreen[0].position = m_gamescreen[0].texCoords = sf::Vector2f(0, 0);
+    m_gamescreen[1].position = m_gamescreen[1].texCoords = sf::Vector2f(res.x, 0);
+    m_gamescreen[2].position = m_gamescreen[2].texCoords = sf::Vector2f(res.x, res.y);
+    m_gamescreen[3].position = m_gamescreen[3].texCoords = sf::Vector2f(0, res.y);
+
     fullscreen = m_engine->Settings()->m_fullscreen;
     setAllPositions(res);
 }
