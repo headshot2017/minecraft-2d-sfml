@@ -108,7 +108,7 @@ void MenuState::init(GameEngine* engine)
 
     char bgfile[128];
     sprintf(bgfile, "data/gui/background/%d.png", rand() % 3);
-    m_parallax_bg.loadFromFile(bgfile);
+    if (not engine->isPaused()) m_parallax_bg.loadFromFile(bgfile); // speed up loading pause screen
     parallax_bg.setPrimitiveType(sf::Quads);
     parallax_bg.resize(4);
     m_parallax_x = 0.f;
@@ -227,8 +227,7 @@ void MenuState::init(GameEngine* engine)
     s_soundvol.setValue(100);
     s_soundvol.setFloatValue(false);
 
-    sf::Vector2u res = engine->app.getSize();
-    setAllPositions(res);
+    setAllPositions(windowsize);
 }
 
 void MenuState::destroy()
