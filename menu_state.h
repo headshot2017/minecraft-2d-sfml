@@ -34,7 +34,7 @@ class MenuState : public GameState
 public:
     void init(GameEngine* engine);
     void destroy();
-    void update(GameEngine* engine);
+    void update(GameEngine *engine, float delta);
     void event_input(GameEngine* engine, sf::Event& event);
     void process_input(GameEngine* engine) {}
     void draw(GameEngine* engine);

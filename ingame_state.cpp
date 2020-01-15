@@ -75,7 +75,7 @@ void IngameState::destroy()
     delete m_gamegui;
 }
 
-void IngameState::update(GameEngine *engine)
+void IngameState::update(GameEngine *engine, float delta)
 {
     if (engine->leavingGame())
     {

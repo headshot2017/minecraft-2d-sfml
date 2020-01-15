@@ -8,7 +8,7 @@ class GameState
 public:
     virtual void init(GameEngine* engine) = 0;
     virtual void destroy() = 0;
-    virtual void update(GameEngine* engine) = 0;
+    virtual void update(GameEngine* engine, float delta) = 0;
     virtual void event_input(GameEngine* engine, sf::Event& event) = 0;
     virtual void process_input(GameEngine* engine) = 0;
     virtual void draw(GameEngine* engine) = 0;

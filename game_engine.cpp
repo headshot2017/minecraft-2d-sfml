@@ -53,6 +53,8 @@ void GameEngine::init()
         it = m_videomodes.insert(it, original);
         m_videomodes.insert(it, 0, original);
     }
+
+    m_clock.restart();
 }
 
 void GameEngine::cleanup()
@@ -70,7 +72,9 @@ void GameEngine::cleanup()
 
 void GameEngine::update()
 {
-    states.back()->update(this);
+    float delta = m_clock.getElapsedTime().asSeconds();
+    states.back()->update(this, delta);
+    m_clock.restart();
 }
 
 void GameEngine::process_input()

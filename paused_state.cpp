@@ -28,7 +28,7 @@ void PausedState::destroy()
 
 }
 
-void PausedState::update(GameEngine* engine)
+void PausedState::update(GameEngine* engine, float delta)
 {
     if (engine->leavingGame() == 2)
         engine->popState();

@@ -1,9 +1,9 @@
 #ifndef GAME_ENGINE_H_INCLUDED
 #define GAME_ENGINE_H_INCLUDED
 
-class SoundEngine;
-
+#define MAX_FPS 60
 #include <SFML/Graphics.hpp>
+#include <SFML/System/Clock.hpp>
 #include <vector>
 #include "bass.h"
 #include "sound.h"
@@ -69,6 +69,7 @@ private:
     std::vector<GameState*> states;
     SoundEngine *m_sound;
     SettingsManager m_settings;
+    sf::Clock m_clock;
 };
 
 #endif // GAME_ENGINE_H_INCLUDED

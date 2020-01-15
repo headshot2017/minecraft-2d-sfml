@@ -350,11 +350,11 @@ void MenuState::setAllPositions(sf::Vector2u& windowsize)
     b_applyvideo.setPosition((windowsize.x/2)-200, windowsize.y-112);
 }
 
-void MenuState::update(GameEngine* engine)
+void MenuState::update(GameEngine* engine, float delta)
 {
     char aBuf[128];
 
-    m_splashscale += m_splashscaledir;
+    m_splashscale += m_splashscaledir * (MAX_FPS * delta);
     if (m_splashscale >= 0.215)
     {
         m_splashscale = 0.215;
@@ -366,7 +366,7 @@ void MenuState::update(GameEngine* engine)
         m_splashscaledir = 0.001;
     }
     m_splashtext.setScale(m_splashscale);
-    m_parallax_x += 1.0f;
+    m_parallax_x += 1.0f * (MAX_FPS * delta);
     if (m_parallax_x >= m_parallax_bg.getSize().x/2.0f)
         m_parallax_x = 0;
     parallax_bg[0].texCoords = sf::Vector2f(m_parallax_x, 0);
