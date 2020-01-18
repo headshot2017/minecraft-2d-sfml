@@ -2,12 +2,14 @@
 #include "game_engine.h"
 #include "menu_state.h"
 #include "ingame_state.h"
+#include "bass.h"
 #include <fstream>
 #include <algorithm>
 #include <stdio.h>
 #include <time.h>
 #include <direct.h>
 #include <dirent.h>
+#include <sys/stat.h>
 
 
 MenuState MenuState::m_Instance;
@@ -40,6 +42,13 @@ bool has_suffix(const std::string &str, const std::string &suffix)
            str.compare(str.size() - suffix.size(), suffix.size(), suffix) == 0;
 }
 
+bool is_folder(const char *path)
+{
+    struct stat path_stat;
+    stat(path, &path_stat);
+    return S_ISREG(path_stat.st_mode);
+}
+
 void listWorlds(std::vector<std::string>& strvec)
 {
     DIR *dir;
@@ -60,6 +69,48 @@ void listWorlds(std::vector<std::string>& strvec)
     }
     else
         mkdir("worlds");
+}
+
+void listSoundThemes(std::vector<std::string>& strvec)
+{
+    DIR *dir;
+    struct dirent *entry;
+    strvec.clear();
+
+    if ((dir = opendir("data/sounds")))
+    {
+        while ((entry = readdir(dir)))
+        {
+            std::string theme(entry->d_name);
+            if (theme != "." and theme != "..")
+            {
+                strvec.push_back(theme);
+            }
+        }
+    }
+}
+
+void listSoundDevices(std::vector<std::string>& strvec)
+{
+    strvec.clear();
+
+    BASS_DEVICEINFO info;
+    DWORD ind = 0;
+    while (BASS_GetDeviceInfo(ind, &info))
+    {
+        strvec.push_back(info.name);
+        ind++;
+    }
+}
+
+int find_in_vector(std::vector<std::string> &strvec, const char *_element)
+{
+    std::string element(_element);
+
+    std::vector<std::string>::iterator it = std::find(strvec.begin(), strvec.end(), element);
+    if (it == strvec.end()) return -1;
+
+    return std::distance(strvec.begin(), it);
 }
 
 void MenuState::init(GameEngine* engine)
@@ -214,18 +265,20 @@ void MenuState::init(GameEngine* engine)
     b_fullscreen = Button(engine, "Fullscreen:", (windowsize.x/2)+8, 64+(48*0), 300);
     b_applyvideo = Button(engine, "Apply", (windowsize.x/2)-200, windowsize.y-112);
 
-    s_mastervol = Slider(engine, "Master Volume:", (windowsize.x/2)-300-8, 64+(48*0), 616);
+    l_devices = ItemList(engine, (windowsize.x/2)-300-8, 64+(48*0), 616, 96, m_devicelist, "Audio device");
+    s_mastervol = Slider(engine, "Master Volume:", (windowsize.x/2)-300-8, 64+(48*2)+16, 616);
     s_mastervol.setMaxValue(100);
     s_mastervol.setValue(100);
     s_mastervol.setFloatValue(false);
-    s_musicvol = Slider(engine, "Music Volume:", (windowsize.x/2)-300-8, 64+(48*1), 300);
+    s_musicvol = Slider(engine, "Music Volume:", (windowsize.x/2)-300-8, 64+(48*3)+16, 300);
     s_musicvol.setMaxValue(100);
     s_musicvol.setValue(100);
     s_musicvol.setFloatValue(false);
-    s_soundvol = Slider(engine, "Sound Volume:", (windowsize.x/2)+8, 64+(48*1), 300);
+    s_soundvol = Slider(engine, "Sound Volume:", (windowsize.x/2)+8, 64+(48*3)+16, 300);
     s_soundvol.setMaxValue(100);
     s_soundvol.setValue(100);
     s_soundvol.setFloatValue(false);
+    l_soundthemes = ItemList(engine, (windowsize.x/2)-300-8, 64+(48*4)+20+48, 616, 96, m_soundthemes, "Sound theme");
 
     setAllPositions(windowsize);
 }
@@ -339,9 +392,11 @@ void MenuState::setAllPositions(sf::Vector2u& windowsize)
     b_fullscreen_control.setPosition((windowsize.x/2)+8, 64+(48*5));
     b_layer1_collide.setPosition((windowsize.x/2)+8, 64+(48*6));
 
-    s_mastervol.setPosition((windowsize.x/2)-300-8, 64+(48*0));
-    s_musicvol.setPosition((windowsize.x/2)-300-8, 64+(48*1));
-    s_soundvol.setPosition((windowsize.x/2)+8, 64+(48*1));
+    l_devices.setPosition((windowsize.x/2)-300-8, 64+(48*0));
+    s_mastervol.setPosition((windowsize.x/2)-300-8, 64+(48*2)+16);
+    s_musicvol.setPosition((windowsize.x/2)-300-8, 64+(48*3)+16);
+    s_soundvol.setPosition((windowsize.x/2)+8, 64+(48*3)+16);
+    l_soundthemes.setPosition((windowsize.x/2)-300-8, 64+(48*4)+20+48);
 
     l_pressakey.setPosition(windowsize.x/2, windowsize.y/2-48);
 
@@ -512,6 +567,8 @@ void MenuState::event_input(GameEngine* engine, sf::Event& event)
     }
     else if (m_submenu == MENU_OPTIONS_SOUND)
     {
+        if (l_soundthemes.event_input(event)) sprintf(engine->Settings()->m_soundtheme, l_soundthemes.getSelectedItem().c_str());
+        if (l_devices.event_input(event)) engine->Settings()->m_sounddevice = l_devices.getSelected();
         s_mastervol.process_input(event);
         s_musicvol.process_input(event);
         s_soundvol.process_input(event);
@@ -629,7 +686,17 @@ void MenuState::event_input(GameEngine* engine, sf::Event& event)
         if (b_options_graphics.update())
             m_submenu = MENU_OPTIONS_GRAPHICS;
         if (b_options_sound.update())
+        {
             m_submenu = MENU_OPTIONS_SOUND;
+
+            listSoundThemes(m_soundthemes);
+            listSoundDevices(m_devicelist);
+
+            l_soundthemes.setItems(m_soundthemes);
+            l_soundthemes.setSelected(find_in_vector(m_soundthemes, engine->Sound()->getTheme()));
+            l_devices.setItems(m_devicelist);
+            l_devices.setSelected((int)BASS_GetDevice());
+        }
     }
 
     else if (m_submenu == MENU_CREATEWORLD)
@@ -712,6 +779,8 @@ void MenuState::event_input(GameEngine* engine, sf::Event& event)
     }
     else if (m_submenu == MENU_OPTIONS_SOUND)
     {
+        l_soundthemes.update();
+        l_devices.update();
         if (s_mastervol.update())
         {
             m_engine->Settings()->m_mastervol = (int)s_mastervol.getValue();
@@ -857,6 +926,8 @@ void MenuState::draw(GameEngine* engine)
     }
     else if (m_submenu == MENU_OPTIONS_SOUND)
     {
+        l_soundthemes.draw();
+        l_devices.draw();
         s_mastervol.draw();
         s_musicvol.draw();
         s_soundvol.draw();

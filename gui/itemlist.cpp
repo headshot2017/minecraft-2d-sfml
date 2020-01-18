@@ -1,52 +1,64 @@
 #include "itemlist.h"
 
-ItemList::ItemList(GameEngine *engine, float x, float y, float w, float h)
+ItemList::ItemList(GameEngine *engine, float x, float y, float w, float h, const char *label)
 {
     m_engine = engine;
+    fit_on_page = 0; max_page = 0; currpage = 0; selected = -1;
     m_pos = sf::Vector2f(x,y);
     m_size = sf::Vector2f(w,h);
+    m_label = std::string(label);
     createButtons();
 }
 
-ItemList::ItemList(GameEngine *engine, sf::Vector2f pos, sf::Vector2f size)
+ItemList::ItemList(GameEngine *engine, sf::Vector2f pos, sf::Vector2f size, const char *label)
 {
     m_engine = engine;
+    fit_on_page = 0; max_page = 0; currpage = 0; selected = -1;
     m_pos = pos;
     m_size = size;
+    m_label = std::string(label);
     createButtons();
 }
 
-ItemList::ItemList(GameEngine *engine, sf::FloatRect rect)
+ItemList::ItemList(GameEngine *engine, sf::FloatRect rect, const char *label)
 {
     m_engine = engine;
+    fit_on_page = 0; max_page = 0; currpage = 0; selected = -1;
     m_pos = sf::Vector2f(rect.left, rect.top);
     m_size = sf::Vector2f(rect.width, rect.height);
+    m_label = std::string(label);
     createButtons();
 }
 
-ItemList::ItemList(GameEngine *engine, float x, float y, float w, float h, std::vector<std::string>& items)
+ItemList::ItemList(GameEngine *engine, float x, float y, float w, float h, std::vector<std::string>& items, const char *label)
 {
     m_engine = engine;
+    fit_on_page = 0; max_page = 0; currpage = 0; selected = -1;
     m_pos = sf::Vector2f(x,y);
     m_size = sf::Vector2f(w,h);
+    m_label = std::string(label);
     setItems(items);
     createButtons();
 }
 
-ItemList::ItemList(GameEngine *engine, sf::Vector2f pos, sf::Vector2f size, std::vector<std::string>& items)
+ItemList::ItemList(GameEngine *engine, sf::Vector2f pos, sf::Vector2f size, std::vector<std::string>& items, const char *label)
 {
     m_engine = engine;
+    fit_on_page = 0; max_page = 0; currpage = 0; selected = -1;
     m_pos = pos;
     m_size = size;
+    m_label = std::string(label);
     setItems(items);
     createButtons();
 }
 
-ItemList::ItemList(GameEngine *engine, sf::FloatRect rect, std::vector<std::string>& items)
+ItemList::ItemList(GameEngine *engine, sf::FloatRect rect, std::vector<std::string>& items, const char *label)
 {
     m_engine = engine;
+    fit_on_page = 0; max_page = 0; currpage = 0; selected = -1;
     m_pos = sf::Vector2f(rect.left, rect.top);
     m_size = sf::Vector2f(rect.width, rect.height);
+    m_label = std::string(label);
     setItems(items);
     createButtons();
 }
@@ -80,8 +92,9 @@ void ItemList::update()
         setPage(currpage+fit_on_page);
 }
 
-void ItemList::event_input(sf::Event& event)
+bool ItemList::event_input(sf::Event& event)
 {
+    bool ret = false;
     m_prevpage.process_input(event);
     m_nextpage.process_input(event);
 
@@ -97,10 +110,13 @@ void ItemList::event_input(sf::Event& event)
             if (event.mouseButton.x >= x-4 and event.mouseButton.x < x+m_size.x and
                 event.mouseButton.y >= y-4 and event.mouseButton.y < y+20)
             {
-                selected = static_cast<int>(i);
+                ret = true;
+                setSelected(static_cast<int>(i));
             }
         }
     }
+
+    return ret;
 }
 
 void ItemList::draw()
@@ -115,6 +131,12 @@ void ItemList::draw()
     Outline.setOutlineColor(sf::Color::Black);
     m_engine->m_window.draw(aRect);
 
+    if (not m_label.empty())
+    {
+        Label l_label(m_engine, m_label, m_pos.x, m_pos.y-28);
+        l_label.draw();
+    }
+
     for(unsigned i=currpage; i<max_page; i++)
     {
         if (i >= m_items.size()) break;
@@ -126,7 +148,7 @@ void ItemList::draw()
         m_text.draw();
     }
 
-    if (selected >= 0)
+    if (selected >= 0 and fit_on_page > 0)
     {
         if (selected / fit_on_page == currpage / fit_on_page)
         {

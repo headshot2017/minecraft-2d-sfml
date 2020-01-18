@@ -17,11 +17,13 @@ public:
     bool m_fullscreen = false;
     unsigned int m_screenwidth = 800;
     unsigned int m_screenheight = 480;
+    int m_sounddevice = -1;
     int m_mastervol = 100;
     int m_musicvol = 100;
     int m_soundvol = 100;
     char m_playername[16];
     char m_playerskin[32];
+    char m_soundtheme[32];
 
 private:
     Controls m_controls;

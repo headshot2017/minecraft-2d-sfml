@@ -130,9 +130,13 @@ private:
     sf::Texture txt_playerskin;
 
     // sound options menu
+    ItemList l_devices;
     Slider s_mastervol;
     Slider s_musicvol;
     Slider s_soundvol;
+    ItemList l_soundthemes;
+    std::vector<std::string> m_soundthemes;
+    std::vector<std::string> m_devicelist;
 
     // video options menu
     bool fullscreen;

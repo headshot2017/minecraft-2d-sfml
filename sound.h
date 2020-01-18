@@ -74,6 +74,7 @@ public:
     void updateVolume();
 
     HSTREAM getCurrentMusic() {return (m_currmusic > -1) ? m_music[m_currmusic] : HSTREAM(0);}
+    const char *getTheme() {return curr_theme;}
 
     void playMusic(int music);
     void stopMusic();
@@ -92,6 +93,7 @@ private:
     std::vector<HSAMPLE> m_samples;
     SettingsManager* m_settings;
     bool theme_loaded = false;
+    const char *curr_theme;
     int m_currmusic;
 };
 

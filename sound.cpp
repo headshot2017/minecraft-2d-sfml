@@ -10,7 +10,7 @@ void SoundEngine::init(SettingsManager *settings)
     m_music.resize(MUSIC_TOTAL);
     m_sounds.resize(SOUND_TOTAL);
     m_samples.resize(SAMPLE_TOTAL);
-    BASS_Init(-1, 44100, 0, 0, 0);
+    BASS_Init(settings->m_sounddevice, 44100, 0, 0, 0);
 
     char aFile[128];
     for (unsigned i=0; i<m_music.size(); i++)
@@ -57,6 +57,7 @@ bool SoundEngine::loadTheme(const char *theme)
 {
     if (theme_loaded)
         unloadTheme();
+    curr_theme = theme;
 
     char aFile[128];
     sprintf(aFile, "data/sounds/%s/click.wav", theme);
@@ -114,6 +115,7 @@ bool SoundEngine::loadTheme(const char *theme)
 bool SoundEngine::unloadTheme()
 {
     if (not theme_loaded) return false;
+    curr_theme = nullptr;
 
     for (HSTREAM snd : m_sounds) BASS_StreamFree(snd);
     for (HSTREAM snd : m_samples) BASS_StreamFree(snd);

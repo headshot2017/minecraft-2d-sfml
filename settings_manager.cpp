@@ -12,9 +12,11 @@ void SettingsManager::generateSettings()
 {
     sprintf(m_playername, "Alexn't");
     sprintf(m_playerskin, "steve");
+    sprintf(m_soundtheme, "default");
     m_fullscreen = false;
     m_screenwidth = 800;
     m_screenheight = 480;
+    m_sounddevice = -1;
     m_mastervol = 100;
     m_musicvol = 100;
     m_soundvol = 100;
@@ -39,9 +41,9 @@ void SettingsManager::loadSettings()
 
             int maxkeys = static_cast<int>(sf::Keyboard::KeyCount);
             if (strcmp(name.c_str(), "player_name") == 0)
-                sprintf(m_playername, "%s", value.c_str());
+                sprintf(m_playername, value.c_str());
             else if (strcmp(name.c_str(), "player_skin") == 0)
-                sprintf(m_playerskin, "%s", value.c_str());
+                sprintf(m_playerskin, value.c_str());
             else if (strcmp(name.c_str(), "fullscreen") == 0)
                 m_fullscreen = std::atoi(value.c_str());
             else if (strcmp(name.c_str(), "screen_width") == 0)
@@ -54,6 +56,10 @@ void SettingsManager::loadSettings()
                 m_musicvol = std::atoi(value.c_str());
             else if (strcmp(name.c_str(), "sound_volume") == 0)
                 m_soundvol = std::atoi(value.c_str());
+            else if (strcmp(name.c_str(), "sound_device") == 0)
+                m_sounddevice = std::atoi(value.c_str());
+            else if (strcmp(name.c_str(), "sound_theme") == 0)
+                sprintf(m_soundtheme, value.c_str());
 
             else if (strcmp(name.c_str(), "control_destroy") == 0)
             {
@@ -186,9 +192,13 @@ void SettingsManager::saveSettings()
     configfile << "fullscreen: " << ((m_fullscreen) ? "1" : "0") << "\n";
     configfile << "screen_width: " << m_screenwidth << "\n";
     configfile << "screen_height: " << m_screenheight << "\n";
+    configfile << "\n";
+    configfile << "sound_device: " << m_sounddevice << "\n";
+    configfile << "sound_theme: " << m_soundtheme << "\n";
     configfile << "master_volume: " << m_mastervol << "\n";
     configfile << "music_volume: " << m_musicvol << "\n";
     configfile << "sound_volume: " << m_soundvol << "\n";
+    configfile << "\n";
 
     auto keys = m_controls.getKeys();
     int maxkeys = static_cast<int>(sf::Keyboard::KeyCount);

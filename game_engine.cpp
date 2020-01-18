@@ -22,7 +22,7 @@ void GameEngine::init()
 
     m_sound = new SoundEngine;
     m_sound->init(&m_settings);
-    m_sound->loadTheme("default");
+    m_sound->loadTheme(m_settings.m_soundtheme);
 
     sf::Image widgets;
     widgets.loadFromFile("data/gui/widgets.png");
