@@ -75,6 +75,7 @@ private:
     bool m_sneak = false;
 
     bool m_isPlayer = false, can_move = true, m_layer1_collide = false, m_fly = false;
+    bool m_inWater2 = false;
     double m_footstepticks = 0.0; // for footstep animations
     int m_ticks = 0; // ticks elapsed since creation (mainly for footstep sounds)
     int m_armtick = 0; // arm swing (when clicking)

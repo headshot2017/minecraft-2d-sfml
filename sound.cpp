@@ -61,6 +61,10 @@ bool SoundEngine::loadTheme(const char *theme)
     char aFile[128];
     sprintf(aFile, "data/sounds/%s/click.wav", theme);
     m_sounds[SOUND_CLICK] = BASS_StreamCreateFile(false, aFile, 0, 0, 0);
+    sprintf(aFile, "data/sounds/%s/splash_weak.wav", theme);
+    m_sounds[SOUND_SPLASH_WEAK] = BASS_StreamCreateFile(false, aFile, 0, 0, 0);
+    sprintf(aFile, "data/sounds/%s/splash_strong.wav", theme);
+    m_sounds[SOUND_SPLASH_STRONG] = BASS_StreamCreateFile(false, aFile, 0, 0, 0);
     sprintf(aFile, "data/sounds/%s/fuse.wav", theme);
     m_samples[SAMPLE_TNT_FUSE] = BASS_SampleLoad(false, aFile, 0, 0, 65536/4, BASS_SAMPLE_OVER_POS);
     for(int i=0; i<4; i++)
@@ -190,6 +194,29 @@ void SoundEngine::playFootstepSound(float player_x, float player_y, float x, flo
         blocktype = SOUND_GLASS_STEP;
 
     playGameSound(player_x, player_y, x, y, blocktype);
+}
+
+void SoundEngine::playWaterSplashSound(float player_x, float player_y, float x, float y, float vspeed)
+{
+    float m_mastervol = m_settings->m_mastervol / 100.f;
+    float m_soundvol = m_settings->m_soundvol / 100.f;
+
+    float vol, pan, dist;
+    dist = sqrt(pow(x - player_x, 2) + pow(y - player_y, 2));
+
+    if (dist < 500)
+        vol = (500.0f - dist) / 500.0f;
+    else
+        vol = 0;
+
+    pan = (-x + player_x) / 500.0f;
+    vol *= vspeed/15.0f;
+    vol = (vol < 0) ? 0 : (vol > 1) ? 1 : vol;
+    int type = (vspeed >= 8) ? SOUND_SPLASH_STRONG : SOUND_SPLASH_WEAK;
+
+    BASS_ChannelSetAttribute(m_sounds[type], BASS_ATTRIB_VOL, vol * m_mastervol * m_soundvol);
+    BASS_ChannelSetAttribute(m_sounds[type], BASS_ATTRIB_PAN, pan);
+    BASS_ChannelPlay(m_sounds[type], true);
 }
 
 void SoundEngine::playGameSound(float player_x, float player_y, float x, float y, int type, int multi)

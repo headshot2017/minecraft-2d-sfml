@@ -178,6 +178,8 @@ void Player::knockBack(float xx, float yy, int maxdist)
 
 void Player::update(GameEngine *engine)
 {
+    sf::Vector2f view = engine->m_window.getView().getCenter();
+
     if (groundCollide()) // gravity.
     {
         if (vspeed > 0)
@@ -187,7 +189,6 @@ void Player::update(GameEngine *engine)
             vspeed = 0.f;
             m_fly = false;
             int block = m_world->getBlock(x/32, y/32);
-            sf::Vector2f view = engine->m_window.getView().getCenter();
             engine->Sound()->playFootstepSound(x, y, view.x, view.y, block);
         }
         else if (vspeed < 0)
@@ -202,10 +203,18 @@ void Player::update(GameEngine *engine)
         {
             if (inWater())
             {
+                if (not m_inWater2) // sound
+                {
+                    m_inWater2 = true;
+                    engine->Sound()->playWaterSplashSound(x, y, view.x, view.y, vspeed);
+                }
                 gravity = engine->Settings()->controls()->Pressed("jump") ? -0.2f : 0.1f;
             }
             else
+            {
+                m_inWater2 = false;
                 gravity = 0.25f;
+            }
         }
         else
             gravity = 0.f;
@@ -262,7 +271,6 @@ void Player::update(GameEngine *engine)
         if (angle < 6 and angle > -6 and not m_footstepwait and not m_sneak and blockCollide(x/32, y/32))
         {
             int block = m_world->getBlock(x/32, y/32);
-            sf::Vector2f view = engine->m_window.getView().getCenter();
             engine->Sound()->playFootstepSound(x, y, view.x, view.y, block);
             m_footstepwait = 25 - (armswing*2);
         }

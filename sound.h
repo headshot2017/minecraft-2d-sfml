@@ -26,7 +26,10 @@ enum
     SOUND_WOOL_DIG=49,
     SOUND_GLASS_DIG=53,
 
-    SOUND_TOTAL=56
+    SOUND_SPLASH_STRONG=57,
+    SOUND_SPLASH_WEAK,
+
+    SOUND_TOTAL
 };
 
 enum
@@ -75,6 +78,7 @@ public:
     void playMusic(int music);
     void stopMusic();
 
+    void playWaterSplashSound(float player_x, float player_y, float x, float y, float vspeed);
     void playGlassBreakSound(float player_x, float player_y, float x, float y);
     void playDigSound(float player_x, float player_y, float x, float y, int type);
     void playFootstepSound(float player_x, float player_y, float x, float y, int type);
