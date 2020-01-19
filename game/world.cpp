@@ -19,6 +19,7 @@ World::World()
             m_blocks2.back().push_back(Chunk());
         }
     }
+    m_seed = 0;
 }
 
 World::World(GameEngine *engine)
@@ -35,6 +36,7 @@ World::World(GameEngine *engine)
             m_blocks2.back().push_back(Chunk(engine));
         }
     }
+    m_seed = 0;
 }
 
 World::~World()
@@ -319,6 +321,7 @@ void World::generateFlatWorld(const char *name, const std::vector<int>& blocks)
 {
     sprintf(fileName, "worlds/%s.dat", name);
     loaded = false;
+    m_seed = 0;
 
     printf("%d\n", blocks.size());
     for(int xx=0; xx<WORLD_W*32; xx+=32)
@@ -350,6 +353,7 @@ void World::generateFlatWorld(const char *name, const std::vector<int>& blocks)
 void World::generateWorld(unsigned int seed, const char *name, int biome)
 {
     srand(seed);
+    m_seed = seed;
     sprintf(fileName, "worlds/%s.dat", name);
     loaded = false;
 
@@ -563,6 +567,7 @@ void World::saveWorld()
     int width = WORLD_W, height = WORLD_H;
     file.write((char*)&width, sizeof(width));
     file.write((char*)&height, sizeof(height));
+    file.write((char*)&m_seed, sizeof(m_seed));
     for(int i=0; i<width*height*4; i++)
     {
         int x = i % width;
@@ -594,7 +599,8 @@ void World::loadWorld(const char *worldName)
 
     file.read((char*)&width, sizeof(width));
     file.read((char*)&height, sizeof(height));
-    printf("world size: %d,%d\n", width, height);
+    file.read((char*)&m_seed, sizeof(m_seed));
+    printf("world size: %d,%d\nseed: %d\n", width, height, m_seed);
 
     for(int yy=0; yy < height/CHUNK_H+1; yy++)
     {

@@ -48,6 +48,7 @@ public:
 private:
     bool loaded;
     char fileName[96];
+    unsigned int m_seed;
     GameEngine *m_engine;
 
     Player* m_player; // will later be changed to vectors for multiplayer

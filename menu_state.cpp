@@ -268,15 +268,15 @@ void MenuState::init(GameEngine* engine)
     l_devices = ItemList(engine, (windowsize.x/2)-300-8, 64+(48*0), 616, 96, m_devicelist, "Audio device");
     s_mastervol = Slider(engine, "Master Volume:", (windowsize.x/2)-300-8, 64+(48*2)+16, 616);
     s_mastervol.setMaxValue(100);
-    s_mastervol.setValue(100);
+    s_mastervol.setValue(engine->Settings()->m_mastervol);
     s_mastervol.setFloatValue(false);
     s_musicvol = Slider(engine, "Music Volume:", (windowsize.x/2)-300-8, 64+(48*3)+16, 300);
     s_musicvol.setMaxValue(100);
-    s_musicvol.setValue(100);
+    s_musicvol.setValue(engine->Settings()->m_musicvol);
     s_musicvol.setFloatValue(false);
     s_soundvol = Slider(engine, "Sound Volume:", (windowsize.x/2)+8, 64+(48*3)+16, 300);
     s_soundvol.setMaxValue(100);
-    s_soundvol.setValue(100);
+    s_soundvol.setValue(engine->Settings()->m_soundvol);
     s_soundvol.setFloatValue(false);
     l_soundthemes = ItemList(engine, (windowsize.x/2)-300-8, 64+(48*4)+20+48, 616, 96, m_soundthemes, "Sound theme");
 
