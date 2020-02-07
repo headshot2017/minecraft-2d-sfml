@@ -2,35 +2,39 @@
 
 const char* Blocks::getBlockName(int num)
 {
-    return (num == 0) ? "Air" :
-           (num == 1) ? "Grass Block" :
-           (num == 2) ? "Dirt" :
-           (num == 3) ? "Oak Wood" :
-           (num == 4) ? "Oak Leaves" :
-           (num == 5) ? "Oak Planks" :
-           (num == 6) ? "Brick" :
-           (num == 7) ? "Cobblestone" :
-           (num == 8) ? "Gravel" :
-           (num == 9) ? "Sand" :
-           (num == 10) ? "Sandstone" :
-           (num == 11) ? "TNT" :
-           (num == 12) ? "Cactus" :
-           (num == 13) ? "Glass" :
-           (num == 14) ? "Ice" :
-           (num == 15) ? "Glowstone" :
-           (num == 16) ? "Bookshelf" :
-           (num == 17) ? "Pumpkin" :
-           (num == 18) ? "Noteblock" :
-           (num == 19) ? "Wool" :
-           (num == 20) ? "Crafting Table" :
-           (num == 21) ? "Furnace" :
-           (num == 22) ? "Coal Ore" :
-           (num == 23) ? "Iron Ore" :
-           (num == 24) ? "Gold Ore" :
-           (num == 25) ? "Diamond Ore" :
-           (num == 26) ? "Water" :
-           (num == 27) ? "Stone" :
-           (num == 28) ? "Obsidian" :
-           (num == 29) ? "Bedrock" :
-           "???";
+    switch(num)
+    {
+        case 0: return "Air";
+        case 1: return "Grass Block";
+        case 2: return "Dirt";
+        case 3: return "Oak Wood";
+        case 4: return "Oak Leaves";
+        case 5: return "Oak Planks";
+        case 6: return "Brick";
+        case 7: return "Cobblestone";
+        case 8: return "Gravel";
+        case 9: return "Sand";
+        case 10: return "Sandstone";
+        case 11: return "TNT";
+        case 12: return "Cactus";
+        case 13: return "Glass";
+        case 14: return "Ice";
+        case 15: return "Glowstone";
+        case 16: return "Bookshelf";
+        case 17: return "Pumpkin";
+        case 18: return "Noteblock";
+        case 19: return "Wool";
+        case 20: return "Crafting Table";
+        case 21: return "Furnace";
+        case 22: return "Coal Ore";
+        case 23: return "Iron Ore";
+        case 24: return "Gold Ore";
+        case 25: return "Diamond Ore";
+        case 26: return "Water";
+        case 27: return "Stone";
+        case 28: return "Obsidian";
+        case 29: return "Bedrock";
+
+        default: return "???";
+    }
 }
