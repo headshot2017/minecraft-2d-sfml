@@ -218,5 +218,7 @@ void SettingsManager::saveSettings()
     configfile << "control_screenshot: " << (keys["screenshot"].inputType == MouseInput ? (static_cast<int>(keys["screenshot"].mouseButton)) + maxkeys : static_cast<int>(keys["screenshot"].key)) << "\n";
     configfile << "control_fullscreen: " << (keys["fullscreen"].inputType == MouseInput ? (static_cast<int>(keys["fullscreen"].mouseButton)) + maxkeys : static_cast<int>(keys["fullscreen"].key)) << "\n";
 
+    configfile.close();
+
     printf("settings saved\n");
 }
