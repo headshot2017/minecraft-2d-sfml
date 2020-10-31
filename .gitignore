@@ -1,0 +1,9 @@
+data/
+bin/
+lib/
+libs/
+obj/
+worlds/
+bass.chm
+*.html
+options.txt
