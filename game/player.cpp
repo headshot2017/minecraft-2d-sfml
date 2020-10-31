@@ -3,7 +3,7 @@
 #include "player.h"
 #include "entities/tnt.h"
 #include <math.h>
-#include <fstream>
+#include <sys/stat.h>
 
 Player::Player()
 {
@@ -18,8 +18,11 @@ Player::Player(World* world, GameEngine *engine)
     m_layer1_collide = false;
     m_fly = false;
 
+    printf("resize skin vertex\n");
     m_skinvertex.resize(7*4);
+    printf("quads\n");
     m_skinvertex.setPrimitiveType(sf::Quads);
+    printf("set skin\n");
     setSkin("steve");
 }
 
@@ -30,17 +33,15 @@ Player::~Player()
 
 void Player::setSkin(const char *name)
 {
-    char aBuf[96];
+    char aBuf[128];
     sprintf(aBuf, "data/skins/%s.png", name);
-    std::fstream file(aBuf);
+    struct stat file;
 
-    if (not file.good())
+    if (stat(aBuf, &file) != 0)
     {
-        file.close();
         setSkin("steve");
         return;
     }
-    file.close();
 
     m_skin.loadFromFile(aBuf);
 }
