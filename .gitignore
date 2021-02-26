@@ -1,4 +1,4 @@
-data/
+data/skins/
 bin/
 lib/
 libs/
@@ -7,3 +7,5 @@ worlds/
 bass.chm
 *.html
 options.txt
+Thumbs.db
+.DS_Store
