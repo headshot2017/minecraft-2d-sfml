@@ -1,4 +1,6 @@
 # minecraft-2d-sfml
-another 2d minecrap dumpster fire clone
+A 2D Minecraft clone, made in C++/SFML with the Code::Blocks IDE.
 
-made with Code::Blocks, SFML 2.5.1
+This project uses the BASS Audio Library, (c) Un4seen Developments.
+
+Minecraft is property of Mojang and Microsoft.
