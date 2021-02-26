@@ -1,12 +1,15 @@
 #ifndef MENU_STATE_H_INCLUDED
 #define MENU_STATE_H_INCLUDED
 
-#include "game_state.h"
-#include "gui/button.h"
-#include "gui/slider.h"
-#include "gui/textinput.h"
-#include "gui/label.h"
-#include "gui/itemlist.h"
+#include <game_state.h>
+#include <submenus/submenu.h>
+
+#include <gui/button.h>
+#include <gui/slider.h>
+#include <gui/textinput.h>
+#include <gui/label.h>
+#include <gui/itemlist.h>
+
 #include <vector>
 
 typedef enum
@@ -36,21 +39,23 @@ public:
     void destroy();
     void update(GameEngine *engine, float delta);
     void event_input(GameEngine* engine, sf::Event& event);
-    void process_input(GameEngine* engine) {}
+    void process_input(GameEngine* engine);
     void draw(GameEngine* engine);
     void pause();
     void resume();
     void onResolutionChange(sf::Vector2u res);
 
+    void changeSubmenu(Submenu* newMenu);
+
     void changeBind(const char *keybind);
     void setAllPositions(sf::Vector2u& windowsize);
-    void setSplashText();
 
     static MenuState* Instance() {return &m_Instance;}
 
 private:
     static MenuState m_Instance;
-    SUB_MENUS m_submenu = MENU_MAINMENU;
+    //SUB_MENUS m_submenu = MENU_MAINMENU;
+    Submenu* m_submenu;
     GameEngine *m_engine;
 
     int m_musicticks;

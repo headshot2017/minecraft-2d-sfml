@@ -42,8 +42,8 @@
 		</Build>
 		<Compiler>
 			<Add option="-Wall" />
-			<Add directory="F:/SFML-2.5.1/include" />
 			<Add directory="C:/Users/Mauricio/Desktop/JuanPablo/SFML-2.5.1/include" />
+			<Add directory="C:/Users/Mauricio/Desktop/JuanPablo/minecraft-2d-sfml-master/" />
 		</Compiler>
 		<Linker>
 			<Add library="mingw32" />
@@ -55,7 +55,6 @@
 			<Add library="sfml-window-d" />
 			<Add library="sfml-system-d" />
 			<Add library="lib/bass.lib" />
-			<Add directory="F:/SFML-2.5.1/lib" />
 			<Add directory="C:/Users/Mauricio/Desktop/JuanPablo/SFML-2.5.1/lib" />
 		</Linker>
 		<Unit filename="animated_sprite.cpp" />
@@ -109,6 +108,9 @@
 		<Unit filename="settings_manager.h" />
 		<Unit filename="sound.cpp" />
 		<Unit filename="sound.h" />
+		<Unit filename="submenus/submenu.h" />
+		<Unit filename="submenus/title_screen.cpp" />
+		<Unit filename="submenus/title_screen.h" />
 		<Extensions>
 			<code_completion />
 			<envvars />

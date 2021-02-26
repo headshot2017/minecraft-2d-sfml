@@ -2,7 +2,8 @@
 #define BUTTON_H_INCLUDED
 
 #include <SFML/Graphics.hpp>
-#include "../game_engine.h"
+#include <game_engine.h>
+#include "defs.h"
 #include "label.h"
 
 class Button
@@ -20,7 +21,8 @@ public:
     void setText(sf::String text);
     void setPosition(sf::Vector2f pos);
     void setPosition(float x, float y) {setPosition(sf::Vector2f(x,y));}
-    bool update();
+    void onClicked(Callback newAction, void *pUser) {callback = newAction; pUserData = pUser;}
+    void update();
     void process_input(sf::Event& event);
     void draw();
 
@@ -30,7 +32,10 @@ private:
     sf::Texture* m_texture;
     sf::Vector2f m_pos;
     GameEngine* engine;
-    bool clicked = false;
+
+    Callback callback;
+    void *pUserData;
+
     int m_width = 0;
 };
 

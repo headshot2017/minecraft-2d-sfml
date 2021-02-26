@@ -35,6 +35,10 @@ public:
     void setPage(unsigned page);
     void setSelected(int selection) {selected = selection;}
 
+    // prev/next button callbacks
+    static void onPrevPage(void *pUserData);
+    static void onNextPage(void *pUserData);
+
     sf::Vector2f getSize() {return m_size;}
     sf::Vector2f getPosition() {return m_pos;}
     std::vector<std::string> getItems() {return m_items;}

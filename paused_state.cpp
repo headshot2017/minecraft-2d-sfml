@@ -33,6 +33,7 @@ void PausedState::update(GameEngine* engine, float delta)
     if (engine->leavingGame() == 2)
         engine->popState();
 
+    /*
     if (b_resume.update())
         engine->popState();
     if (b_options.update())
@@ -42,6 +43,7 @@ void PausedState::update(GameEngine* engine, float delta)
         engine->leaveGame(1);
         engine->popState();
     }
+    */
 }
 
 void PausedState::event_input(GameEngine* engine, sf::Event& event)

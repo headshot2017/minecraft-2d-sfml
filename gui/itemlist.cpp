@@ -67,6 +67,8 @@ void ItemList::createButtons()
 {
     m_prevpage = Button(m_engine, "<<", 0, 0, 40);
     m_nextpage = Button(m_engine, ">>", 0, 0, 40);
+    m_prevpage.onClicked(&onPrevPage, this);
+    m_nextpage.onClicked(&onNextPage, this);
     setupButtons();
 }
 
@@ -81,15 +83,29 @@ void ItemList::setPage(unsigned page)
     currpage = page;
 }
 
+void ItemList::onPrevPage(void *pUserData)
+{
+    ItemList* self = (ItemList* )pUserData;
+
+    if (self->currpage > 0)
+        self->setPage(self->currpage - self->fit_on_page);
+}
+
+void ItemList::onNextPage(void *pUserData)
+{
+    ItemList* self = (ItemList* )pUserData;
+
+    if (self->currpage + self->fit_on_page < self->m_items.size())
+        self->setPage(self->currpage + self->fit_on_page);
+}
+
 void ItemList::update()
 {
     fit_on_page = (m_size.y)/24;
     max_page = fit_on_page+currpage;
 
-    if (m_prevpage.update() and currpage > 0)
-        setPage(currpage-fit_on_page);
-    else if (m_nextpage.update() and currpage+fit_on_page < m_items.size())
-        setPage(currpage+fit_on_page);
+    m_prevpage.update();
+    m_nextpage.update();
 }
 
 bool ItemList::event_input(sf::Event& event)

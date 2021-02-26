@@ -760,7 +760,7 @@
 	<stdlib.h>
 	<math.h>
 
-1579316457 source:c:\users\mauricio\desktop\juanpablo\minecraft-2d-sfml-master\game_engine.cpp
+1607238704 source:c:\users\mauricio\desktop\juanpablo\minecraft-2d-sfml-master\game_engine.cpp
 	"game_engine.h"
 	"game_state.h"
 	<SFML/Graphics.hpp>
@@ -772,26 +772,27 @@
 1579049217 c:\users\mauricio\desktop\juanpablo\minecraft-2d-sfml-master\game_state.h
 	"game_engine.h"
 
-1567817386 source:c:\users\mauricio\desktop\juanpablo\minecraft-2d-sfml-master\gui\button.cpp
+1614359648 source:c:\users\mauricio\desktop\juanpablo\minecraft-2d-sfml-master\gui\button.cpp
 	<SFML/Graphics.hpp>
 	"button.h"
 	"../bass.h"
 	"../game_engine.h"
 	<stdio.h>
 
-1567817386 c:\users\mauricio\desktop\juanpablo\minecraft-2d-sfml-master\gui\button.h
+1614360574 c:\users\mauricio\desktop\juanpablo\minecraft-2d-sfml-master\gui\button.h
 	<SFML/Graphics.hpp>
-	"../game_engine.h"
+	<game_engine.h>
+	"defs.h"
 	"label.h"
 
 1567817386 c:\users\mauricio\desktop\juanpablo\minecraft-2d-sfml-master\gui\label.h
 	<SFML/Graphics.hpp>
 	"../game_engine.h"
 
-1579316341 source:c:\users\mauricio\desktop\juanpablo\minecraft-2d-sfml-master\gui\itemlist.cpp
+1614359412 source:c:\users\mauricio\desktop\juanpablo\minecraft-2d-sfml-master\gui\itemlist.cpp
 	"itemlist.h"
 
-1579316311 c:\users\mauricio\desktop\juanpablo\minecraft-2d-sfml-master\gui\itemlist.h
+1614360621 c:\users\mauricio\desktop\juanpablo\minecraft-2d-sfml-master\gui\itemlist.h
 	"button.h"
 	"label.h"
 
@@ -841,13 +842,14 @@
 	<fstream>
 	<vector>
 
-1579312579 c:\users\mauricio\desktop\juanpablo\minecraft-2d-sfml-master\menu_state.h
-	"game_state.h"
-	"gui/button.h"
-	"gui/slider.h"
-	"gui/textinput.h"
-	"gui/label.h"
-	"gui/itemlist.h"
+1614319896 c:\users\mauricio\desktop\juanpablo\minecraft-2d-sfml-master\menu_state.h
+	<game_state.h>
+	<submenus/submenu.h>
+	<gui/button.h>
+	<gui/slider.h>
+	<gui/textinput.h>
+	<gui/label.h>
+	<gui/itemlist.h>
 	<vector>
 
 1579049246 c:\users\mauricio\desktop\juanpablo\minecraft-2d-sfml-master\paused_state.h
@@ -861,12 +863,13 @@
 	"ingame_state.h"
 	<stdlib.h>
 
-1579406754 source:c:\users\mauricio\desktop\juanpablo\minecraft-2d-sfml-master\menu_state.cpp
+1614322224 source:c:\users\mauricio\desktop\juanpablo\minecraft-2d-sfml-master\menu_state.cpp
 	<SFML/Graphics.hpp>
-	"game_engine.h"
-	"menu_state.h"
-	"ingame_state.h"
-	"bass.h"
+	<game_engine.h>
+	<menu_state.h>
+	<ingame_state.h>
+	<submenus/title_screen.h>
+	<bass.h>
 	<fstream>
 	<algorithm>
 	<stdio.h>
@@ -875,11 +878,11 @@
 	<dirent.h>
 	<sys/stat.h>
 
-1579049284 source:c:\users\mauricio\desktop\juanpablo\minecraft-2d-sfml-master\paused_state.cpp
+1614356840 source:c:\users\mauricio\desktop\juanpablo\minecraft-2d-sfml-master\paused_state.cpp
 	"paused_state.h"
 	"menu_state.h"
 
-1579316549 source:c:\users\mauricio\desktop\juanpablo\minecraft-2d-sfml-master\settings_manager.cpp
+1604178119 source:c:\users\mauricio\desktop\juanpablo\minecraft-2d-sfml-master\settings_manager.cpp
 	"settings_manager.h"
 	<fstream>
 	<algorithm>
@@ -1298,4 +1301,132 @@
 	<SFML/Graphics/PrimitiveType.hpp>
 	<SFML/Graphics/Drawable.hpp>
 	<SFML/Window/GlResource.hpp>
+
+1579049217 c:\users\mauricio\desktop\juanpablo\minecraft-2d-sfml-master\\game_state.h
+	"game_engine.h"
+
+1579049338 c:\users\mauricio\desktop\juanpablo\minecraft-2d-sfml-master\\game_engine.h
+	<SFML/Graphics.hpp>
+	<SFML/System/Clock.hpp>
+	<vector>
+	"bass.h"
+	"sound.h"
+	"game/block.h"
+	"settings_manager.h"
+
+1567817386 c:\users\mauricio\desktop\juanpablo\minecraft-2d-sfml-master\\bass.h
+	<wtypes.h>
+	<stdint.h>
+
+1579314826 c:\users\mauricio\desktop\juanpablo\minecraft-2d-sfml-master\\sound.h
+	"bass.h"
+	"settings_manager.h"
+	"game/block.h"
+	<vector>
+
+1579316480 c:\users\mauricio\desktop\juanpablo\minecraft-2d-sfml-master\\settings_manager.h
+	"controls.h"
+
+1567817386 c:\users\mauricio\desktop\juanpablo\minecraft-2d-sfml-master\\controls.h
+	<SFML/Window/Keyboard.hpp>
+	<SFML/Window/Mouse.hpp>
+	<SFML/Window/Event.hpp>
+	<map>
+
+1578786324 c:\users\mauricio\desktop\juanpablo\minecraft-2d-sfml-master\\game\block.h
+
+1614360574 c:\users\mauricio\desktop\juanpablo\minecraft-2d-sfml-master\\gui\button.h
+	<SFML/Graphics.hpp>
+	<game_engine.h>
+	"defs.h"
+	"label.h"
+
+1567817386 c:\users\mauricio\desktop\juanpablo\minecraft-2d-sfml-master\\gui\label.h
+	<SFML/Graphics.hpp>
+	"../game_engine.h"
+
+1579029457 c:\users\mauricio\desktop\juanpablo\minecraft-2d-sfml-master\\gui\slider.h
+	<SFML/Graphics.hpp>
+	"../game_engine.h"
+	"label.h"
+
+1567817386 c:\users\mauricio\desktop\juanpablo\minecraft-2d-sfml-master\\gui\textinput.h
+	<SFML/Graphics.hpp>
+	"../game_engine.h"
+
+1614360621 c:\users\mauricio\desktop\juanpablo\minecraft-2d-sfml-master\\gui\itemlist.h
+	"button.h"
+	"label.h"
+
+1614359473 c:\users\mauricio\desktop\juanpablo\minecraft-2d-sfml-master\\submenus\title_screen.h
+	"submenu.h"
+	<gui/label.h>
+	<gui/button.h>
+
+1614322252 c:\users\mauricio\desktop\juanpablo\minecraft-2d-sfml-master\\submenus\submenu.h
+	<game_engine.h>
+
+1614319896 c:\users\mauricio\desktop\juanpablo\minecraft-2d-sfml-master\\menu_state.h
+	<game_state.h>
+	<submenus/submenu.h>
+	<gui/button.h>
+	<gui/slider.h>
+	<gui/textinput.h>
+	<gui/label.h>
+	<gui/itemlist.h>
+	<vector>
+
+1579049236 c:\users\mauricio\desktop\juanpablo\minecraft-2d-sfml-master\\ingame_state.h
+	<SFML/Graphics.hpp>
+	"game_state.h"
+	"game/world.h"
+	"game/player.h"
+	"ingame_gui.h"
+	<fstream>
+	<vector>
+
+1579406039 c:\users\mauricio\desktop\juanpablo\minecraft-2d-sfml-master\\game\world.h
+	<SFML/Graphics.hpp>
+	"../game_engine.h"
+	"chunk.h"
+	"entity.h"
+	"player.h"
+	<vector>
+
+1578785374 c:\users\mauricio\desktop\juanpablo\minecraft-2d-sfml-master\\game\chunk.h
+	<SFML/Graphics.hpp>
+	"../game_engine.h"
+	"block.h"
+	"world.h"
+
+1570468024 c:\users\mauricio\desktop\juanpablo\minecraft-2d-sfml-master\\game\entity.h
+	"../game_engine.h"
+	"world.h"
+
+1579307145 c:\users\mauricio\desktop\juanpablo\minecraft-2d-sfml-master\\game\player.h
+	<SFML/Graphics.hpp>
+	"world.h"
+
+1579049232 c:\users\mauricio\desktop\juanpablo\minecraft-2d-sfml-master\\ingame_gui.h
+	"game_engine.h"
+
+1614359823 source:c:\users\mauricio\desktop\juanpablo\minecraft-2d-sfml-master\submenus\title_screen.cpp
+	<fstream>
+	"submenu.h"
+	"title_screen.h"
+
+1614359473 c:\users\mauricio\desktop\juanpablo\minecraft-2d-sfml-master\submenus\title_screen.h
+	"submenu.h"
+	<gui/label.h>
+	<gui/button.h>
+
+1614322252 c:\users\mauricio\desktop\juanpablo\minecraft-2d-sfml-master\submenus\submenu.h
+	<game_engine.h>
+
+1614320720 source:c:\users\mauricio\desktop\juanpablo\minecraft-2d-sfml-master\submenus\submenu.cpp
+	"submenu.h"
+
+1614360649 c:\users\mauricio\desktop\juanpablo\minecraft-2d-sfml-master\gui\defs.h
+
+1614360649 c:\users\mauricio\desktop\juanpablo\minecraft-2d-sfml-master\\gui\defs.h
 

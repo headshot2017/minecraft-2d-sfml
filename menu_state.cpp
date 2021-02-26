@@ -1,8 +1,9 @@
 #include <SFML/Graphics.hpp>
-#include "game_engine.h"
-#include "menu_state.h"
-#include "ingame_state.h"
-#include "bass.h"
+#include <game_engine.h>
+#include <menu_state.h>
+#include <ingame_state.h>
+#include <submenus/title_screen.h>
+#include <bass.h>
 #include <fstream>
 #include <algorithm>
 #include <stdio.h>
@@ -118,10 +119,7 @@ void MenuState::init(GameEngine* engine)
     m_engine = engine;
     srand(time(0));
 
-    if (not engine->isPaused())
-        m_submenu = MENU_MAINMENU;
-    else
-        m_submenu = MENU_OPTIONS;
+    m_submenu = (engine->isPaused()) ? new TitleScreenSubmenu(engine) : new TitleScreenSubmenu(engine);
 
     m_musicticks = 60*5;
 
@@ -130,13 +128,7 @@ void MenuState::init(GameEngine* engine)
     m_dirt_tile.loadFromFile("data/gui/options_background.png");
     m_dirt_tile.setRepeated(true);
 
-    sf::Image m_minecraft_logo_raw;
-    sf::Image m_minecraft_logo_final;
 
-    m_minecraft_logo_raw.loadFromFile("data/gui/title/minecraft.png");
-    m_minecraft_logo_final.create(274, 44, sf::Color(0, 0, 0, 0));
-    m_minecraft_logo_final.copy(m_minecraft_logo_raw, 0, 0, sf::IntRect(0, 0, 155, 44)); // minec
-    m_minecraft_logo_final.copy(m_minecraft_logo_raw, 155, 0, sf::IntRect(0, 45, 119, 88));
 
     dirt_tile.setTexture(m_dirt_tile);
     dirt_tile.setScale(4.0f, 4.0f);
@@ -152,31 +144,10 @@ void MenuState::init(GameEngine* engine)
     m_gamescreen[2].color = sf::Color(128, 128, 128+64);
     m_gamescreen[3].color = sf::Color(128, 128, 128+64);
 
-    m_minecraft_logo.loadFromImage(m_minecraft_logo_final);
-    minecraft_logo.setTexture(m_minecraft_logo);
-    minecraft_logo.setPosition((windowsize.x/2) - 274.0f, (windowsize.y/4)-64);
-    minecraft_logo.setScale(2.0f, 2.0f);
 
-    char bgfile[128];
-    sprintf(bgfile, "data/gui/background/%d.png", rand() % 3);
-    if (not engine->isPaused()) m_parallax_bg.loadFromFile(bgfile); // speed up loading pause screen
-    parallax_bg.setPrimitiveType(sf::Quads);
-    parallax_bg.resize(4);
-    m_parallax_x = 0.f;
 
-    m_splashscale = 0.2;
-    m_splashscaledir = 0.002;
 
-    m_splashtext = Label(engine, "ara ara", 0, 0, 0, 0);
-    m_splashtext.setHAlign(1);
-    m_splashtext.setColor(sf::Color::Yellow);
-    m_splashtext.setRotation(-20);
-    m_splashtext.setScale(0.2);
-    setSplashText();
-
-    m_versioninfo = Label(engine, "Minecraft 2D 0.1", 2, windowsize.y-2, 0, 2);
-    m_fanmadeproject = Label(engine, "Fanmade project", windowsize.x-2, windowsize.y-2, 2, 2);
-
+    /*
     b_back = Button(engine, sf::String("Back"), (windowsize.x/2)-200, windowsize.y-48);
     b_back_options = Button(engine, sf::String("Back"), (windowsize.x/2)-200, windowsize.y-48);
 
@@ -281,6 +252,7 @@ void MenuState::init(GameEngine* engine)
     l_soundthemes = ItemList(engine, (windowsize.x/2)-300-8, 64+(48*4)+20+48, 616, 96, m_soundthemes, "Sound theme");
 
     setAllPositions(windowsize);
+    */
 }
 
 void MenuState::destroy()
@@ -288,38 +260,10 @@ void MenuState::destroy()
     m_splashtexts.clear();
 }
 
-void MenuState::setSplashText()
-{
-    m_splashtexts.clear();
-    std::ifstream texts = std::ifstream("data/splashes.txt");
-    char major[16];
-    char minor[16];
-    sprintf(major, "%d", m_engine->app.getSettings().majorVersion);
-    sprintf(minor, "%d", m_engine->app.getSettings().minorVersion);
-    if (texts.good())
-    {
-        std::string line;
-        while (getline(texts, line))
-        {
-            std::size_t m_major = line.find("[M]");
-            if (m_major != std::string::npos)
-                line.replace(m_major, 3, major);
-
-            std::size_t m_minor = line.find("[m]");
-            if (m_minor != std::string::npos)
-                line.replace(m_minor, 3, minor);
-            m_splashtexts.push_back(line);
-        }
-    }
-    else
-        m_splashtexts.push_back(std::string("splashes.txt broken go home"));
-
-    m_splashtext.setText(m_splashtexts[rand() % m_splashtexts.size()].c_str());
-}
-
 void MenuState::setAllPositions(sf::Vector2u& windowsize)
 {
     dirt_tile.setTextureRect(sf::IntRect(0, 0, windowsize.x/4, windowsize.y/4));
+    /*
     minecraft_logo.setPosition((windowsize.x/2) - 274.0f, (windowsize.y/4)-64);
     sf::Vector2f aPos = minecraft_logo.getPosition();
     m_splashtext.setPosition(aPos.x+384+88, aPos.y+88+m_splashtext.getText().getSize());
@@ -403,31 +347,14 @@ void MenuState::setAllPositions(sf::Vector2u& windowsize)
     s_videores.setPosition((windowsize.x/2)-300-8, 64+(48*0));
     b_fullscreen.setPosition((windowsize.x/2)+8, 64+(48*0));
     b_applyvideo.setPosition((windowsize.x/2)-200, windowsize.y-112);
+    */
 }
 
 void MenuState::update(GameEngine* engine, float delta)
 {
+    /*
     char aBuf[128];
 
-    m_splashscale += m_splashscaledir * (MAX_FPS * delta);
-    if (m_splashscale >= 0.215)
-    {
-        m_splashscale = 0.215;
-        m_splashscaledir = -0.001;
-    }
-    else if (m_splashscale < 0.2)
-    {
-        m_splashscale = 0.2;
-        m_splashscaledir = 0.001;
-    }
-    m_splashtext.setScale(m_splashscale);
-    m_parallax_x += 1.0f * (MAX_FPS * delta);
-    if (m_parallax_x >= m_parallax_bg.getSize().x/2.0f)
-        m_parallax_x = 0;
-    parallax_bg[0].texCoords = sf::Vector2f(m_parallax_x, 0);
-    parallax_bg[1].texCoords = sf::Vector2f(m_parallax_x+800, 0);
-    parallax_bg[2].texCoords = sf::Vector2f(m_parallax_x+800, m_parallax_bg.getSize().y);
-    parallax_bg[3].texCoords = sf::Vector2f(m_parallax_x, m_parallax_bg.getSize().y);
 
     b_moveleft.setText(sf::String("Move left: ") + engine->Settings()->controls()->getKeyName("left"));
     b_moveright.setText(sf::String("Move right: ") + engine->Settings()->controls()->getKeyName("right"));
@@ -457,6 +384,7 @@ void MenuState::update(GameEngine* engine, float delta)
 
     sprintf(aBuf, "Fullscreen: %s", fullscreen ? "YES" : "NO");
     b_fullscreen.setText(aBuf);
+    */
 
     if (not engine->isPaused())
     {
@@ -468,6 +396,13 @@ void MenuState::update(GameEngine* engine, float delta)
             m_musicticks = 60 * (BASS_ChannelBytes2Seconds(menu_music, BASS_ChannelGetLength(menu_music, BASS_POS_BYTE)) + 5);
         }
     }
+
+    m_submenu->update(delta);
+}
+
+void MenuState::process_input(GameEngine* engine)
+{
+
 }
 
 void MenuState::event_input(GameEngine* engine, sf::Event& event)
@@ -478,20 +413,23 @@ void MenuState::event_input(GameEngine* engine, sf::Event& event)
     }
     else if (event.type == sf::Event::KeyPressed)
     {
-        if (event.key.code == sf::Keyboard::Escape and m_submenu != MENU_OPTIONS_CONTROLS_CHANGE)
+        if (event.key.code == sf::Keyboard::Escape and m_submenu->m_allowEsc)
         {
             if (engine->isPaused())
                 engine->popState();
             else
             {
-                m_submenu = MENU_MAINMENU;
-                setSplashText(); // minecraft does this too.
+                delete m_submenu;
+                m_submenu = new TitleScreenSubmenu(m_engine);
             }
         }
         else if (event.key.code == sf::Keyboard::F5)
             m_musicticks = 1;
     }
 
+    m_submenu->process_input(event);
+
+    /*
     if (m_submenu == MENU_MAINMENU)
     {
         b_singleplayer.process_input(event);
@@ -832,24 +770,25 @@ void MenuState::event_input(GameEngine* engine, sf::Event& event)
         if (b_back_options.update())
             m_submenu = MENU_OPTIONS;
     }
+    */
 }
 
 void MenuState::draw(GameEngine* engine)
 {
+    m_dirt_tile.setRepeated(true);
+    dirt_tile.setTexture(m_dirt_tile);
+
     if (engine->isPaused())
-    {
         engine->m_window.draw(m_gamescreen, &engine->m_screenshot);
-    }
     else
         engine->m_window.draw(dirt_tile);
 
+    m_submenu->draw();
+
+    /*
     if (m_submenu == MENU_MAINMENU)
     {
-        engine->m_window.draw(parallax_bg, &m_parallax_bg);
-        engine->m_window.draw(minecraft_logo);
-        m_splashtext.draw();
-        m_versioninfo.draw();
-        m_fanmadeproject.draw();
+
         b_singleplayer.draw();
         b_multiplayer.draw();
         b_options.draw();
@@ -953,6 +892,7 @@ void MenuState::draw(GameEngine* engine)
     }
     else if (m_submenu == MENU_OPTIONS_CONTROLS_CHANGE)
         l_pressakey.draw();
+    */
 }
 
 void MenuState::pause()
@@ -978,9 +918,11 @@ void MenuState::onResolutionChange(sf::Vector2u res)
 
 void MenuState::changeBind(const char* keybind)
 {
+    /*
     char aBuf[192];
     sprintf(m_changingControl, "%s", keybind);
     sprintf(aBuf, "Press any key to change control \"%s\".\nPress ESC to cancel.", keybind);
     l_pressakey.setText(aBuf);
     m_submenu = MENU_OPTIONS_CONTROLS_CHANGE;
+    */
 }

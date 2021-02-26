@@ -23,6 +23,8 @@ Button::Button(GameEngine* _engine, sf::String text, sf::Vector2f pos, int width
     m_sprite.resize(8);
     m_sprite.setPrimitiveType(sf::Quads);
     setButtonWidth(width);
+
+    callback = NULL;
 }
 
 Button::Button(GameEngine* _engine, sf::String text, float X, float Y, int width)
@@ -39,6 +41,8 @@ Button::Button(GameEngine* _engine, sf::String text, float X, float Y, int width
     m_sprite.resize(8);
     m_sprite.setPrimitiveType(sf::Quads);
     setButtonWidth(width);
+
+    callback = NULL;
 }
 
 Button::Button(GameEngine* _engine, const char* text, sf::Vector2f pos, int width)
@@ -55,6 +59,8 @@ Button::Button(GameEngine* _engine, const char* text, sf::Vector2f pos, int widt
     m_sprite.resize(8);
     m_sprite.setPrimitiveType(sf::Quads);
     setButtonWidth(width);
+
+    callback = NULL;
 }
 
 Button::Button(GameEngine* _engine, const char* text, float X, float Y, int width)
@@ -71,6 +77,8 @@ Button::Button(GameEngine* _engine, const char* text, float X, float Y, int widt
     m_sprite.resize(8);
     m_sprite.setPrimitiveType(sf::Quads);
     setButtonWidth(width);
+
+    callback = NULL;
 }
 
 void Button::setButtonWidth(int width)
@@ -114,7 +122,6 @@ void Button::setPosition(sf::Vector2f pos)
 
 void Button::process_input(sf::Event& event)
 {
-    clicked = false;
     if (event.type == sf::Event::MouseButtonPressed)
     {
         if (event.mouseButton.x > m_pos.x and
@@ -122,11 +129,15 @@ void Button::process_input(sf::Event& event)
             event.mouseButton.x < m_pos.x + m_width and
             event.mouseButton.y < m_pos.y + 40 and
             event.mouseButton.button == sf::Mouse::Left)
-            clicked = true;
+        {
+            engine->Sound()->playClickSound();
+            if (callback)
+                callback(pUserData);
+        }
     }
 }
 
-bool Button::update()
+void Button::update()
 {
     if (sf::Mouse::getPosition(engine->app).x > m_pos.x and
         sf::Mouse::getPosition(engine->app).y > m_pos.y and
@@ -135,17 +146,12 @@ bool Button::update()
     {
         m_texture = &engine->m_button_hover;
         m_text.setColor(sf::Color(255, 255, 128));
-        if (clicked)
-            engine->Sound()->playClickSound();
     }
     else
     {
-        clicked = false;
         m_texture = &engine->m_button;
         m_text.setColor(sf::Color::White);
     }
-
-    return clicked;
 }
 
 void Button::draw()
