@@ -11,21 +11,22 @@ If you are on a Debian-based Linux distro such as Ubuntu, install these dependen
 sudo apt-get install libogg-dev libvorbis-dev libflac-dev libudev-dev libxrandr-dev
 ```
 The rest of the dependencies (freetype, x11, opengl, openal, pthread) should already be bundled in your installation.
-If you are on Windows/macOS, these dependencies are already bundled in the SFML source code, so don't worry.
+If you are on Windows/macOS, these dependencies are already bundled for you in the SFML source code, so don't worry.
 
 Clone the SFML repository and build the source code:
 ```
 git clone https://github.com/sfml/sfml
 mkdir sfml/build
 cd sfml/build
-cmake .. -DBUILD_SHARED_LIBS=FALSE
-make
+cmake .. -DBUILD_SHARED_LIBS=FALSE -DCMAKE_INSTALL_PREFIX=.
+make install
 ```
 
 ### Building with Code::Blocks
-Open `minecrap.cbp` on Code::Blocks and select the `Release` build target, then Build and run.
+Open `minecrap.cbp` on Code::Blocks and select the Release build target that matches your OS, then Build and run.
 
 ### Building with CMake
+Make sure you have CMake installed on your system.
 On the root directory of the project, run these commands on a command prompt/terminal:
 ```
 mkdir build

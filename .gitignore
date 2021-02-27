@@ -1,9 +1,9 @@
 data/skins/
 bin/
-lib/
 libs/
 obj/
 worlds/
+sfml/
 bass.chm
 *.html
 options.txt
