@@ -1,9 +1,9 @@
 #include <SFML/Graphics.hpp>
-#include <game_engine.h>
-#include <menu_state.h>
-#include <ingame_state.h>
-#include <submenus/title_screen.h>
-#include <bass.h>
+#include "game_engine.h"
+#include "menu_state.h"
+#include "ingame_state.h"
+#include "submenus/title_screen.h"
+#include "bass.h"
 #include <fstream>
 #include <algorithm>
 #include <stdio.h>
