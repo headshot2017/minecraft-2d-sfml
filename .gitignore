@@ -9,3 +9,5 @@ bass.chm
 options.txt
 Thumbs.db
 .DS_Store
+*.layout
+*.depend
