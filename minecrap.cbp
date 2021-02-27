@@ -6,7 +6,7 @@
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
 		<Build>
-			<Target title="Debug">
+			<Target title="Windows Debug">
 				<Option output="bin/Debug/minecrap" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj/Debug/" />
 				<Option type="1" />
@@ -15,40 +15,70 @@
 					<Add option="-g" />
 				</Compiler>
 				<Linker>
-					<Add library="sfml-graphics-d" />
-					<Add library="sfml-window-d" />
-					<Add library="sfml-system-d" />
-					<Add library="lib/bass.lib" />
+					<Add library="gdi32" />
+					<Add library="winmm" />
 				</Linker>
+				<ExtraCommands>
+					<Add after="xcopy /E /I /Y data $(TARGET_OUTPUT_DIR)data" />
+					<Add after="copy lib\bass.dll $(TARGET_OUTPUT_DIR)bass.dll" />
+				</ExtraCommands>
 			</Target>
-			<Target title="Release">
+			<Target title="Windows Release">
 				<Option output="bin/Release/minecrap" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj/Release/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Linker>
-					<Add library="sfml-graphics-d" />
-					<Add library="sfml-window-d" />
-					<Add library="sfml-system-d" />
-					<Add library="lib/bass.lib" />
+					<Add library="gdi32" />
+					<Add library="winmm" />
 				</Linker>
+				<ExtraCommands>
+					<Add after="xcopy /E /I /Y data $(TARGET_OUTPUT_DIR)data" />
+					<Add after="copy lib\bass.dll $(TARGET_OUTPUT_DIR)bass.dll" />
+				</ExtraCommands>
+			</Target>
+			<Target title="Unix/Linux Debug">
+				<Option output="bin/Debug/minecrap" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+				<ExtraCommands>
+					<Add after="cp -r data $(TARGET_OUTPUT_DIR)data" />
+					<Add after="cp lib/libbass.so $(TARGET_OUTPUT_DIR)libbass.so" />
+				</ExtraCommands>
+			</Target>
+			<Target title="Unix/Linux Release">
+				<Option output="bin/Release/minecrap" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<ExtraCommands>
+					<Add after="cp -r data $(TARGET_OUTPUT_DIR)data" />
+					<Add after="cp lib/libbass.so $(TARGET_OUTPUT_DIR)libbass.so" />
+				</ExtraCommands>
 			</Target>
 		</Build>
 		<Compiler>
 			<Add option="-Wall" />
-			<Add directory="C:/SFML-2.5.1/include" />
+			<Add option="-DSFML_STATIC" />
+			<Add directory="sfml/include" />
 		</Compiler>
 		<Linker>
-			<Add library="mingw32" />
-			<Add library="user32" />
-			<Add library="gdi32" />
-			<Add library="winmm" />
-			<Add library="dxguid" />
-			<Add library="sfml-graphics-d" />
-			<Add library="sfml-window-d" />
-			<Add library="sfml-system-d" />
-			<Add library="lib/bass.lib" />
-			<Add directory="C:/SFML-2.5.1/lib" />
+			<Add option="-static-libstdc++" />
+			<Add option="-static-libgcc" />
+			<Add option="-static" />
+			<Add library="bass" />
+			<Add library="sfml-graphics-s" />
+			<Add library="sfml-window-s" />
+			<Add library="sfml-system-s" />
+			<Add library="opengl32" />
+			<Add library="freetype" />
+			<Add directory="sfml/build/lib" />
+			<Add directory="sfml/lib" />
+			<Add directory="lib" />
 		</Linker>
 		<Unit filename="animated_sprite.cpp" />
 		<Unit filename="animated_sprite.h" />
