@@ -2,7 +2,7 @@
 #define BUTTON_H_INCLUDED
 
 #include <SFML/Graphics.hpp>
-#include <game_engine.h>
+#include "../game_engine.h"
 #include "defs.h"
 #include "label.h"
 

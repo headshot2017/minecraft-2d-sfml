@@ -13,14 +13,12 @@
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-g" />
-					<Add directory="C:/Users/Mauricio/Desktop/JuanPablo/SFML-2.5.1/include" />
 				</Compiler>
 				<Linker>
 					<Add library="sfml-graphics-d" />
 					<Add library="sfml-window-d" />
 					<Add library="sfml-system-d" />
 					<Add library="lib/bass.lib" />
-					<Add directory="C:/Users/Mauricio/Desktop/JuanPablo/SFML-2.5.1/lib" />
 				</Linker>
 			</Target>
 			<Target title="Release">
@@ -28,22 +26,18 @@
 				<Option object_output="obj/Release/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
-				<Compiler>
-					<Add directory="C:/Users/Mauricio/Desktop/JuanPablo/SFML-2.5.1/include" />
-				</Compiler>
 				<Linker>
 					<Add library="sfml-graphics-d" />
 					<Add library="sfml-window-d" />
 					<Add library="sfml-system-d" />
 					<Add library="lib/bass.lib" />
-					<Add directory="C:/Users/Mauricio/Desktop/JuanPablo/SFML-2.5.1/lib" />
 				</Linker>
 			</Target>
 		</Build>
 		<Compiler>
 			<Add option="-Wall" />
-			<Add directory="C:/Users/Mauricio/Desktop/JuanPablo/SFML-2.5.1/include" />
-			<Add directory="C:/Users/Mauricio/Desktop/JuanPablo/minecraft-2d-sfml-master/" />
+			<Add directory="C:/SFML-2.5.1/include" />
+			<Add directory="./" />
 		</Compiler>
 		<Linker>
 			<Add library="mingw32" />
@@ -55,7 +49,7 @@
 			<Add library="sfml-window-d" />
 			<Add library="sfml-system-d" />
 			<Add library="lib/bass.lib" />
-			<Add directory="C:/Users/Mauricio/Desktop/JuanPablo/SFML-2.5.1/lib" />
+			<Add directory="C:/SFML-2.5.1/lib" />
 		</Linker>
 		<Unit filename="animated_sprite.cpp" />
 		<Unit filename="animated_sprite.h" />

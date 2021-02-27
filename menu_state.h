@@ -1,14 +1,14 @@
 #ifndef MENU_STATE_H_INCLUDED
 #define MENU_STATE_H_INCLUDED
 
-#include <game_state.h>
-#include <submenus/submenu.h>
+#include "game_state.h"
+#include "submenus/submenu.h"
 
-#include <gui/button.h>
-#include <gui/slider.h>
-#include <gui/textinput.h>
-#include <gui/label.h>
-#include <gui/itemlist.h>
+#include "gui/button.h"
+#include "gui/slider.h"
+#include "gui/textinput.h"
+#include "gui/label.h"
+#include "gui/itemlist.h"
 
 #include <vector>
 

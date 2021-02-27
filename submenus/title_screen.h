@@ -6,8 +6,8 @@
 */
 
 #include "submenu.h"
-#include <gui/label.h>
-#include <gui/button.h>
+#include "../gui/label.h"
+#include "../gui/button.h"
 
 class TitleScreenSubmenu : public Submenu
 {
