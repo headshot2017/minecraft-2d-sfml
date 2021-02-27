@@ -8,7 +8,6 @@
 #include <algorithm>
 #include <stdio.h>
 #include <time.h>
-#include <direct.h>
 #include <dirent.h>
 #include <sys/stat.h>
 
