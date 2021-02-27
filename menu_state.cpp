@@ -68,7 +68,11 @@ void listWorlds(std::vector<std::string>& strvec)
         }
     }
     else
+#ifdef _WIN32
         mkdir("worlds");
+#else
+        mkdir("worlds", 0777);
+#endif
 }
 
 void listSoundThemes(std::vector<std::string>& strvec)
