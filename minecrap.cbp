@@ -37,7 +37,6 @@
 		<Compiler>
 			<Add option="-Wall" />
 			<Add directory="C:/SFML-2.5.1/include" />
-			<Add directory="./" />
 		</Compiler>
 		<Linker>
 			<Add library="mingw32" />

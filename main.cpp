@@ -10,7 +10,7 @@ int main(int argc, char *argv[]) //def main(argc, argv):
 {
     GameEngine engine;
     engine.init();
-    engine.changeState(MenuState::Instance());
+    engine.changeState(new MenuState(&engine));
 
     while (engine.isRunning())
     {

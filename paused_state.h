@@ -8,29 +8,24 @@
 class PausedState : public GameState
 {
 public:
-    void init(GameEngine* engine);
-    void destroy();
-    void update(GameEngine *engine, float delta);
-    void event_input(GameEngine* engine, sf::Event& event);
-    void process_input(GameEngine* engine) {}
-    void draw(GameEngine* engine);
+    PausedState(GameEngine* engine);
+    ~PausedState();
+
+    void update(float delta);
+    void event_input(sf::Event& event);
+    void process_input() {}
+    void draw();
     void pause();
     void resume();
     void onResolutionChange(sf::Vector2u res);
 
-    static PausedState* Instance() {return &m_Instance;}
-
 private:
-    static PausedState m_Instance;
     GameEngine* m_engine;
 
     sf::VertexArray m_gamescreen;
     Button b_resume;
     Button b_options;
     Button b_quit;
-
-protected:
-    PausedState() {}
 };
 
 #endif // PAUSED_STATE_H_INCLUDED

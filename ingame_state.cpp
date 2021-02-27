@@ -7,8 +7,6 @@
 #include <SFML/Graphics.hpp>
 #include <math.h>
 
-IngameState IngameState::m_Instance;
-
 float numwrap(float number, float minimum, float maximum)
 {
     if (number > maximum)
@@ -18,9 +16,10 @@ float numwrap(float number, float minimum, float maximum)
     return number;
 }
 
-void IngameState::init(GameEngine *engine)
+IngameState::IngameState(GameEngine *engine) : GameState(engine)
 {
     m_engine = engine;
+
     engine->app.setKeyRepeatEnabled(false);
 
     cam_x = 0;
@@ -66,7 +65,7 @@ void IngameState::init(GameEngine *engine)
     text_cam_pos.setOutlineThickness(10);
 }
 
-void IngameState::destroy()
+IngameState::~IngameState()
 {
     m_engine->app.setKeyRepeatEnabled(true);
     m_engine->Sound()->stopMusic();
@@ -75,39 +74,39 @@ void IngameState::destroy()
     delete m_gamegui;
 }
 
-void IngameState::update(GameEngine *engine, float delta)
+void IngameState::update(float delta)
 {
-    if (engine->leavingGame())
+    if (m_engine->leavingGame())
     {
-        int leave_type = engine->leavingGame();
-        engine->leaveGame(0);
-        engine->Sound()->stopMusic();
+        int leave_type = m_engine->leavingGame();
+        m_engine->leaveGame(0);
+        m_engine->Sound()->stopMusic();
         m_world->saveWorld();
 
         if (leave_type == 1) // return to main menu
         {
-            engine->changeState(MenuState::Instance());
+            m_engine->changeState(new MenuState(m_engine));
         }
         else if (leave_type == 2) // leave game entirely
-            engine->quit();
+            m_engine->quit();
     }
     else
     {
-        m_world->getPlayer()->update(engine);
+        m_world->getPlayer()->update(m_engine);
         m_world->updateEntities();
-        m_gamegui->update(engine);
+        m_gamegui->update(m_engine);
 
         m_musicticks--;
         if (not m_musicticks)
         {
             m_musicticks = 60*60*10; // 10 min
-            engine->Sound()->playMusic(rand() % (m_gamemode == 1 ? MUSIC_MENU1 : MUSIC_CREATIVE1));
+            m_engine->Sound()->playMusic(rand() % (m_gamemode == 1 ? MUSIC_MENU1 : MUSIC_CREATIVE1));
         }
 
         sf::Color daycolor = m_daysky.getFillColor();
         sf::Color nightcolor = m_nightsky.getFillColor();
 
-        if (engine->m_ticks % 3 == 0)
+        if (m_engine->m_ticks % 3 == 0)
         {
             m_skytime++;
             if (m_skytime >= 24000) m_skytime = 0;
@@ -135,12 +134,12 @@ void IngameState::update(GameEngine *engine, float delta)
     }
 }
 
-void IngameState::event_input(GameEngine *engine, sf::Event& event)
+void IngameState::event_input(sf::Event& event)
 {
     Player *aPlayer = m_world->getPlayer();
 
-    aPlayer->event_input(engine, event);
-    int guiresult = m_gamegui->event_input(engine, event);
+    aPlayer->event_input(m_engine, event);
+    int guiresult = m_gamegui->event_input(m_engine, event);
     if (guiresult > -1)
     {
         if (m_gamegui->getGUI() == GUI_INVENTORY)
@@ -156,7 +155,7 @@ void IngameState::event_input(GameEngine *engine, sf::Event& event)
         }
     }
 
-    if (engine->Settings()->controls()->PressedEvent("inventory", event))
+    if (m_engine->Settings()->controls()->PressedEvent("inventory", event))
     {
         if (not m_gamegui->isOpen())
         {
@@ -169,7 +168,7 @@ void IngameState::event_input(GameEngine *engine, sf::Event& event)
             aPlayer->setCanMove(true);
         }
     }
-    else if (engine->Settings()->controls()->PressedEvent("drop", event))
+    else if (m_engine->Settings()->controls()->PressedEvent("drop", event))
     {
         if (m_inventory[m_hotbarslot][0])
         {
@@ -181,7 +180,7 @@ void IngameState::event_input(GameEngine *engine, sf::Event& event)
             }
         }
     }
-    else if (engine->Settings()->controls()->PressedEvent("jump", event))
+    else if (m_engine->Settings()->controls()->PressedEvent("jump", event))
     {
         if (m_flytick)
         {
@@ -191,7 +190,7 @@ void IngameState::event_input(GameEngine *engine, sf::Event& event)
         else
             m_flytick = 60*0.25;
     }
-    else if (engine->Settings()->controls()->PressedEvent("pick", event))
+    else if (m_engine->Settings()->controls()->PressedEvent("pick", event))
     {
         sf::Vector2f mousepos = m_world->getPlayer()->getMouse();
         int xx = mousepos.x/32;
@@ -229,7 +228,7 @@ void IngameState::event_input(GameEngine *engine, sf::Event& event)
     if (event.type == sf::Event::Closed)
     {
         m_world->saveWorld();
-        engine->quit();
+        m_engine->quit();
     }
 
     else if (event.type == sf::Event::KeyPressed)
@@ -241,7 +240,7 @@ void IngameState::event_input(GameEngine *engine, sf::Event& event)
         if (event.key.code == sf::Keyboard::R)
             cam_x = cam_y = 0.f;
         else if (event.key.code == sf::Keyboard::Escape)
-            engine->pushState(PausedState::Instance());
+            m_engine->pushState(new PausedState(m_engine));
         else if (intcode >= num1code and intcode <= num9code) // hotbar
             setHotbarSlot(intcode - num1code);
         else if (event.key.code == sf::Keyboard::F1) // show hotbar, etc
@@ -281,16 +280,16 @@ void IngameState::event_input(GameEngine *engine, sf::Event& event)
     }
 
     else if (event.type == sf::Event::LostFocus)
-        engine->pushState(PausedState::Instance());
+        m_engine->pushState(new PausedState(m_engine));
 }
 
-void IngameState::process_input(GameEngine* engine)
+void IngameState::process_input()
 {
-    m_world->getPlayer()->process_input(engine);
-    if (m_world->getPlayer()->getCanMove() and not engine->isPaused())
+    m_world->getPlayer()->process_input(m_engine);
+    if (m_world->getPlayer()->getCanMove() and not m_engine->isPaused())
     {
         sf::Vector2f mousepos = m_world->getPlayer()->getMouse();
-        if (engine->Settings()->controls()->Pressed("place") and not rmb)
+        if (m_engine->Settings()->controls()->Pressed("place") and not rmb)
         {
             if (m_world->getPlayer()->canBuild(mousepos.x/32, (mousepos.y-56)/32))
             {
@@ -304,10 +303,10 @@ void IngameState::process_input(GameEngine* engine)
             }
             rmb = true;
         }
-        else if (not engine->Settings()->controls()->Pressed("place") and rmb)
+        else if (not m_engine->Settings()->controls()->Pressed("place") and rmb)
             rmb = false;
 
-        if (engine->Settings()->controls()->Pressed("destroy"))
+        if (m_engine->Settings()->controls()->Pressed("destroy"))
         {
             if (not lmb_tick)
             {
@@ -326,7 +325,7 @@ void IngameState::process_input(GameEngine* engine)
     }
 
     // smooth camera
-    sf::Vector2u res = engine->app.getSize();
+    sf::Vector2u res = m_engine->app.getSize();
     if (not m_freecam)
     {
         sf::Vector2f pos = m_world->getPlayer()->getPos();
@@ -391,11 +390,11 @@ void IngameState::drawWorld(bool front)
     }
 }
 
-void IngameState::draw(GameEngine *engine)
+void IngameState::draw()
 {
-    sf::Vector2u windowsize = engine->app.getSize();
+    sf::Vector2u windowsize = m_engine->app.getSize();
     sf::View m_view(sf::FloatRect(cam_x, cam_y, windowsize.x, windowsize.y));
-    engine->m_window.setView(m_view);
+    m_engine->m_window.setView(m_view);
 
     sf::Sprite spr_stars(m_nightstars);
     spr_stars.setScale(3,3);
@@ -405,12 +404,12 @@ void IngameState::draw(GameEngine *engine)
     m_nightsky.setPosition(cam_x, cam_y);
     spr_stars.setPosition(cam_x - m_star_x, cam_y + ((-m_skytime)/30));
     spr_stars.setColor(sf::Color(255, 255, 255, m_staralpha));
-    engine->m_window.draw(m_daysky);
-    engine->m_window.draw(m_nightsky);
-    engine->m_window.draw(spr_stars);
+    m_engine->m_window.draw(m_daysky);
+    m_engine->m_window.draw(m_nightsky);
+    m_engine->m_window.draw(spr_stars);
 
-    sf::Sprite spr_sun(engine->m_sun);
-    sf::Sprite spr_moon(engine->m_moon);
+    sf::Sprite spr_sun(m_engine->m_sun);
+    sf::Sprite spr_moon(m_engine->m_moon);
     spr_sun.setScale(8,8);
     spr_moon.setScale(8,8);
 
@@ -420,12 +419,12 @@ void IngameState::draw(GameEngine *engine)
         spr_sun.setPosition(cam_x+(windowsize.x/2)-128, cam_y+(windowsize.y/5) + ((-m_skytime+24000)/25.0f));
     spr_moon.setPosition(cam_x+(windowsize.x/2)-128, cam_y+(windowsize.y/5) + ((-m_skytime+12000)/25.0f));
 
-    engine->m_window.draw(spr_sun);
-    if (m_skytime > 1000) engine->m_window.draw(spr_moon);
+    m_engine->m_window.draw(spr_sun);
+    if (m_skytime > 1000) m_engine->m_window.draw(spr_moon);
 
     // draw the world
     drawWorld(false);
-    m_world->getPlayer()->draw(engine);
+    m_world->getPlayer()->draw(m_engine);
     m_world->drawEntities();
     drawWorld(true);
 
@@ -438,29 +437,29 @@ void IngameState::draw(GameEngine *engine)
             m_world->getBlock((outlinepos.x-32)/32, (outlinepos.y+00)/32) or
             m_world->getBlock((outlinepos.x+00)/32, (outlinepos.y+32)/32) or
             m_world->getBlock((outlinepos.x+00)/32, (outlinepos.y-32)/32))
-            engine->m_window.draw(m_blockoutline);
+            m_engine->m_window.draw(m_blockoutline);
 
         // inventory
-        sf::Sprite hotbar(engine->m_hotbar);
-        sf::Sprite hotbarselect(engine->m_hotbarselect);
+        sf::Sprite hotbar(m_engine->m_hotbar);
+        sf::Sprite hotbarselect(m_engine->m_hotbarselect);
         hotbar.scale(2,2);
         hotbarselect.scale(2,2);
-        hotbar.setPosition(cam_x + (windowsize.x/2) - engine->m_hotbar.getSize().x, windowsize.y - (engine->m_hotbar.getSize().y*2)+cam_y);
+        hotbar.setPosition(cam_x + (windowsize.x/2) - m_engine->m_hotbar.getSize().x, windowsize.y - (m_engine->m_hotbar.getSize().y*2)+cam_y);
         hotbarselect.setPosition(hotbar.getPosition().x - 2 + (m_hotbarslot*40), hotbar.getPosition().y - 2);
-        engine->m_window.draw(hotbar);
-        engine->m_window.draw(hotbarselect);
+        m_engine->m_window.draw(hotbar);
+        m_engine->m_window.draw(hotbarselect);
         for (int i=0; i<9; i++) // hotbar blocks
         {
             if (m_inventory[i][0])
             {
                 char amount[16];
                 sprintf(amount, "%d", m_inventory[i][1]);
-                sf::Sprite block(engine->m_blocks, sf::IntRect(m_inventory[i][0]*32, 0, 32, 32));
-                Label text_amount(engine, amount, cam_x + (windowsize.x/2) - engine->m_hotbar.getSize().x + (i*40)+36, windowsize.y - (engine->m_hotbar.getSize().y*2)+cam_y + 20, 2);
+                sf::Sprite block(m_engine->m_blocks, sf::IntRect(m_inventory[i][0]*32, 0, 32, 32));
+                Label text_amount(m_engine, amount, cam_x + (windowsize.x/2) - m_engine->m_hotbar.getSize().x + (i*40)+36, windowsize.y - (m_engine->m_hotbar.getSize().y*2)+cam_y + 20, 2);
 
-                block.setPosition(cam_x + (windowsize.x/2) - engine->m_hotbar.getSize().x + (i*40)+6, windowsize.y - (engine->m_hotbar.getSize().y*2)+cam_y + 6);
+                block.setPosition(cam_x + (windowsize.x/2) - m_engine->m_hotbar.getSize().x + (i*40)+6, windowsize.y - (m_engine->m_hotbar.getSize().y*2)+cam_y + 6);
 
-                engine->m_window.draw(block);
+                m_engine->m_window.draw(block);
                 if (m_inventory[i][1] > 1)
                     text_amount.draw();
             }
@@ -473,10 +472,10 @@ void IngameState::draw(GameEngine *engine)
         sprintf(aBuf, "%.1f,%.1f\nChunk position: %d,%d\nBuilding layer: %d\nLayer 1 collisions: %s\nTime: %d", cam_x/32, cam_y/32, xx/CHUNK_W, yy/CHUNK_H, m_world->getPlayer()->getBuildLayer(), m_world->getPlayer()->getLayer1Collisions() ? "Yes" : "No", m_skytime);
         text_cam_pos.setString(sf::String(aBuf));
         text_cam_pos.setPosition(cam_x, cam_y);
-        engine->m_window.draw(text_cam_pos);
+        m_engine->m_window.draw(text_cam_pos);
     }
 
-    m_gamegui->draw(engine); // inventory window, crafting window, etc
+    m_gamegui->draw(m_engine); // inventory window, crafting window, etc
 }
 
 void IngameState::pause()

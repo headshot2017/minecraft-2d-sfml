@@ -35,12 +35,12 @@ typedef enum
 class MenuState : public GameState
 {
 public:
-    void init(GameEngine* engine);
-    void destroy();
-    void update(GameEngine *engine, float delta);
-    void event_input(GameEngine* engine, sf::Event& event);
-    void process_input(GameEngine* engine);
-    void draw(GameEngine* engine);
+    MenuState(GameEngine* engine);
+    ~MenuState();
+    void update(float delta);
+    void event_input(sf::Event& event);
+    void process_input();
+    void draw();
     void pause();
     void resume();
     void onResolutionChange(sf::Vector2u res);
@@ -50,10 +50,7 @@ public:
     void changeBind(const char *keybind);
     void setAllPositions(sf::Vector2u& windowsize);
 
-    static MenuState* Instance() {return &m_Instance;}
-
 private:
-    static MenuState m_Instance;
     //SUB_MENUS m_submenu = MENU_MAINMENU;
     Submenu* m_submenu;
     GameEngine *m_engine;
@@ -168,10 +165,6 @@ private:
     // changing control menu
     Label l_pressakey;
     char m_changingControl[32];
-
-
-protected:
-    MenuState() {}
 };
 
 #endif // MENU_STATE_H_INCLUDED

@@ -55,13 +55,14 @@ void GameEngine::init()
     }
 
     m_clock.restart();
+    m_paused = false;
 }
 
 void GameEngine::cleanup()
 {
     while (not states.empty())
     {
-        states.back()->destroy();
+        delete states.back();
         states.pop_back();
     }
     m_sound->cleanup();
@@ -73,7 +74,7 @@ void GameEngine::cleanup()
 void GameEngine::update()
 {
     float delta = m_clock.getElapsedTime().asSeconds();
-    states.back()->update(this, delta);
+    states.back()->update(delta);
     m_clock.restart();
 }
 
@@ -109,17 +110,17 @@ void GameEngine::process_input()
             printf("screenshot saved as '%s'\n", aFile);
         }
 
-        states.back()->event_input(this, event);
+        states.back()->event_input(event);
     }
 
-    states.back()->process_input(this);
+    states.back()->process_input();
 }
 
 void GameEngine::draw()
 {
     app.clear();
     m_window.clear();
-    states.back()->draw(this);
+    states.back()->draw();
     m_window.display();
     app.draw(sf::Sprite(m_window.getTexture()));
     app.display();
@@ -135,11 +136,10 @@ void GameEngine::changeState(GameState* state)
 {
     if (not states.empty())
     {
-        states.back()->destroy();
+        delete states.back();
         states.pop_back();
     }
     states.push_back(state);
-    states.back()->init(this);
 }
 
 void GameEngine::pushState(GameState* state)
@@ -149,7 +149,6 @@ void GameEngine::pushState(GameState* state)
 
     states.back()->pause();
     states.push_back(state);
-    states.back()->init(this);
 }
 
 void GameEngine::popState()
@@ -157,7 +156,7 @@ void GameEngine::popState()
     if (states.empty())
         return;
 
-    states.back()->destroy();
+    delete states.back();
     states.pop_back();
     states.back()->resume();
 }

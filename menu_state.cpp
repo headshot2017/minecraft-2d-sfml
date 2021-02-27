@@ -11,9 +11,6 @@
 #include <dirent.h>
 #include <sys/stat.h>
 
-
-MenuState MenuState::m_Instance;
-
 bool replaceStr(std::string& str, const std::string& from, const std::string& to)
 {
     std::size_t start_pos = str.find(from);
@@ -117,7 +114,7 @@ int find_in_vector(std::vector<std::string> &strvec, const char *_element)
     return std::distance(strvec.begin(), it);
 }
 
-void MenuState::init(GameEngine* engine)
+MenuState::MenuState(GameEngine* engine) : GameState(engine)
 {
     m_engine = engine;
     srand(time(0));
@@ -258,9 +255,11 @@ void MenuState::init(GameEngine* engine)
     */
 }
 
-void MenuState::destroy()
+MenuState::~MenuState()
 {
     m_splashtexts.clear();
+    delete m_submenu;
+    m_submenu = 0;
 }
 
 void MenuState::setAllPositions(sf::Vector2u& windowsize)
@@ -353,7 +352,7 @@ void MenuState::setAllPositions(sf::Vector2u& windowsize)
     */
 }
 
-void MenuState::update(GameEngine* engine, float delta)
+void MenuState::update(float delta)
 {
     /*
     char aBuf[128];
@@ -389,13 +388,13 @@ void MenuState::update(GameEngine* engine, float delta)
     b_fullscreen.setText(aBuf);
     */
 
-    if (not engine->isPaused())
+    if (not m_engine->isPaused())
     {
         m_musicticks--;
         if (not m_musicticks)
         {
-            engine->Sound()->playMusic(MUSIC_MENU1 + (rand() % 4));
-            HSTREAM menu_music = engine->Sound()->getCurrentMusic();
+            m_engine->Sound()->playMusic(MUSIC_MENU1 + (rand() % 4));
+            HSTREAM menu_music = m_engine->Sound()->getCurrentMusic();
             m_musicticks = 60 * (BASS_ChannelBytes2Seconds(menu_music, BASS_ChannelGetLength(menu_music, BASS_POS_BYTE)) + 5);
         }
     }
@@ -403,23 +402,23 @@ void MenuState::update(GameEngine* engine, float delta)
     m_submenu->update(delta);
 }
 
-void MenuState::process_input(GameEngine* engine)
+void MenuState::process_input()
 {
 
 }
 
-void MenuState::event_input(GameEngine* engine, sf::Event& event)
+void MenuState::event_input(sf::Event& event)
 {
-    if (event.type == sf::Event::Closed and not engine->isPaused())
+    if (event.type == sf::Event::Closed and not m_engine->isPaused())
     {
-        engine->quit();
+        m_engine->quit();
     }
     else if (event.type == sf::Event::KeyPressed)
     {
         if (event.key.code == sf::Keyboard::Escape and m_submenu->m_allowEsc)
         {
-            if (engine->isPaused())
-                engine->popState();
+            if (m_engine->isPaused())
+                m_engine->popState();
             else
             {
                 delete m_submenu;
@@ -776,15 +775,15 @@ void MenuState::event_input(GameEngine* engine, sf::Event& event)
     */
 }
 
-void MenuState::draw(GameEngine* engine)
+void MenuState::draw()
 {
     m_dirt_tile.setRepeated(true);
     dirt_tile.setTexture(m_dirt_tile);
 
-    if (engine->isPaused())
-        engine->m_window.draw(m_gamescreen, &engine->m_screenshot);
+    if (m_engine->isPaused())
+        m_engine->m_window.draw(m_gamescreen, &m_engine->m_screenshot);
     else
-        engine->m_window.draw(dirt_tile);
+        m_engine->m_window.draw(dirt_tile);
 
     m_submenu->draw();
 

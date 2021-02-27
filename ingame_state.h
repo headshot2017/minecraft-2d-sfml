@@ -21,12 +21,12 @@ enum
 class IngameState : public GameState
 {
 public:
-    void init(GameEngine* engine);
-    void destroy();
-    void update(GameEngine *engine, float delta);
-    void event_input(GameEngine* engine, sf::Event& event);
-    void process_input(GameEngine* engine);
-    void draw(GameEngine* engine);
+    IngameState(GameEngine* engine);
+    ~IngameState();
+    void update(float delta);
+    void event_input(sf::Event& event);
+    void process_input();
+    void draw();
     void pause();
     void resume();
     void onResolutionChange(sf::Vector2u res);
@@ -37,11 +37,7 @@ public:
     void setHotbarSlot(int slot);
     void randomizeStars();
 
-    static IngameState* Instance() {return &m_Instance;}
-
 private:
-    static IngameState m_Instance;
-
     World *m_world;
     GameEngine *m_engine;
     GameGUI *m_gamegui;
@@ -73,9 +69,6 @@ private:
     int lmb_tick = 0;
 
     void drawWorld(bool front);
-
-protected:
-    IngameState() {}
 };
 
 #endif // INGAME_STATE_H_INCLUDED

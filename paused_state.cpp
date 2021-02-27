@@ -1,11 +1,10 @@
 #include "paused_state.h"
 #include "menu_state.h"
 
-PausedState PausedState::m_Instance;
-
-void PausedState::init(GameEngine* engine)
+PausedState::PausedState(GameEngine* engine) : GameState(engine)
 {
     m_engine = engine;
+
     sf::Vector2u res = engine->app.getSize();
 
     m_gamescreen = engine->getGUIWindow(sf::Vector2f(res.x, res.y));
@@ -23,15 +22,15 @@ void PausedState::init(GameEngine* engine)
     b_quit = Button(engine, sf::String("Save and Quit to title"), res.x/2-200, res.y/2+48);
 }
 
-void PausedState::destroy()
+PausedState::~PausedState()
 {
 
 }
 
-void PausedState::update(GameEngine* engine, float delta)
+void PausedState::update(float delta)
 {
-    if (engine->leavingGame() == 2)
-        engine->popState();
+    if (m_engine->leavingGame() == 2)
+        m_engine->popState();
 
     /*
     if (b_resume.update())
@@ -46,12 +45,12 @@ void PausedState::update(GameEngine* engine, float delta)
     */
 }
 
-void PausedState::event_input(GameEngine* engine, sf::Event& event)
+void PausedState::event_input(sf::Event& event)
 {
     if (event.type == sf::Event::KeyPressed)
     {
         if (event.key.code == sf::Keyboard::Escape)
-            engine->popState();
+            m_engine->popState();
     }
 
     b_resume.process_input(event);
@@ -59,9 +58,9 @@ void PausedState::event_input(GameEngine* engine, sf::Event& event)
     b_quit.process_input(event);
 }
 
-void PausedState::draw(GameEngine* engine)
+void PausedState::draw()
 {
-    engine->m_window.draw(m_gamescreen, &engine->m_screenshot);
+    m_engine->m_window.draw(m_gamescreen, &m_engine->m_screenshot);
     b_resume.draw();
     b_options.draw();
     b_quit.draw();
