@@ -32,7 +32,8 @@ On the root directory of the project, run these commands on a command prompt/ter
 mkdir build
 cd build
 cmake ..
-make```
+make
+```
 
 ### Building with bam
 Bam is a fast and flexible build system made by matricks, and uses Lua to describe the build process. It's best known for its' use on the game Teeworlds.
