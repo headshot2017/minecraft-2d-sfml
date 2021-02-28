@@ -33,3 +33,19 @@ mkdir build
 cd build
 cmake ..
 make```
+
+### Building with bam
+Bam is a fast and flexible build system made by matricks, and uses Lua to describe the build process. It's best known for its' use on the game Teeworlds.
+Clone the bam repo and build the source code by running the correct "make" script according to your OS.
+```
+git clone https://github.com/matricks/bam
+cd bam
+
+# For windows/mingw:
+make_win32_mingw.bat
+# For unix/linux:
+./make_unix.sh
+
+cd ..
+bam/bam
+```
