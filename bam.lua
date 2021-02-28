@@ -1,16 +1,3 @@
-target_family = os.getenv("TARGET_FAMILY")
-if target_family then
-	family = target_family
-end
-target_platform = os.getenv("TARGET_PLATFORM")
-if target_platform then
-	platform = target_platform
-end
-target_arch = os.getenv("TARGET_ARCH")
-if target_arch then
-	arch = target_arch
-end
-
 function ResCompile(scriptfile)
 	windres = os.getenv("WINDRES")
 	if not windres then
