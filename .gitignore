@@ -1,8 +1,12 @@
+.bam/
+bam/
 data/skins/
 build/
 bin/
 libs/
 obj/
+objs/
+out/
 worlds/
 sfml/
 bass.chm
@@ -12,3 +16,5 @@ Thumbs.db
 .DS_Store
 *.layout
 *.depend
+*.exe
+config.lua
