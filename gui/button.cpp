@@ -126,7 +126,7 @@ void Button::setPosition(sf::Vector2f pos)
 
 void Button::process_input(sf::Event& event)
 {
-    if (event.type == sf::Event::MouseButtonPressed)
+    if (event.type == sf::Event::MouseButtonPressed && !m_disabled)
     {
         if (event.mouseButton.x > m_pos.x and
             event.mouseButton.y > m_pos.y and
@@ -143,18 +143,26 @@ void Button::process_input(sf::Event& event)
 
 void Button::update()
 {
-    if (sf::Mouse::getPosition(engine->app).x > m_pos.x and
-        sf::Mouse::getPosition(engine->app).y > m_pos.y and
-        sf::Mouse::getPosition(engine->app).x < m_pos.x + m_width and
-        sf::Mouse::getPosition(engine->app).y < m_pos.y + 40)
+    if (!m_disabled)
     {
-        m_texture = &engine->m_button_hover;
-        m_text.setColor(sf::Color(255, 255, 128));
+        if (sf::Mouse::getPosition(engine->app).x > m_pos.x and
+            sf::Mouse::getPosition(engine->app).y > m_pos.y and
+            sf::Mouse::getPosition(engine->app).x < m_pos.x + m_width and
+            sf::Mouse::getPosition(engine->app).y < m_pos.y + 40)
+        {
+            m_texture = &engine->m_button_hover;
+            m_text.setColor(sf::Color(255, 255, 160));
+        }
+        else
+        {
+            m_texture = &engine->m_button;
+            m_text.setColor(sf::Color(224, 224, 244));
+        }
     }
     else
     {
-        m_texture = &engine->m_button;
-        m_text.setColor(sf::Color::White);
+        m_texture = &engine->m_button_locked;
+        m_text.setColor(sf::Color(160, 160, 160));
     }
 }
 
