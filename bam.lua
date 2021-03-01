@@ -41,7 +41,7 @@ function CopyGameDLL()
 			input = Path("lib/linux/libbass.so")
 			output = Path("out/libbass.so")
 		elseif platform == "macosx" then
-			input = Path("lib/linux/libbass.dylib")
+			input = Path("lib/mac/libbass.dylib")
 			output = Path("out/libbass.dylib")
 		end
 		AddJob(output, "copy "..Path(output), "cp "..input.." "..output)
