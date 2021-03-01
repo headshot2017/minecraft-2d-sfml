@@ -25,6 +25,7 @@ Button::Button(GameEngine* _engine, sf::String text, sf::Vector2f pos, int width
     setButtonWidth(width);
 
     callback = NULL;
+    m_disabled = false;
 }
 
 Button::Button(GameEngine* _engine, sf::String text, float X, float Y, int width)
@@ -43,6 +44,7 @@ Button::Button(GameEngine* _engine, sf::String text, float X, float Y, int width
     setButtonWidth(width);
 
     callback = NULL;
+    m_disabled = false;
 }
 
 Button::Button(GameEngine* _engine, const char* text, sf::Vector2f pos, int width)
@@ -61,6 +63,7 @@ Button::Button(GameEngine* _engine, const char* text, sf::Vector2f pos, int widt
     setButtonWidth(width);
 
     callback = NULL;
+    m_disabled = false;
 }
 
 Button::Button(GameEngine* _engine, const char* text, float X, float Y, int width)
@@ -79,6 +82,7 @@ Button::Button(GameEngine* _engine, const char* text, float X, float Y, int widt
     setButtonWidth(width);
 
     callback = NULL;
+    m_disabled = false;
 }
 
 void Button::setButtonWidth(int width)

@@ -17,11 +17,16 @@ public:
     void setButtonWidth(int width);
 
     sf::Vector2f getPos() {return m_pos;}
+    bool getDisabled() const {return m_disabled;}
+
     void setText(const char *text) {setText(sf::String(text));}
     void setText(sf::String text);
     void setPosition(sf::Vector2f pos);
     void setPosition(float x, float y) {setPosition(sf::Vector2f(x,y));}
+    void setDisabled(bool disabled) {m_disabled = disabled;}
+
     void onClicked(Callback newAction, void *pUser) {callback = newAction; pUserData = pUser;}
+
     void update();
     void process_input(sf::Event& event);
     void draw();
@@ -37,6 +42,7 @@ private:
     void *pUserData;
 
     int m_width = 0;
+    bool m_disabled;
 };
 
 #endif // BUTTON_H_INCLUDED

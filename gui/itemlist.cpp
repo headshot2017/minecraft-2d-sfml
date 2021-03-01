@@ -69,6 +69,7 @@ void ItemList::createButtons()
     m_nextpage = Button(m_engine, ">>", 0, 0, 40);
     m_prevpage.onClicked(&onPrevPage, this);
     m_nextpage.onClicked(&onNextPage, this);
+    callbackOnSelect = NULL;
     setupButtons();
 }
 
@@ -108,9 +109,8 @@ void ItemList::update()
     m_nextpage.update();
 }
 
-bool ItemList::event_input(sf::Event& event)
+void ItemList::event_input(sf::Event& event)
 {
-    bool ret = false;
     m_prevpage.process_input(event);
     m_nextpage.process_input(event);
 
@@ -126,13 +126,12 @@ bool ItemList::event_input(sf::Event& event)
             if (event.mouseButton.x >= x-4 and event.mouseButton.x < x+m_size.x and
                 event.mouseButton.y >= y-4 and event.mouseButton.y < y+20)
             {
-                ret = true;
                 setSelected(static_cast<int>(i));
+                if (callbackOnSelect)
+                    callbackOnSelect(selected, pUserData);
             }
         }
     }
-
-    return ret;
 }
 
 void ItemList::draw()

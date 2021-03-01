@@ -3,6 +3,7 @@
 
 #include "button.h"
 #include "label.h"
+#include "defs.h"
 
 class ItemList
 {
@@ -23,7 +24,7 @@ public:
     void setupButtons();
 
     void update();
-    bool event_input(sf::Event& event);
+    void event_input(sf::Event& event);
     void draw();
 
     void setSize(sf::Vector2f newsize) {m_size = newsize; setupButtons();}
@@ -47,14 +48,21 @@ public:
     bool isSelected() {return selected >= 0;}
     std::string getSelectedItem() {return m_items[selected];}
 
+    void onItemClicked(IndexCallback newAction, void *pUser) {callbackOnSelect = newAction; pUserData = pUser;}
+
 private:
     GameEngine *m_engine;
+
     sf::Vector2f m_size, m_pos;
     std::vector<std::string> m_items;
+
     Button m_prevpage, m_nextpage;
     std::string m_label;
     unsigned fit_on_page = 0, max_page = 0, currpage = 0;
     int selected = -1;
+
+    IndexCallback callbackOnSelect;
+    void *pUserData;
 };
 
 #endif // ITEMLIST_H_INCLUDED
