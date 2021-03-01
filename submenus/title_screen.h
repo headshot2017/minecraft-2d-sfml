@@ -12,7 +12,7 @@
 class TitleScreenSubmenu : public Submenu
 {
 public:
-    TitleScreenSubmenu(GameEngine *engine);
+    TitleScreenSubmenu(GameEngine *engine, MenuState *menu);
     ~TitleScreenSubmenu();
 
     void update(float delta);
@@ -20,7 +20,7 @@ public:
     void draw();
     void onResolutionChange(sf::Vector2u res);
 
-    //static void onSinglePlayerClicked(void *pUserData);
+    static void onSinglePlayerClicked(void *pUserData);
     //static void onMultiPlayerClicked(void *pUserData);
     //static void onOptionsClicked(void *pUserData);
     static void onQuitClicked(void *pUserData);

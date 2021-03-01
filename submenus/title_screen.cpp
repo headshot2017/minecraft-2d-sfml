@@ -1,10 +1,13 @@
-#include <fstream>
-#include "submenu.h"
 #include "title_screen.h"
 
-TitleScreenSubmenu::TitleScreenSubmenu(GameEngine* engine) : Submenu(engine)
+#include <fstream>
+
+#include "../menu_state.h"
+#include "singleplayer.h"
+
+TitleScreenSubmenu::TitleScreenSubmenu(GameEngine* engine, MenuState *menu) : Submenu(engine, menu)
 {
-    //m_allowEsc = false;
+    m_allowEsc = false;
     sf::Vector2u windowsize = engine->app.getSize();
 
     // minecraft logo
@@ -17,6 +20,7 @@ TitleScreenSubmenu::TitleScreenSubmenu(GameEngine* engine) : Submenu(engine)
     char bgfile[128];
     sprintf(bgfile, "data/gui/background/%d.png", rand() % 3); // pick from 3 different backgrounds;
     m_parallax_bg.loadFromFile(bgfile);
+    m_parallax_bg.setRepeated(true);
     vtx_parallax_bg.setPrimitiveType(sf::Quads);
     vtx_parallax_bg.resize(4);
     vtx_parallax_bg[0].position = sf::Vector2f(0, 0);
@@ -44,11 +48,14 @@ TitleScreenSubmenu::TitleScreenSubmenu(GameEngine* engine) : Submenu(engine)
     btn_multiplayer = new Button(engine, sf::String("Multiplayer"), (windowsize.x/2)-200, btn_singleplayer->getPos().y + 64);
     btn_options = new Button(engine, sf::String("Options"), (windowsize.x/2)-200, btn_multiplayer->getPos().y + 64);
     btn_quit = new Button(engine, sf::String("Quit"), (windowsize.x/2)-200, btn_options->getPos().y + 64);
+
+    btn_singleplayer->onClicked(&onSinglePlayerClicked, this);
     btn_quit->onClicked(&onQuitClicked, this);
 }
 
 TitleScreenSubmenu::~TitleScreenSubmenu()
 {
+    m_splashtexts.clear();
     delete m_splashtext;
     delete m_versioninfo;
     delete m_fanmadeproject;
@@ -56,6 +63,14 @@ TitleScreenSubmenu::~TitleScreenSubmenu()
     delete btn_multiplayer;
     delete btn_options;
     delete btn_quit;
+}
+
+void TitleScreenSubmenu::onSinglePlayerClicked(void* pUserData)
+{
+    TitleScreenSubmenu* self = (TitleScreenSubmenu*)pUserData;
+
+    SingleplayerSubmenu* newstate = new SingleplayerSubmenu(self->m_engine, self->m_menu);
+    self->m_menu->changeSubmenu(newstate);
 }
 
 void TitleScreenSubmenu::onQuitClicked(void* pUserData)
@@ -115,11 +130,11 @@ void TitleScreenSubmenu::update(float delta)
     }
     m_splashtext->setScale(m_splashscale);
     m_parallax_x += 1.0f * (MAX_FPS * delta);
-    if (m_parallax_x >= m_parallax_bg.getSize().x/2.0f)
+    if (m_parallax_x >= m_parallax_bg.getSize().x)
         m_parallax_x = 0;
     vtx_parallax_bg[0].texCoords = sf::Vector2f(m_parallax_x, 0);
-    vtx_parallax_bg[1].texCoords = sf::Vector2f(m_parallax_x+800, 0);
-    vtx_parallax_bg[2].texCoords = sf::Vector2f(m_parallax_x+800, m_parallax_bg.getSize().y);
+    vtx_parallax_bg[1].texCoords = sf::Vector2f(m_parallax_x + m_engine->app.getSize().x, 0);
+    vtx_parallax_bg[2].texCoords = sf::Vector2f(m_parallax_x + m_engine->app.getSize().x, m_parallax_bg.getSize().y);
     vtx_parallax_bg[3].texCoords = sf::Vector2f(m_parallax_x, m_parallax_bg.getSize().y);
 
     btn_singleplayer->update();
