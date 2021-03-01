@@ -68,16 +68,33 @@ SingleplayerSubmenu::SingleplayerSubmenu(GameEngine* engine, MenuState *menu) : 
     list_worlds->onItemClicked(&onWorldSelected, this);
     btn_playworld->onClicked(&onPlayClicked, this);
     btn_cancel->onClicked(&onCancelClicked, this);
+
+    btn_playworld->setDisabled(true);
+    btn_renameworld->setDisabled(true);
+    btn_deleteworld->setDisabled(true);
+    btn_recreate_world->setDisabled(true);
 }
 
 SingleplayerSubmenu::~SingleplayerSubmenu()
 {
-
+    delete lbl_selectworld;
+    delete list_worlds;
+    delete btn_playworld;
+    delete btn_createworld;
+    delete btn_renameworld;
+    delete btn_deleteworld;
+    delete btn_recreate_world;
+    delete btn_cancel;
 }
 
 void SingleplayerSubmenu::onWorldSelected(int index, void* pUserData)
 {
+    SingleplayerSubmenu* self = (SingleplayerSubmenu*)pUserData;
 
+    self->btn_playworld->setDisabled(false);
+    self->btn_renameworld->setDisabled(false);
+    self->btn_deleteworld->setDisabled(false);
+    self->btn_recreate_world->setDisabled(false);
 }
 
 void SingleplayerSubmenu::onPlayClicked(void* pUserData)
