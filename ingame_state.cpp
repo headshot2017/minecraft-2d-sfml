@@ -38,7 +38,7 @@ IngameState::IngameState(GameEngine *engine) : GameState(engine)
 
     m_freecam = false;
     m_showgui = true;
-    m_showdebug = true;
+    m_showdebug = false;
 
     m_daysky = sf::RectangleShape(sf::Vector2f(800, 480));
     m_nightsky = sf::RectangleShape(sf::Vector2f(800, 480));
@@ -245,6 +245,8 @@ void IngameState::event_input(sf::Event& event)
             setHotbarSlot(intcode - num1code);
         else if (event.key.code == sf::Keyboard::F1) // show hotbar, etc
             m_showgui = not m_showgui;
+        else if (event.key.code == sf::Keyboard::F3) // player pos, chunk pos, time, etc
+            m_showdebug = not m_showdebug;
         else if (event.key.code == sf::Keyboard::F4) // freecam
         {
             m_freecam = not m_freecam;
@@ -261,7 +263,7 @@ void IngameState::event_input(sf::Event& event)
 
         else if (event.key.code == sf::Keyboard::F5)
             m_musicticks = 1;
-        else if (event.key.code == sf::Keyboard::F6)
+        else if (event.key.code == sf::Keyboard::F6) // toggle day/night time
         {
             m_skytime = (m_skytime < 9000 or m_skytime >= 21000) ? 9000 : 21000;
         }
@@ -468,11 +470,14 @@ void IngameState::draw()
         int xx = (cam_x+(windowsize.x/2))/32;
         int yy = (cam_y+(windowsize.y/2))/32;
 
-        char aBuf[192];
-        sprintf(aBuf, "%.1f,%.1f\nChunk position: %d,%d\nBuilding layer: %d\nLayer 1 collisions: %s\nTime: %d", cam_x/32, cam_y/32, xx/CHUNK_W, yy/CHUNK_H, m_world->getPlayer()->getBuildLayer(), m_world->getPlayer()->getLayer1Collisions() ? "Yes" : "No", m_skytime);
-        text_cam_pos.setString(sf::String(aBuf));
-        text_cam_pos.setPosition(cam_x, cam_y);
-        m_engine->m_window.draw(text_cam_pos);
+        if (m_showdebug)
+        {
+            char aBuf[192];
+            sprintf(aBuf, "%.1f,%.1f\nChunk position: %d,%d\nBuilding layer: %d\nLayer 1 collisions: %s\nTime: %d", cam_x/32, cam_y/32, xx/CHUNK_W, yy/CHUNK_H, m_world->getPlayer()->getBuildLayer(), m_world->getPlayer()->getLayer1Collisions() ? "Yes" : "No", m_skytime);
+            text_cam_pos.setString(sf::String(aBuf));
+            text_cam_pos.setPosition(cam_x, cam_y);
+            m_engine->m_window.draw(text_cam_pos);
+        }
     }
 
     m_gamegui->draw(m_engine); // inventory window, crafting window, etc
