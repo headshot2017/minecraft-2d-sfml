@@ -25,7 +25,7 @@
 				</Linker>
 				<ExtraCommands>
 					<Add after="xcopy /E /I /Y data $(TARGET_OUTPUT_DIR)data" />
-					<Add after="xcopy /Y lib\windows\bass.dll $(TARGET_OUTPUT_DIR)bass.dll" />
+					<Add after="xcopy /Y lib\windows\bass.dll $(TARGET_OUTPUT_DIR)bass.dll*" />
 				</ExtraCommands>
 			</Target>
 			<Target title="Windows Release">
@@ -44,7 +44,7 @@
 				</Linker>
 				<ExtraCommands>
 					<Add after="xcopy /E /I /Y data $(TARGET_OUTPUT_DIR)data" />
-					<Add after="xcopy /Y lib\windows\bass.dll $(TARGET_OUTPUT_DIR)bass.dll" />
+					<Add after="xcopy /Y lib\windows\bass.dll $(TARGET_OUTPUT_DIR)bass.dll*" />
 				</ExtraCommands>
 			</Target>
 			<Target title="Unix/Linux Debug">
@@ -129,9 +129,11 @@
 		<Unit filename="game/world.h" />
 		<Unit filename="game_engine.cpp" />
 		<Unit filename="game_engine.h" />
+		<Unit filename="game_state.cpp" />
 		<Unit filename="game_state.h" />
 		<Unit filename="gui/button.cpp" />
 		<Unit filename="gui/button.h" />
+		<Unit filename="gui/defs.h" />
 		<Unit filename="gui/itemlist.cpp" />
 		<Unit filename="gui/itemlist.h" />
 		<Unit filename="gui/label.cpp" />
@@ -156,6 +158,9 @@
 		<Unit filename="settings_manager.h" />
 		<Unit filename="sound.cpp" />
 		<Unit filename="sound.h" />
+		<Unit filename="submenus/singleplayer.cpp" />
+		<Unit filename="submenus/singleplayer.h" />
+		<Unit filename="submenus/submenu.cpp" />
 		<Unit filename="submenus/submenu.h" />
 		<Unit filename="submenus/title_screen.cpp" />
 		<Unit filename="submenus/title_screen.h" />

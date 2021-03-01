@@ -21,7 +21,7 @@ function CopyGameData()
 	input = Path("data")
 	if family == "windows" then
 		output = Path("out\\data")
-		AddJob(output, "copy "..input, "xcopy /E /I /Y "..input.." "..output)
+		AddJob(output, "copy "..input, "xcopy /E /I /Y "..input.." "..output.." > nul")
 	else
 		output = Path("out/data")
 		AddJob(output, "copy "..input, "cp -r "..input.." "..output)
