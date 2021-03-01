@@ -10,7 +10,6 @@
 #include "game/block.h"
 #include "settings_manager.h"
 
-
 class GameState;
 
 class GameEngine

@@ -1,24 +1,17 @@
-#include <SFML/Graphics.hpp>
-#include "game_engine.h"
-#include "menu_state.h"
-#include "ingame_state.h"
-#include "submenus/title_screen.h"
-#include "bass.h"
 #include <fstream>
 #include <algorithm>
 #include <stdio.h>
 #include <time.h>
-#include <dirent.h>
 #include <sys/stat.h>
 
-bool replaceStr(std::string& str, const std::string& from, const std::string& to)
-{
-    std::size_t start_pos = str.find(from);
-    if (start_pos == std::string::npos)
-        return false;
-    str.replace(start_pos, from.length(), to);
-    return true;
-}
+#include <SFML/Graphics.hpp>
+
+#include "game_engine.h"
+#include "menu_state.h"
+#include "ingame_state.h"
+#include "submenus/submenu.h"
+#include "submenus/title_screen.h"
+#include "bass.h"
 
 void tokenize(std::string const &str, const char* delim,
 			std::vector<std::string> &out)
@@ -33,12 +26,6 @@ void tokenize(std::string const &str, const char* delim,
 	}
 }
 
-bool has_suffix(const std::string &str, const std::string &suffix)
-{
-    return str.size() >= suffix.size() &&
-           str.compare(str.size() - suffix.size(), suffix.size(), suffix) == 0;
-}
-
 bool is_folder(const char *path)
 {
     struct stat path_stat;
@@ -46,33 +33,7 @@ bool is_folder(const char *path)
     return S_ISREG(path_stat.st_mode);
 }
 
-void listWorlds(std::vector<std::string>& strvec)
-{
-    DIR *dir;
-    struct dirent *entry;
-    strvec.clear();
-
-    if ((dir = opendir("worlds")))
-    {
-        while ((entry = readdir(dir)))
-        {
-            std::string worldname(entry->d_name);
-            if (has_suffix(worldname, std::string(".dat")))
-            {
-                replaceStr(worldname, ".dat", "");
-                strvec.push_back(worldname);
-            }
-        }
-    }
-    else
-#ifdef _WIN32
-        mkdir("worlds");
-#else
-        mkdir("worlds", 0777);
-#endif
-}
-
-void listSoundThemes(std::vector<std::string>& strvec)
+/*void listSoundThemes(std::vector<std::string>& strvec)
 {
     DIR *dir;
     struct dirent *entry;
@@ -89,7 +50,7 @@ void listSoundThemes(std::vector<std::string>& strvec)
             }
         }
     }
-}
+}*/
 
 void listSoundDevices(std::vector<std::string>& strvec)
 {
@@ -119,7 +80,7 @@ MenuState::MenuState(GameEngine* engine) : GameState(engine)
     m_engine = engine;
     srand(time(0));
 
-    m_submenu = (engine->isPaused()) ? new TitleScreenSubmenu(engine) : new TitleScreenSubmenu(engine);
+    m_submenu = (engine->isPaused()) ? new TitleScreenSubmenu(engine, this) : new TitleScreenSubmenu(engine, this);
 
     m_musicticks = 60*5;
 
@@ -133,6 +94,7 @@ MenuState::MenuState(GameEngine* engine) : GameState(engine)
     dirt_tile.setTexture(m_dirt_tile);
     dirt_tile.setScale(4.0f, 4.0f);
     dirt_tile.setColor(sf::Color(128, 128, 128));
+    dirt_tile.setTextureRect(sf::IntRect(0, 0, windowsize.x/4, windowsize.y/4));
 
     m_gamescreen = engine->getGUIWindow(sf::Vector2f(windowsize.x, windowsize.y));
     m_gamescreen[0].texCoords = sf::Vector2f(0, 0);
@@ -257,15 +219,13 @@ MenuState::MenuState(GameEngine* engine) : GameState(engine)
 
 MenuState::~MenuState()
 {
-    m_splashtexts.clear();
     delete m_submenu;
     m_submenu = 0;
 }
 
+/*
 void MenuState::setAllPositions(sf::Vector2u& windowsize)
 {
-    dirt_tile.setTextureRect(sf::IntRect(0, 0, windowsize.x/4, windowsize.y/4));
-    /*
     minecraft_logo.setPosition((windowsize.x/2) - 274.0f, (windowsize.y/4)-64);
     sf::Vector2f aPos = minecraft_logo.getPosition();
     m_splashtext.setPosition(aPos.x+384+88, aPos.y+88+m_splashtext.getText().getSize());
@@ -349,8 +309,7 @@ void MenuState::setAllPositions(sf::Vector2u& windowsize)
     s_videores.setPosition((windowsize.x/2)-300-8, 64+(48*0));
     b_fullscreen.setPosition((windowsize.x/2)+8, 64+(48*0));
     b_applyvideo.setPosition((windowsize.x/2)-200, windowsize.y-112);
-    */
-}
+}*/
 
 void MenuState::update(float delta)
 {
@@ -421,8 +380,7 @@ void MenuState::event_input(sf::Event& event)
                 m_engine->popState();
             else
             {
-                delete m_submenu;
-                m_submenu = new TitleScreenSubmenu(m_engine);
+                changeSubmenu(new TitleScreenSubmenu(m_engine, this));
             }
         }
         else if (event.key.code == sf::Keyboard::F5)
@@ -915,7 +873,7 @@ void MenuState::onResolutionChange(sf::Vector2u res)
     m_gamescreen[3].position = m_gamescreen[3].texCoords = sf::Vector2f(0, res.y);
 
     fullscreen = m_engine->Settings()->m_fullscreen;
-    setAllPositions(res);
+    dirt_tile.setTextureRect(sf::IntRect(0, 0, res.x/4, res.y/4));
 }
 
 void MenuState::changeBind(const char* keybind)
@@ -927,4 +885,10 @@ void MenuState::changeBind(const char* keybind)
     l_pressakey.setText(aBuf);
     m_submenu = MENU_OPTIONS_CONTROLS_CHANGE;
     */
+}
+
+void MenuState::changeSubmenu(Submenu* submenu)
+{
+    delete m_submenu;
+    m_submenu = submenu;
 }

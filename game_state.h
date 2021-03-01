@@ -1,12 +1,14 @@
 #ifndef GAME_STATE_H_INCLUDED
 #define GAME_STATE_H_INCLUDED
 
-#include "game_engine.h"
+#include <SFML/Graphics.hpp>
+
+class GameEngine;
 
 class GameState
 {
 public:
-    GameState(GameEngine* engine) {m_engine = engine;}
+    GameState(GameEngine* engine);
     virtual ~GameState() {};
 
     virtual void update(float delta) = 0;
@@ -16,11 +18,6 @@ public:
     virtual void pause() = 0;
     virtual void resume() = 0;
     virtual void onResolutionChange(sf::Vector2u res) = 0;
-
-    void changeState(GameEngine* engine, GameState* state)
-    {
-        engine->changeState(state);
-    }
 
 protected:
     GameEngine* m_engine;

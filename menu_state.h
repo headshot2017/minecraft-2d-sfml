@@ -1,6 +1,7 @@
 #ifndef MENU_STATE_H_INCLUDED
 #define MENU_STATE_H_INCLUDED
 
+#include "game_engine.h"
 #include "game_state.h"
 #include "submenus/submenu.h"
 
@@ -11,26 +12,6 @@
 #include "gui/itemlist.h"
 
 #include <vector>
-
-typedef enum
-{
-    MENU_MAINMENU,
-    MENU_LOADWORLD,
-    MENU_MULTIPLAYER,
-    MENU_OPTIONS,
-
-    MENU_CREATEWORLD,
-    MENU_RENAMEWORLD,
-    MENU_CONFIRMDELETE,
-    MENU_SUPERFLAT_SETUP,
-
-    MENU_OPTIONS_GRAPHICS,
-    MENU_OPTIONS_CONTROLS,
-    MENU_OPTIONS_PLAYER,
-    MENU_OPTIONS_SOUND,
-
-    MENU_OPTIONS_CONTROLS_CHANGE
-} SUB_MENUS;
 
 class MenuState : public GameState
 {
@@ -48,44 +29,21 @@ public:
     void changeSubmenu(Submenu* newMenu);
 
     void changeBind(const char *keybind);
-    void setAllPositions(sf::Vector2u& windowsize);
+    //void setAllPositions(sf::Vector2u& windowsize);
 
 private:
-    //SUB_MENUS m_submenu = MENU_MAINMENU;
     Submenu* m_submenu;
     GameEngine *m_engine;
 
     int m_musicticks;
 
     sf::Sprite dirt_tile;
-    sf::Sprite minecraft_logo;
-    sf::VertexArray parallax_bg;
-
     sf::Texture m_dirt_tile;
-    sf::Texture m_minecraft_logo;
-    sf::Texture m_parallax_bg;
-    float m_parallax_x;
     sf::VertexArray m_gamescreen;
-
-    Label m_splashtext;
-    std::vector<std::string> m_splashtexts;
-    std::vector<std::string> m_worldlist;
-
-    float m_splashscale;
-    float m_splashscaledir;
-
-    Label m_versioninfo;
-    Label m_fanmadeproject;
 
     // general buttons
     Button b_back;
     Button b_back_options;
-
-    // main menu
-    Button b_singleplayer;
-    Button b_multiplayer;
-    Button b_options;
-    Button b_quit;
 
     // singleplayer menu
     Label l_selectworld;

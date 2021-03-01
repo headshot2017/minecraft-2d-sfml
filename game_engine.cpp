@@ -191,18 +191,18 @@ void GameEngine::setResolution(sf::Vector2u res, sf::Uint32 flags)
 
 sf::VertexArray GameEngine::getGUIWindow(sf::Vector2f size)
 {
-    sf::VertexArray ara_ara(sf::Quads, 4);
+    sf::VertexArray guiwindow(sf::Quads, 4);
     sf::Vector2f view = m_window.getView().getCenter();
     for(int i=0; i<4; i++)
     {
         if (i<2)
-            ara_ara[i].color = sf::Color(0, 0, 0, 192);
+            guiwindow[i].color = sf::Color(0, 0, 0, 192);
         else
-            ara_ara[i].color = sf::Color(0, 0, 64, 192);
+            guiwindow[i].color = sf::Color(0, 0, 64, 192);
     }
-    ara_ara[0].position = sf::Vector2f(view.x-(size.x/2.0f), view.y-(size.y/2.0f));
-    ara_ara[1].position = sf::Vector2f(view.x+(size.x/2.0f), view.y-(size.y/2.0f));
-    ara_ara[2].position = sf::Vector2f(view.x+(size.x/2.0f), view.y+(size.y/2.0f));
-    ara_ara[3].position = sf::Vector2f(view.x-(size.x/2.0f), view.y+(size.y/2.0f));
-    return ara_ara;
+    guiwindow[0].position = sf::Vector2f(view.x-(size.x/2.0f), view.y-(size.y/2.0f));
+    guiwindow[1].position = sf::Vector2f(view.x+(size.x/2.0f), view.y-(size.y/2.0f));
+    guiwindow[2].position = sf::Vector2f(view.x+(size.x/2.0f), view.y+(size.y/2.0f));
+    guiwindow[3].position = sf::Vector2f(view.x-(size.x/2.0f), view.y+(size.y/2.0f));
+    return guiwindow;
 }
