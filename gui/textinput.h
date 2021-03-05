@@ -3,6 +3,7 @@
 
 #include <SFML/Graphics.hpp>
 #include "../game_engine.h"
+#include "defs.h"
 
 class TextInput
 {
@@ -21,7 +22,7 @@ public:
     sf::String getString() {return m_str;}
 
     void update();
-    int process_input(sf::Event& event);
+    void process_input(sf::Event& event);
     void draw();
 
 private:
@@ -35,6 +36,10 @@ private:
     std::size_t m_length;
     bool active = false;
     GameEngine *m_engine;
+
+    StringCallback onEnterPressed;
+    StringCallback onClickAway;
+    void* pUserData;
 };
 
 #endif // TEXTINPUT_H_INCLUDED

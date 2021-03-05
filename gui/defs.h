@@ -3,5 +3,6 @@
 
 typedef void (*Callback)(void *pUserData);
 typedef void (*IndexCallback)(int index, void *pUserData);
+typedef void (*StringCallback)(std::string str, void *pUserData);
 
 #endif // _GUIDEFS_H

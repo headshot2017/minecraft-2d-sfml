@@ -130,23 +130,21 @@ void TextInput::update()
         m_caret = m_str.getSize();
 }
 
-int TextInput::process_input(sf::Event& event)
+void TextInput::process_input(sf::Event& event)
 {
-    int typed = 0;
-
     if (event.type == sf::Event::MouseButtonPressed)
     {
-        if (event.mouseButton.x >= m_pos.x and
-            event.mouseButton.x < m_pos.x+400 and
-            event.mouseButton.y >= m_pos.y and
-            event.mouseButton.y < m_pos.y+40)
-            active = true;
-        else
-            active = false;
+        bool doActive = (event.mouseButton.x >= m_pos.x &&
+                        event.mouseButton.x < m_pos.x+400 &&
+                        event.mouseButton.y >= m_pos.y &&
+                        event.mouseButton.y < m_pos.y+40);
+
+        if (!doActive && active && onClickAway)
+            onClickAway(m_str.toAnsiString(), pUserData);
+        active = doActive;
     }
     else if (event.type == sf::Event::TextEntered and active)
     {
-        typed = 1;
         if (event.text.unicode == '\b')
         {
             if (m_caret > 0)
@@ -180,7 +178,7 @@ int TextInput::process_input(sf::Event& event)
         else if (event.key.code == sf::Keyboard::Enter)
         {
             active = false;
-            typed = 2;
+            if (onEnterPressed) onEnterPressed(m_str.toAnsiString(), pUserData);
         }
         else if (event.key.code == sf::Keyboard::Delete)
         {
@@ -188,8 +186,6 @@ int TextInput::process_input(sf::Event& event)
             setCursor(m_caret);
         }
     }
-
-    return typed;
 }
 
 void TextInput::draw()
