@@ -47,9 +47,7 @@ private:
 
     // singleplayer menu
 
-    Label label_confirm_delete;
-    Button b_delete_yes;
-    Button b_delete_no;
+
 
     Label label_renameworld;
     Button b_confirmrename;

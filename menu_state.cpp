@@ -140,10 +140,6 @@ MenuState::MenuState(GameEngine* engine) : GameState(engine)
     for(int i=0; i<3; i++) superflat_blocks.push_back(BLOCK_DIRT);
     superflat_blocks.push_back(BLOCK_GRASS);
 
-    label_confirm_delete = Label(engine, "Ara (ara) you sure?", windowsize.x/2, windowsize.y/2-96, 1);
-    b_delete_yes = Button(engine, "Delete", (windowsize.x/2)-300-8, windowsize.y/2+16, 300);
-    b_delete_no = Button(engine, "Cancel", (windowsize.x/2)+8, windowsize.y/2+16, 300);
-
     label_renameworld = Label(engine, "Rename World", windowsize.x/2, 48, 1, 1);
     b_cancelrename = Button(engine, "Cancel", windowsize.x/2-200, windowsize.y-40-32);
     b_confirmrename = Button(engine, "Rename", windowsize.x/2-200, b_cancelrename.getPos().y-48);

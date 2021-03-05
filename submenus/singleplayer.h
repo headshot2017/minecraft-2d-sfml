@@ -25,7 +25,7 @@ public:
     static void onPlayClicked(void *pUserData);
     static void onCreateWorldClicked(void *pUserData);
     //static void onRenameWorldClicked(void *pUserData);
-    //static void onDeleteWorldClicked(void *pUserData);
+    static void onDeleteWorldClicked(void *pUserData);
     //static void onRecreateWorldClicked(void *pUserData);
     static void onCancelClicked(void *pUserData);
 
