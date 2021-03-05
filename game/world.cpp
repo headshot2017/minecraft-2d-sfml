@@ -5,20 +5,13 @@
 #include <fstream>
 #include <stdlib.h>
 #include <math.h>
+#include <zlib.h>
 
 World::World()
 {
     loaded = false;
     m_blocks2.clear();
     m_entities.clear();
-    for(int yy=0; yy < WORLD_H/CHUNK_H+1; yy++)
-    {
-        m_blocks2.push_back(std::vector<Chunk>());
-        for (int xx=0; xx < WORLD_W/CHUNK_W+1; xx++)
-        {
-            m_blocks2.back().push_back(Chunk());
-        }
-    }
     m_seed = 0;
 }
 
@@ -28,14 +21,6 @@ World::World(GameEngine *engine)
     m_engine = engine;
     m_blocks2.clear();
     m_entities.clear();
-    for(int yy=0; yy < WORLD_H/CHUNK_H+1; yy++)
-    {
-        m_blocks2.push_back(std::vector<Chunk>());
-        for (int xx=0; xx < WORLD_W/CHUNK_W+1; xx++)
-        {
-            m_blocks2.back().push_back(Chunk(engine));
-        }
-    }
     m_seed = 0;
 }
 
@@ -167,15 +152,15 @@ void World::drawEntities()
     }
 }
 
-void World::setBlock(int x, int y, int block, int layer)
+void World::setBlock(uint32_t x, uint32_t y, int block, int layer)
 {
-    int x_ind = x/CHUNK_W;
-    int y_ind = y/CHUNK_H;
-    int x_block_chunk = x % CHUNK_W;
-    int y_block_chunk = y % CHUNK_H;
-    int ind = (y_block_chunk * CHUNK_W + x_block_chunk)*4;
+    uint32_t x_ind = x/CHUNK_W;
+    uint32_t y_ind = y/CHUNK_H;
+    uint32_t x_block_chunk = x % CHUNK_W;
+    uint32_t y_block_chunk = y % CHUNK_H;
+    uint32_t ind = (y_block_chunk * CHUNK_W + x_block_chunk)*4;
 
-    if (x < 0 or x >= WORLD_W or y < 0 or y >= WORLD_H) return;
+    if (x < 0 or x >= m_width or y < 0 or y >= m_height) return;
 
     m_blocks2[y_ind][x_ind].setBlock(x, y, block, layer);
     sf::VertexArray& m_blocks = getBlocksFromPoint(x, y);
@@ -192,11 +177,11 @@ void World::setBlock(int x, int y, int block, int layer)
         updateLighting(x, y);
         if (x > 0)
             updateLighting(x-1, y);
-        if (x < WORLD_W-1)
+        if (x < m_width-1)
             updateLighting(x+1, y);
         if (y > 0)
             updateLighting(x, y-1);
-        if (y < WORLD_H-1)
+        if (y < m_height-1)
             updateLighting(x, y+1);
     }
 
@@ -215,7 +200,7 @@ void World::setBlock(int x, int y, int block, int layer)
         }
         else if (block == BLOCK_SAND or block == BLOCK_GRAVEL)
         {
-            if (y < WORLD_H-1)
+            if (y < m_height-1)
             {
                 if (getBlock(x, y+1) == BLOCK_AIR)
                 {
@@ -227,61 +212,61 @@ void World::setBlock(int x, int y, int block, int layer)
     }
 }
 
-int World::getBlock(int x, int y)
+int World::getBlock(uint32_t x, uint32_t y)
 {
-    if (x < 0) x = 0;
-    if (y < 0) y = 0;
-    if (x >= WORLD_W) x = WORLD_W-1;
-    if (y >= WORLD_H) y = WORLD_H-1;
+    //if (x < 0) x = 0;
+    //if (y < 0) y = 0;
+    if (x >= m_width) x = m_width-1;
+    if (y >= m_height) y = m_height-1;
 
-    int x_ind = x/CHUNK_W;
-    int y_ind = y/CHUNK_H;
-    int x_block_chunk = x % CHUNK_W;
-    int y_block_chunk = y % CHUNK_H;
+    uint32_t x_ind = x/CHUNK_W;
+    uint32_t y_ind = y/CHUNK_H;
+    uint32_t x_block_chunk = x % CHUNK_W;
+    uint32_t y_block_chunk = y % CHUNK_H;
 
     int block = m_blocks2[y_ind][x_ind].getBlock(x_block_chunk, y_block_chunk);
     return block;
 }
 
-int World::getBlockFlags(int x, int y)
+int World::getBlockFlags(uint32_t x, uint32_t y)
 {
-    if (x < 0) x = 0;
-    if (y < 0) y = 0;
-    if (x >= WORLD_W) x = WORLD_W-1;
-    if (y >= WORLD_H) y = WORLD_H-1;
+    //if (x < 0) x = 0;
+    //if (y < 0) y = 0;
+    if (x >= m_width) x = m_width-1;
+    if (y >= m_height) y = m_height-1;
 
-    int x_ind = x/CHUNK_W;
-    int y_ind = y/CHUNK_H;
-    int x_block_chunk = x % CHUNK_W;
-    int y_block_chunk = y % CHUNK_H;
+    uint32_t x_ind = x/CHUNK_W;
+    uint32_t y_ind = y/CHUNK_H;
+    uint32_t x_block_chunk = x % CHUNK_W;
+    uint32_t y_block_chunk = y % CHUNK_H;
 
     int block = m_blocks2[y_ind][x_ind].getBlockFlags(x_block_chunk, y_block_chunk);
     return block;
 }
 
-int World::getBlockLayer(int x, int y)
+int World::getBlockLayer(uint32_t x, uint32_t y)
 {
-    if (x < 0) x = 0;
-    if (y < 0) y = 0;
-    if (x >= WORLD_W) x = WORLD_W-1;
-    if (y >= WORLD_H) y = WORLD_H-1;
+    //if (x < 0) x = 0;
+    //if (y < 0) y = 0;
+    if (x >= m_width) x = m_width-1;
+    if (y >= m_height) y = m_height-1;
 
-    int x_ind = x/CHUNK_W;
-    int y_ind = y/CHUNK_H;
-    int x_block_chunk = x % CHUNK_W;
-    int y_block_chunk = y % CHUNK_H;
+    uint32_t x_ind = x/CHUNK_W;
+    uint32_t y_ind = y/CHUNK_H;
+    uint32_t x_block_chunk = x % CHUNK_W;
+    uint32_t y_block_chunk = y % CHUNK_H;
 
     int block = m_blocks2[y_ind][x_ind].getBlockLayer(x_block_chunk, y_block_chunk);
     return block;
 }
 
-void World::updateLighting(int x, int y)
+void World::updateLighting(uint32_t x, uint32_t y)
 {
     int block = getBlock(x, y);
     int layer = getBlockLayer(x, y);
-    int x_block_chunk = x % CHUNK_W;
-    int y_block_chunk = y % CHUNK_H;
-    int ind = (y_block_chunk * CHUNK_W + x_block_chunk)*4;
+    uint32_t x_block_chunk = x % CHUNK_W;
+    uint32_t y_block_chunk = y % CHUNK_H;
+    uint32_t ind = (y_block_chunk * CHUNK_W + x_block_chunk)*4;
     sf::VertexArray& m_blocks = getBlocksFromPoint(x, y);
 
     if (layer == LAYER_DECORATION)
@@ -304,66 +289,79 @@ void World::updateLighting(int x, int y)
     }
 }
 
-sf::VertexArray& World::getBlocksFromPoint(int x, int y, bool front)
+sf::VertexArray& World::getBlocksFromPoint(uint32_t x, uint32_t y, bool front)
 {
-    int x_ind = x/CHUNK_W;
-    int y_ind = y/CHUNK_H;
+    uint32_t x_ind = x/CHUNK_W;
+    uint32_t y_ind = y/CHUNK_H;
 
-    if (x_ind > WORLD_W/CHUNK_W) x_ind = WORLD_W/CHUNK_W;
-    if (y_ind > WORLD_H/CHUNK_H) y_ind = WORLD_H/CHUNK_H;
-    if (x_ind < 0) x_ind = 0;
-    if (y_ind < 0) y_ind = 0;
+    if (x_ind > m_width/CHUNK_W) x_ind = m_width/CHUNK_W;
+    if (y_ind > m_height/CHUNK_H) y_ind = m_height/CHUNK_H;
+    //if (x_ind < 0) x_ind = 0;
+    //if (y_ind < 0) y_ind = 0;
 
     return (not front) ? m_blocks2[y_ind][x_ind].getVertex() : m_blocks2[y_ind][x_ind].getVertexFront();
 }
 
-void World::generateFlatWorld(const char *name, const std::vector<int>& blocks)
+void World::generateFlatWorld(const char *name, const std::vector<int>& blocks, uint32_t width, uint32_t height)
 {
     sprintf(fileName, "worlds/%s.dat", name);
     loaded = false;
     m_seed = 0;
+    m_width = width;
+    m_height = height;
 
-    printf("%d\n", blocks.size());
-    for(int xx=0; xx<WORLD_W*32; xx+=32)
+    printf("%d blocks for flatworld\n", blocks.size());
+
+    for(uint32_t yy=0; yy < m_height/CHUNK_H+1; yy++)
     {
-        int yy = WORLD_H*32-32;
-        for (unsigned i=0; i<blocks.size(); i++)
+        m_blocks2.push_back(std::vector<Chunk>());
+        for (uint32_t xx=0; xx < m_width/CHUNK_W+1; xx++)
         {
-            //printf("i %d\n", i);
-            setBlock(xx/32, yy/32, blocks[i]);
-            yy -= 32;
+            m_blocks2.back().push_back(Chunk(m_engine));
+        }
+    }
+
+    for(uint32_t xx=0; xx<width; xx++)
+    {
+        uint32_t yy = height-1;
+        for (uint32_t i=0; i<blocks.size(); i++)
+        {
+            setBlock(xx, yy, blocks[i]);
+            yy--;
         }
     }
 
     saveWorld();
     printf("lighting up the world...\n");
-    for(int i=0; i<WORLD_W*WORLD_H*4; i++)
+    for(uint32_t i=0; i<width*height*4; i++)
     {
-        int x = i % WORLD_W;
-        int y = i / WORLD_W;
+        uint32_t x = i % width;
+        uint32_t y = i / width;
         updateLighting(x, y);
     }
     printf("completed!\n");
     m_player = new Player(this, m_engine);
-    m_player->move((WORLD_W*32)/2.0f, 32);
+    m_player->move((width*32)/2.0f, 32);
     m_player->moveToGround();
     loaded = true;
 }
 
-void World::generateWorld(unsigned int seed, const char *name, int biome)
+void World::generateWorld(unsigned int seed, const char *name, uint32_t width, uint32_t height, int biome)
 {
     srand(seed);
     m_seed = seed;
+    m_width = width;
+    m_height = height;
     sprintf(fileName, "worlds/%s.dat", name);
     loaded = false;
 
     double pi = 3.141592653589793;
-    int heights[] = {58,59,60,61,62,63,64,65,66,67,68,69,70};
+    uint32_t heights[] = {58,59,60,61,62,63,64,65,66,67,68,69,70};
     bool aHill[3] = {true, false, false};
-    int randomDirtLevel[] = {2,3,3,3};
-    int startingHeight = heights[rand() % 13]*32;
-    int alternateHeight = startingHeight;
-    int dirtLevel, stoneLevel, altDirtLvl;
+    uint32_t randomDirtLevel[] = {2,3,3,3};
+    uint32_t startingHeight = heights[rand() % 13]*32;
+    uint32_t alternateHeight = startingHeight;
+    uint32_t dirtLevel, stoneLevel, altDirtLvl;
     int tree = rand() % 2;
     bool hill = aHill[rand() % 3];
 
@@ -372,23 +370,32 @@ void World::generateWorld(unsigned int seed, const char *name, int biome)
 
     printf("biome selected: %d\n", biome);
 
-    for(int xx=0; xx<WORLD_W*32; xx+=32)
+    for(uint32_t yy=0; yy < m_height/CHUNK_H+1; yy++)
+    {
+        m_blocks2.push_back(std::vector<Chunk>());
+        for (uint32_t xx=0; xx < m_width/CHUNK_W+1; xx++)
+        {
+            m_blocks2.back().push_back(Chunk(m_engine));
+        }
+    }
+
+    for(uint32_t xx=0; xx<width*32; xx+=32)
     {
         if (biome == 0) // PLAINS //
         {
             dirtLevel = alternateHeight + 32*randomDirtLevel[rand() % 4];
-            stoneLevel = WORLD_H*32;
+            stoneLevel = height*32;
 
             setBlock(xx/32, alternateHeight/32, BLOCK_GRASS);
 
             // dirt level
-            for(int yy=alternateHeight; yy<dirtLevel; yy+=32)
+            for(uint32_t yy=alternateHeight; yy<dirtLevel; yy+=32)
             {
                 setBlock(xx/32, yy/32+1, BLOCK_DIRT);
                 altDirtLvl = yy;
             }
 
-            for(int yy=altDirtLvl; yy<altDirtLvl+64; yy+=32)
+            for(uint32_t yy=altDirtLvl; yy<altDirtLvl+64; yy+=32)
             {
                 int u = rand() % 4;
                 if (u == 1)
@@ -398,16 +405,16 @@ void World::generateWorld(unsigned int seed, const char *name, int biome)
             }
 
             //stoneLevel
-            for(int yy=altDirtLvl+64; yy<stoneLevel; yy+=32)
+            for(uint32_t yy=altDirtLvl+64; yy<stoneLevel; yy+=32)
             {
-                if (yy/32+2 < WORLD_H-2)
+                if (yy/32+2 < m_height-2)
                     setBlock(xx/32, yy/32+2, BLOCK_STONE);
                 else
                     setBlock(xx/32, yy/32+2, BLOCK_BEDROCK);
             }
 
             int amp = rand() % 13;
-            alternateHeight += int((amp*sin((2*pi)/1728*(xx-864))));
+            alternateHeight += uint32_t((amp*sin((2*pi)/1728*(xx-864))));
         }
 
         else if (biome == 1) // PLAINS WITH TREES //
@@ -415,23 +422,23 @@ void World::generateWorld(unsigned int seed, const char *name, int biome)
             setBlock(xx/32, alternateHeight/32, BLOCK_GRASS);
 
             dirtLevel = alternateHeight + 32*randomDirtLevel[rand() % 4];
-            stoneLevel = WORLD_H*32;
-            int waterLevel = (WORLD_H-32)*32;
-            int cc[3] = {1,1,2};
+            stoneLevel = height*32;
+            uint32_t waterLevel = (height-32)*32;
+            uint32_t cc[3] = {1,1,2};
             if (alternateHeight <= waterLevel)
                 tree++;
 
             // trees
             if (tree >= 9 and alternateHeight <= waterLevel)
             {
-                int c = cc[rand() % 3];
+                uint32_t c = cc[rand() % 3];
                 if (c == 1) // put the tree
                 {
-                    int tree_y = alternateHeight-32;
-                    int tree_height = (rand() % 4) + 2;
-                    for (int aY=tree_y; aY >= tree_y-(tree_height*32); aY-=32)
+                    uint32_t tree_y = alternateHeight-32;
+                    uint32_t tree_height = (rand() % 4) + 2;
+                    for (uint32_t aY=tree_y; aY >= tree_y-(tree_height*32); aY-=32)
                         setBlock(xx/32, aY/32, BLOCK_OAK_WOOD, LAYER_NONSOLID);
-                    for (int aY = tree_y-(tree_height*32)-32; aY <= tree_y-(tree_height*32)+32; aY+=32)
+                    for (uint32_t aY = tree_y-(tree_height*32)-32; aY <= tree_y-(tree_height*32)+32; aY+=32)
                     {
                         for (int aX=-2; aX<=2; aX++)
                         {
@@ -442,18 +449,18 @@ void World::generateWorld(unsigned int seed, const char *name, int biome)
                         }
                     }
                 }
-                int aTree[7] = {1,2,2,3,3,3,4};
+                uint32_t aTree[7] = {1,2,2,3,3,3,4};
                 tree = aTree[rand() % 7];
             }
 
             // dirt level
-            for(int yy=alternateHeight; yy<dirtLevel; yy+=32)
+            for(uint32_t yy=alternateHeight; yy<dirtLevel; yy+=32)
             {
                 setBlock(xx/32, yy/32+1, BLOCK_DIRT);
                 altDirtLvl = yy;
             }
 
-            for(int yy=altDirtLvl; yy<altDirtLvl+64; yy+=32)
+            for(uint32_t yy=altDirtLvl; yy<altDirtLvl+64; yy+=32)
             {
                 int u = rand() % 4;
                 if (u == 1)
@@ -463,38 +470,38 @@ void World::generateWorld(unsigned int seed, const char *name, int biome)
             }
 
             //stoneLevel
-            for(int yy=altDirtLvl+64; yy<stoneLevel; yy+=32)
+            for(uint32_t yy=altDirtLvl+64; yy<stoneLevel; yy+=32)
             {
-                if (yy/32+2 < WORLD_H-2)
+                if (yy/32+2 < height-2)
                     setBlock(xx/32, yy/32+2, BLOCK_STONE);
                 else
                     setBlock(xx/32, yy/32+2, BLOCK_BEDROCK);
             }
 
-            int amp;
+            uint32_t amp;
             if (hill)
                 amp = 16;
             else
                 amp = 10 + (rand() % 4);
 
-            int aChoose[3] = {54,108,240};
-            alternateHeight += amp*sin((2*pi)/1728*(xx-864))+((8+(rand() % 8))*sin((2*pi)/(aChoose[rand()%3])*xx))+((15+(rand()%2))*sin((2*pi/240)*xx));
+            uint32_t aChoose[3] = {54,108,240};
+            alternateHeight += amp*sin((2*pi)/1728*(xx-864))+((8+(rand() % 8))*sin((2*pi)/(aChoose[rand()%3])*xx))+((15+(rand()%2))*sin((2*pi/240)*xx)); // having a stroke yet?
         }
 
         else if (biome == 2) // DESERT //
         {
             setBlock(xx/32, alternateHeight/32, BLOCK_SAND);
 
-            int cc[3] = {1,1,2};
+            uint32_t cc[3] = {1,1,2};
             tree += cc[rand() % 3];
             if (tree >= 14 and tree <= 24)
             {
-                int p = cc[rand() % 3];
+                uint32_t p = cc[rand() % 3];
                 if (p == 1)
                 {
-                    int cacti_y = alternateHeight-32;
-                    int cacti_height = (rand() % 3) + 1;
-                    for (int aY = cacti_y; aY >= cacti_y-(cacti_height*32); aY-=32)
+                    uint32_t cacti_y = alternateHeight-32;
+                    uint32_t cacti_height = (rand() % 3) + 1;
+                    for (uint32_t aY = cacti_y; aY >= cacti_y-(cacti_height*32); aY-=32)
                         setBlock(xx/32, aY/32, BLOCK_CACTUS, LAYER_NONSOLID);
                 }
                 tree = rand() % 6;
@@ -506,37 +513,37 @@ void World::generateWorld(unsigned int seed, const char *name, int biome)
             }
 
             dirtLevel = alternateHeight + 32*randomDirtLevel[rand() % 4];
-            stoneLevel = WORLD_H*32;
+            stoneLevel = height*32;
 
             // sand level
-            for(int yy=alternateHeight; yy<dirtLevel; yy+=32)
+            for(uint32_t yy=alternateHeight; yy<dirtLevel; yy+=32)
             {
                 setBlock(xx/32, yy/32+1, BLOCK_SAND);
                 altDirtLvl = yy;
             }
 
-            int altLevels[5] = {1,2,2,2,3};
-            int sandStoneLvl = altDirtLvl + 32*altLevels[rand() % 5];
+            uint32_t altLevels[5] = {1,2,2,2,3};
+            uint32_t sandStoneLvl = altDirtLvl + 32*altLevels[rand() % 5];
 
-            for(int yy=altDirtLvl; yy<sandStoneLvl; yy+=32)
+            for(uint32_t yy=altDirtLvl; yy<sandStoneLvl; yy+=32)
                 setBlock(xx/32, yy/32+2, BLOCK_SANDSTONE);
 
             //stoneLevel
-            for(int yy=sandStoneLvl; yy<stoneLevel; yy+=32)
+            for(uint32_t yy=sandStoneLvl; yy<stoneLevel; yy+=32)
             {
-                if (yy/32+2 < WORLD_H-2)
+                if (yy/32+2 < height-2)
                     setBlock(xx/32, yy/32+2, BLOCK_STONE);
                 else
                     setBlock(xx/32, yy/32+2, BLOCK_BEDROCK);
             }
 
-            int amp;
+            uint32_t amp;
             if (hill)
                 amp = 16;
             else
                 amp = 10 + (rand() % 4);
 
-            int aChoose[3] = {54,108,240};
+            uint32_t aChoose[3] = {54,108,240};
             alternateHeight += amp*sin((2*pi)/1728*(xx-864))+((8+(rand() % 8))*sin((2*pi)/(aChoose[rand()%3])*xx))+((15+(rand()%2))*sin((2*pi/240)*xx));
         }
 
@@ -546,15 +553,15 @@ void World::generateWorld(unsigned int seed, const char *name, int biome)
 
     saveWorld();
     printf("lighting up the world...\n");
-    for(int i=0; i<WORLD_W*WORLD_H*4; i++)
+    for(uint32_t i=0; i<width*height*4; i++)
     {
-        int x = i % WORLD_W;
-        int y = i / WORLD_W;
+        uint32_t x = i % width;
+        uint32_t y = i / width;
         updateLighting(x, y);
     }
     printf("completed!\n");
     m_player = new Player(this, m_engine);
-    m_player->move((WORLD_W*32)/2.0f, 32);
+    m_player->move((width*32)/2.0f, 32);
     m_player->moveToGround();
     loaded = true;
 }
@@ -564,15 +571,14 @@ void World::saveWorld()
     printf("opening file\n");
     std::fstream file(fileName, std::ios::out | std::ios::binary);
 
-    int width = WORLD_W, height = WORLD_H;
-    file.write((char*)&width, sizeof(width));
-    file.write((char*)&height, sizeof(height));
+    file.write((char*)&m_width, sizeof(m_width));
+    file.write((char*)&m_height, sizeof(m_height));
     file.write((char*)&m_seed, sizeof(m_seed));
-    for(int i=0; i<width*height*4; i++)
+    for(uint32_t i=0; i<m_width*m_height*4; i++)
     {
-        int x = i % width;
-        int y = i / width;
-        if (x < 0 or x >= width or y < 0 or y >= height) continue;
+        uint32_t x = i % m_width;
+        uint32_t y = i / m_width;
+        if (x < 0 or x >= m_width or y < 0 or y >= m_height) continue;
         int block = getBlock(x,y);
         int layer = getBlockLayer(x,y);
 
@@ -595,23 +601,24 @@ void World::loadWorld(const char *worldName)
 
     printf("loading world %s...\n", fileName);
 
-    int width, height, pos_x, pos_y, block_type, block_layer;
+    uint32_t pos_x, pos_y;
+    int block_type, block_layer;
 
-    file.read((char*)&width, sizeof(width));
-    file.read((char*)&height, sizeof(height));
+    file.read((char*)&m_width, sizeof(m_width));
+    file.read((char*)&m_height, sizeof(m_height));
     file.read((char*)&m_seed, sizeof(m_seed));
-    printf("world size: %d,%d\nseed: %d\n", width, height, m_seed);
+    printf("world size: %d,%d\nseed: %d\n", m_width, m_height, m_seed);
 
-    for(int yy=0; yy < height/CHUNK_H+1; yy++)
+    for(uint32_t yy=0; yy < m_height/CHUNK_H+1; yy++)
     {
         m_blocks2.push_back(std::vector<Chunk>());
-        for (int xx=0; xx < width/CHUNK_W+1; xx++)
+        for (uint32_t xx=0; xx < m_width/CHUNK_W+1; xx++)
         {
             m_blocks2.back().push_back(Chunk(m_engine));
         }
     }
 
-    for(int i=0; i<width*height*4; i++)
+    for(uint32_t i=0; i<m_width*m_height*4; i++)
     {
         //printf("read %d\n", i);
         file.read((char*)&pos_x, sizeof(pos_x));
@@ -623,16 +630,16 @@ void World::loadWorld(const char *worldName)
     }
 
     printf("lighting up the world...\n");
-    for(int i=0; i<width*height*4; i++)
+    for(uint32_t i=0; i<m_width*m_height*4; i++)
     {
-        int x = i % width;
-        int y = i / width;
+        uint32_t x = i % m_width;
+        uint32_t y = i / m_width;
         updateLighting(x, y);
     }
 
     printf("world loaded!\n");
     m_player = new Player(this, m_engine);
-    m_player->move((WORLD_W*32)/2.0f, 32);
+    m_player->move((m_width*32)/2.0f, 32);
     m_player->moveToGround();
     loaded = true;
 }

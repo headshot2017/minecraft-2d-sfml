@@ -346,8 +346,8 @@ void IngameState::process_input()
             cam_y += cam_y_dist;
     }
 
-    cam_x = numwrap(cam_x, 0.0f, WORLD_W*32-(res.x));
-    cam_y = numwrap(cam_y, 0.0f, WORLD_H*32-(res.y));
+    cam_x = numwrap(cam_x, 0.0f, m_world->Width()*32-(res.x));
+    cam_y = numwrap(cam_y, 0.0f, m_world->Height()*32-(res.y));
 
     sf::Vector2f m_mousepos = m_world->getPlayer()->getMouse();
     m_blockoutline.setPosition(floor(m_mousepos.x/32)*32, floor((m_mousepos.y-56)/32)*32);
@@ -371,21 +371,21 @@ void IngameState::drawWorld(bool front)
     for(unsigned int xsep=1; xsep<maxColumns; xsep++)
     {
         m_engine->m_window.draw(m_world->getBlocksFromPoint(xx-(CHUNK_W*xsep), yy, front), &m_engine->m_blocks);
-        if ((xx+(CHUNK_W*xsep))/CHUNK_W < WORLD_W/CHUNK_W+1)
+        if ((xx+(CHUNK_W*xsep))/CHUNK_W < m_world->Width()/CHUNK_W+1)
             m_engine->m_window.draw(m_world->getBlocksFromPoint(xx+(CHUNK_W*xsep), yy, front), &m_engine->m_blocks);
 
         for (unsigned int ysep=1; ysep<maxRows; ysep++)
         {
             m_engine->m_window.draw(m_world->getBlocksFromPoint(xx-(CHUNK_W*xsep), yy-(CHUNK_H*ysep), front), &m_engine->m_blocks);
             m_engine->m_window.draw(m_world->getBlocksFromPoint(xx, yy-(CHUNK_H*ysep), front), &m_engine->m_blocks);
-            if ((xx+(CHUNK_W*xsep))/CHUNK_W < WORLD_W/CHUNK_W+1)
+            if ((xx+(CHUNK_W*xsep))/CHUNK_W < m_world->Width()/CHUNK_W+1)
                 m_engine->m_window.draw(m_world->getBlocksFromPoint(xx+(CHUNK_W*xsep), yy-(CHUNK_H*ysep), front), &m_engine->m_blocks);
 
-            if ((yy+(CHUNK_H*ysep))/CHUNK_H < WORLD_H/CHUNK_H)
+            if ((yy+(CHUNK_H*ysep))/CHUNK_H < m_world->Height()/CHUNK_H)
             {
                 m_engine->m_window.draw(m_world->getBlocksFromPoint(xx-(CHUNK_W*xsep), yy+(CHUNK_H*ysep), front), &m_engine->m_blocks);
                 m_engine->m_window.draw(m_world->getBlocksFromPoint(xx, yy+(CHUNK_H*ysep), front), &m_engine->m_blocks);
-                if ((xx+(CHUNK_W*xsep))/CHUNK_W < WORLD_W/CHUNK_W+1)
+                if ((xx+(CHUNK_W*xsep))/CHUNK_W < m_world->Width()/CHUNK_W+1)
                     m_engine->m_window.draw(m_world->getBlocksFromPoint(xx+(CHUNK_W*xsep), yy+(CHUNK_H*ysep), front), &m_engine->m_blocks);
             }
         }
