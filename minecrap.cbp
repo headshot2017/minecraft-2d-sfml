@@ -158,6 +158,8 @@
 		<Unit filename="settings_manager.h" />
 		<Unit filename="sound.cpp" />
 		<Unit filename="sound.h" />
+		<Unit filename="submenus/create_world.cpp" />
+		<Unit filename="submenus/create_world.h" />
 		<Unit filename="submenus/singleplayer.cpp" />
 		<Unit filename="submenus/singleplayer.h" />
 		<Unit filename="submenus/submenu.cpp" />

@@ -46,14 +46,6 @@ private:
     Button b_back_options;
 
     // singleplayer menu
-    Label l_selectworld;
-    ItemList l_worlds;
-    Button b_playworld;
-    Button b_createworld_list;
-    Button b_renameworld;
-    Button b_deleteworld;
-    Button b_recreate_world;
-    Button b_cancel_list;
 
     Label label_confirm_delete;
     Button b_delete_yes;
@@ -63,14 +55,7 @@ private:
     Button b_confirmrename;
     Button b_cancelrename;
 
-    Label label_createworld;
-    Label label_worldname;
-    TextInput input_worldname;
-    Button b_worldbiome;
-    Button b_confirmcreate;
-    Button b_cancelcreate;
-    int selected_biome = -1;
-    std::vector<int> superflat_blocks;
+
 
     // multiplayer menu
     Button b_connect;

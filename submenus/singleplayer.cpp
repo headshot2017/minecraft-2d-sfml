@@ -3,6 +3,7 @@
 #include "../menu_state.h"
 #include "../ingame_state.h"
 #include "singleplayer.h"
+#include "create_world.h"
 #include "title_screen.h"
 
 bool has_suffix(const std::string &str, const std::string &suffix)
@@ -67,6 +68,7 @@ SingleplayerSubmenu::SingleplayerSubmenu(GameEngine* engine, MenuState *menu) : 
 
     list_worlds->onItemClicked(&onWorldSelected, this);
     btn_playworld->onClicked(&onPlayClicked, this);
+    btn_createworld->onClicked(&onCreateWorldClicked, this);
     btn_cancel->onClicked(&onCancelClicked, this);
 
     btn_playworld->setDisabled(true);
@@ -107,6 +109,14 @@ void SingleplayerSubmenu::onPlayClicked(void* pUserData)
     state->loadWorld(self->list_worlds->getSelectedItem().c_str());
 
     self->m_engine->changeState(state);
+}
+
+void SingleplayerSubmenu::onCreateWorldClicked(void* pUserData)
+{
+    SingleplayerSubmenu* self = (SingleplayerSubmenu*)pUserData;
+
+    CreateWorldSubmenu* newstate = new CreateWorldSubmenu(self->m_engine, self->m_menu);
+    self->m_menu->changeSubmenu(newstate);
 }
 
 void SingleplayerSubmenu::onCancelClicked(void* pUserData)
