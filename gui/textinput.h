@@ -16,6 +16,7 @@ public:
     void setText(sf::String text) {m_str = text;}
     void setPosition(sf::Vector2f pos);
     void setPosition(float x, float y) {setPosition(sf::Vector2f(x,y));}
+    void setCursor(unsigned int pos);
 
     sf::String getString() {return m_str;}
 
@@ -26,7 +27,6 @@ public:
 private:
     sf::String m_str;
     sf::Text m_text;
-    sf::Text m_textcaret;
     sf::Vector2f m_pos;
     sf::RectangleShape m_rect;
     sf::RectangleShape m_caretline;

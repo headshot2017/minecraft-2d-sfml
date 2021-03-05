@@ -1,3 +1,4 @@
+#include <GL/gl.h>
 #include "textinput.h"
 
 TextInput::TextInput()
@@ -25,10 +26,6 @@ TextInput::TextInput(GameEngine *engine, sf::Vector2f pos, std::size_t length)
     m_text.setFont(engine->mc_font);
     m_text.setScale(0.16667f, 0.16667f);
     m_text.setCharacterSize(96);
-
-    m_textcaret.setFont(engine->mc_font);
-    m_textcaret.setScale(0.16667f, 0.16667f);
-    m_textcaret.setCharacterSize(96);
 }
 
 TextInput::TextInput(GameEngine *engine, sf::String text, sf::Vector2f pos, std::size_t length)
@@ -51,10 +48,9 @@ TextInput::TextInput(GameEngine *engine, sf::String text, sf::Vector2f pos, std:
     m_text.setFont(engine->mc_font);
     m_text.setScale(0.16667f, 0.16667f);
     m_text.setCharacterSize(96);
+    m_text.setString(m_str);
 
-    m_textcaret.setFont(engine->mc_font);
-    m_textcaret.setScale(0.16667f, 0.16667f);
-    m_textcaret.setCharacterSize(96);
+    setCursor(m_str.getSize());
 }
 
 TextInput::TextInput(GameEngine *engine, const char *text, sf::Vector2f pos, std::size_t length)
@@ -74,28 +70,64 @@ TextInput::TextInput(GameEngine *engine, const char *text, sf::Vector2f pos, std
     m_text.setFont(engine->mc_font);
     m_text.setScale(0.16667f, 0.16667f);
     m_text.setCharacterSize(96);
-
-    m_textcaret.setFont(engine->mc_font);
-    m_textcaret.setScale(0.16667f, 0.16667f);
-    m_textcaret.setCharacterSize(96);
+    m_text.setString(m_str);
 
     setPosition(pos);
+    setCursor(m_str.getSize());
 }
 
 void TextInput::setPosition(sf::Vector2f pos)
 {
     m_pos = pos;
     m_rect.setPosition(m_pos);
-    m_text.setPosition(m_pos.x+4, m_pos.y+10);
+    m_text.setPosition(m_pos.x+6, m_pos.y+10);
+}
+
+void TextInput::setCursor(unsigned int pos)
+{
+    if (pos <= m_str.getSize())
+    {
+        m_caret = pos;
+
+        float padding = 4;
+        m_caretline.setPosition(m_text.findCharacterPos(pos).x - 2, m_pos.y+10);
+
+        if (m_caretline.getPosition().x > m_pos.x + 400 - padding)
+        {
+            // shift left
+            float diff = m_caretline.getPosition().x - m_pos.x - 400 + padding;
+            m_text.move(-diff, 0);
+            m_caretline.move(-diff, 0);
+        }
+        else if (m_caretline.getPosition().x < m_pos.x + padding)
+        {
+            // shift right
+            float diff = m_pos.x + padding - m_caretline.getPosition().x;
+            m_text.move(diff, 0);
+            m_caretline.move(diff, 0);
+        }
+
+        float textwidth = m_text.getGlobalBounds().width;
+        if (m_text.getPosition().x < m_pos.x + padding && m_pos.x + m_text.getPosition().x + textwidth < 400 - padding)
+        {
+            float diff = (400 - padding) - (m_text.getPosition().x + textwidth);
+            m_text.move(diff, 0);
+            m_caretline.move(diff, 0);
+            // if text is smaller than textbox, force align left
+            if (textwidth < (400 - padding * 2))
+            {
+                diff = padding - m_text.getPosition().x + m_pos.x;
+                m_text.move(diff, 0);
+                m_caretline.move(diff, 0);
+            }
+        }
+    }
 }
 
 void TextInput::update()
 {
     if (m_caret > m_str.getSize())
         m_caret = m_str.getSize();
-    m_text.setString(m_str);
-    m_textcaret.setString(m_str.substring(0, m_caret));
-    m_caretline.setPosition(m_textcaret.getGlobalBounds().width+m_pos.x+4, m_pos.y+10);
 }
 
 int TextInput::process_input(sf::Event& event)
@@ -120,7 +152,8 @@ int TextInput::process_input(sf::Event& event)
             if (m_caret > 0)
             {
                 m_str.erase(m_caret-1, 1);
-                m_caret--;
+                m_text.setString(m_str);
+                setCursor(m_caret-1);
             }
         }
         else
@@ -128,7 +161,8 @@ int TextInput::process_input(sf::Event& event)
             if (event.text.unicode != '\r' and event.text.unicode != '\n' and (m_length > 0 and m_str.getSize() < m_length))
             {
                 m_str.insert(m_caret, event.text.unicode);
-                m_caret++;
+                m_text.setString(m_str);
+                setCursor(m_caret+1);
             }
         }
     }
@@ -136,26 +170,23 @@ int TextInput::process_input(sf::Event& event)
     else if (event.type == sf::Event::KeyPressed and active)
     {
         if (event.key.code == sf::Keyboard::Left)
-        {
-            if (m_caret > 0)
-                m_caret--;
-        }
+            setCursor(m_caret-1);
         else if (event.key.code == sf::Keyboard::Right)
-        {
-            if (m_caret < m_str.getSize())
-                m_caret++;
-        }
+            setCursor(m_caret+1);
         else if (event.key.code == sf::Keyboard::End)
-            m_caret = m_str.getSize();
+            setCursor(m_str.getSize());
         else if (event.key.code == sf::Keyboard::Home)
-            m_caret = 0;
+            setCursor(0);
         else if (event.key.code == sf::Keyboard::Enter)
         {
             active = false;
             typed = 2;
         }
         else if (event.key.code == sf::Keyboard::Delete)
-            m_str.erase(m_caret, 1);
+        {
+            m_text.setString(m_str);
+            setCursor(m_caret);
+        }
     }
 
     return typed;
@@ -164,7 +195,14 @@ int TextInput::process_input(sf::Event& event)
 void TextInput::draw()
 {
     m_engine->m_window.draw(m_rect);
+
+    // crop text with GL scissor
+    glEnable(GL_SCISSOR_TEST);
+    glScissor(m_pos.x + 2, m_engine->m_window.getSize().y - (m_pos.y + 40), 400-4, 40);
+
     m_engine->m_window.draw(m_text);
     if (active)
         m_engine->m_window.draw(m_caretline);
+
+    glDisable(GL_SCISSOR_TEST);
 }
