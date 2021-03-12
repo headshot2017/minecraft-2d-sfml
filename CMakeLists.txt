@@ -9,7 +9,11 @@ elseif(${CMAKE_SYSTEM_NAME} STREQUAL "Darwin")
 	set(OS_MAC 1)
 endif()
 
-set(SFML_STATIC_LIBRARIES TRUE)
+
+if(NOT OS_MAC) # mac .app bundles have Frameworks, no need for static link
+	set(SFML_STATIC_LIBRARIES TRUE)
+endif()
+
 set(SFML_DIR "sfml/build") # git clone https://github.com/sfml/sfml
 
 
@@ -50,4 +54,16 @@ if(OS_WINDOWS)
 	target_link_libraries(minecrap -static -static-libgcc -static-libstdc++ sfml-graphics sfml-system sfml-window bass)
 else()
 	target_link_libraries(minecrap -Wl,-rpath,. sfml-graphics sfml-system sfml-window bass)
+	if(OS_MAC)
+		target_link_libraries(minecrap -Wl,-rpath,../sfml/extlibs/libs-osx/Frameworks "-framework OpenGL" -stdlib=libc++)
+		target_compile_options(minecrap PRIVATE -stdlib=libc++)
+		set_target_properties(minecrap PROPERTIES
+			BUNDLE True
+			MACOSX_BUNDLE_GUI_IDENTIFIER world.tee.headbot.minecraft2d
+			MACOSX_BUNDLE_BUNDLE_NAME "Minecraft 2D"
+			MACOSX_BUNDLE_BUNDLE_VERSION "0.1"
+			MACOSX_BUNDLE_SHORT_VERSION_STRING "0.1"
+			#MACOSX_BUNDLE_INFO_PLIST
+		)
+	endif()
 endif()

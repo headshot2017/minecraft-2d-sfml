@@ -41,7 +41,7 @@ private:
     Callback callback;
     void *pUserData;
 
-    int m_width = 0;
+    int m_width;
     bool m_disabled;
 };
 

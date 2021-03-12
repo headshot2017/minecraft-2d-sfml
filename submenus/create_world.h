@@ -34,7 +34,7 @@ private:
     Button* btn_cancelcreate;
 
     std::vector<int> superflat_blocks;
-    int selected_biome = -1;
+    int selected_biome;
 };
 
 #endif // CREATE_WORLD_H_INCLUDED

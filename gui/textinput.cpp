@@ -1,4 +1,8 @@
-#include <GL/gl.h>
+#ifndef __APPLE__
+    #include <GL/gl.h>
+#else
+    #include <OpenGL/gl.h>
+#endif
 #include "textinput.h"
 
 TextInput::TextInput()
@@ -12,6 +16,8 @@ TextInput::TextInput(GameEngine *engine, sf::Vector2f pos, std::size_t length)
     m_engine = engine;
     m_pos = pos;
     m_length = length;
+    m_caret = 0;
+    active = false;
 
     m_rect.setPosition(m_pos);
     m_rect.setFillColor(sf::Color::Black);
@@ -34,6 +40,7 @@ TextInput::TextInput(GameEngine *engine, sf::String text, sf::Vector2f pos, std:
     m_pos = pos;
     m_str = text;
     m_length = length;
+    active = false;
 
     m_rect.setPosition(m_pos);
     m_rect.setFillColor(sf::Color::Black);
@@ -58,6 +65,7 @@ TextInput::TextInput(GameEngine *engine, const char *text, sf::Vector2f pos, std
     m_engine = engine;
     m_str = sf::String(text);
     m_length = length;
+    active = false;
 
     m_rect.setFillColor(sf::Color::Black);
     m_rect.setOutlineColor(sf::Color(128, 128, 128));

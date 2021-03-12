@@ -54,7 +54,7 @@ public:
     unsigned int getSeed() const {return m_seed;}
     Player* getPlayer() {return m_player;}
     sf::VertexArray& getBlocksFromPoint(uint32_t x, uint32_t y, bool front=false);
-    std::vector<std::vector<Chunk>>* getBlocks() {return &m_blocks2;}
+    std::vector<std::vector<Chunk> >* getBlocks() {return &m_blocks2;}
 
 private:
     bool loaded;
@@ -63,7 +63,7 @@ private:
     GameEngine *m_engine;
 
     Player* m_player; // will later be changed to vectors for multiplayer
-    std::vector<std::vector<Chunk>> m_blocks2;
+    std::vector<std::vector<Chunk> > m_blocks2;
     std::vector<Entity*> m_entities;
 };
 

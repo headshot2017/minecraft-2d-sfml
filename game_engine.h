@@ -58,12 +58,12 @@ public:
     sf::Texture m_hotbar;
     sf::Texture m_hotbarselect;
 
-    long int m_ticks = 0;
+    long int m_ticks;
 
 private:
-    bool m_running = true;
-    bool m_paused = false;
-    int m_leavegame = 0;
+    bool m_running;
+    bool m_paused;
+    int m_leavegame;
     std::vector<sf::VideoMode> m_videomodes;
     std::vector<GameState*> states;
     SoundEngine *m_sound;

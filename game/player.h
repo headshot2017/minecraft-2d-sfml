@@ -70,18 +70,18 @@ private:
     World *m_world;
 
     float x, y, new_x, new_y, hspeed, vspeed, x_acc, gravity, m_angle;
-    int m_dir = 1;
-    int m_layer = LAYER_BUILD;
-    bool m_sneak = false;
+    int m_dir;
+    int m_layer;
+    bool m_sneak;
 
-    bool m_isPlayer = false, can_move = true, m_layer1_collide = false, m_fly = false;
-    bool m_inWater2 = false;
-    double m_footstepticks = 0.0; // for footstep animations
-    int m_ticks = 0; // ticks elapsed since creation (mainly for footstep sounds)
-    int m_armtick = 0; // arm swing (when clicking)
-    int m_footstepwait = 0; // ticks to wait until next footstep sound
+    bool m_isPlayer, can_move, m_layer1_collide, m_fly;
+    bool m_inWater2;
+    double m_footstepticks; // for footstep animations
+    int m_ticks; // ticks elapsed since creation (mainly for footstep sounds)
+    int m_armtick; // arm swing (when clicking)
+    int m_footstepwait; // ticks to wait until next footstep sound
 
-    int m_currblock = 1;
+    int m_currblock;
 
     GameEngine *m_engine;
 

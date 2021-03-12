@@ -58,8 +58,8 @@ private:
 
     Button m_prevpage, m_nextpage;
     std::string m_label;
-    unsigned fit_on_page = 0, max_page = 0, currpage = 0;
-    int selected = -1;
+    unsigned fit_on_page, max_page, currpage;
+    int selected;
 
     IndexCallback callbackOnSelect;
     void *pUserData;

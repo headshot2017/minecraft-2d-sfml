@@ -57,15 +57,16 @@ enum
 class Block
 {
 public:
+    Block() {m_dir = 1; m_layer = LAYER_BUILD; m_blockflags = 0;}
     void setDir(int dir) {m_dir = dir;}
     void setLayer(int layer) {m_layer = layer;}
     int getDir() {return m_dir;}
     int getLayer() {return m_layer;}
-    int m_blockflags = 0;
+    int m_blockflags;
 
 private:
-    int m_dir = 1;
-    int m_layer = LAYER_BUILD;
+    int m_dir;
+    int m_layer;
 };
 
 namespace Blocks

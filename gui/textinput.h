@@ -32,9 +32,9 @@ private:
     sf::RectangleShape m_rect;
     sf::RectangleShape m_caretline;
 
-    std::size_t m_caret = 0;
+    std::size_t m_caret;
     std::size_t m_length;
-    bool active = false;
+    bool active;
     GameEngine *m_engine;
 
     StringCallback onEnterPressed;

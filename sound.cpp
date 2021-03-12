@@ -46,7 +46,12 @@ void SoundEngine::init(SettingsManager *settings)
 
 void SoundEngine::cleanup()
 {
-    for (HSTREAM snd : m_music) BASS_StreamFree(snd);
+    for (unsigned i=0; i<m_music.size(); i++)
+    {
+        HSTREAM snd = m_music[i];
+        BASS_StreamFree(snd);
+    }
+
     m_currmusic = -1;
     unloadTheme();
     BASS_Free();
@@ -115,11 +120,13 @@ bool SoundEngine::loadTheme(const char *theme)
 bool SoundEngine::unloadTheme()
 {
     if (not theme_loaded) return false;
-    curr_theme = nullptr;
+    curr_theme = 0;
 
-    for (HSTREAM snd : m_sounds) BASS_StreamFree(snd);
-    for (HSTREAM snd : m_samples) BASS_StreamFree(snd);
-
+    for (unsigned i=0; i<m_sounds.size(); i++)
+        BASS_StreamFree(m_sounds[i]);
+    for (unsigned i=0; i<m_samples.size(); i++)
+        BASS_StreamFree(m_samples[i]);
+    
     theme_loaded = false;
     return true;
 }

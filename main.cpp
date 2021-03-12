@@ -1,6 +1,6 @@
 #include "game_engine.h"
 #include "menu_state.h"
-#include <stdlib.h>
+//#include <stdlib.h>
 
 int main(int argc, char *argv[])
 {
