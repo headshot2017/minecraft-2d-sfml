@@ -42,7 +42,7 @@ private:
     void *pUserData;
 
     int m_width = 0;
-    bool m_disabled;
+    bool m_disabled = false;
 };
 
 #endif // BUTTON_H_INCLUDED

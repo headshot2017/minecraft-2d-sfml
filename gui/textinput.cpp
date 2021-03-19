@@ -26,6 +26,9 @@ TextInput::TextInput(GameEngine *engine, sf::Vector2f pos, std::size_t length)
     m_text.setFont(engine->mc_font);
     m_text.setScale(0.16667f, 0.16667f);
     m_text.setCharacterSize(96);
+
+    onClickAway = NULL;
+    onEnterPressed = NULL;
 }
 
 TextInput::TextInput(GameEngine *engine, sf::String text, sf::Vector2f pos, std::size_t length)
@@ -51,6 +54,9 @@ TextInput::TextInput(GameEngine *engine, sf::String text, sf::Vector2f pos, std:
     m_text.setString(m_str);
 
     setCursor(m_str.getSize());
+
+    onClickAway = NULL;
+    onEnterPressed = NULL;
 }
 
 TextInput::TextInput(GameEngine *engine, const char *text, sf::Vector2f pos, std::size_t length)
@@ -74,6 +80,9 @@ TextInput::TextInput(GameEngine *engine, const char *text, sf::Vector2f pos, std
 
     setPosition(pos);
     setCursor(m_str.getSize());
+
+    onClickAway = NULL;
+    onEnterPressed = NULL;
 }
 
 void TextInput::setPosition(sf::Vector2f pos)
@@ -178,7 +187,8 @@ void TextInput::process_input(sf::Event& event)
         else if (event.key.code == sf::Keyboard::Enter)
         {
             active = false;
-            if (onEnterPressed) onEnterPressed(m_str.toAnsiString(), pUserData);
+            if (onEnterPressed)
+                onEnterPressed(m_str.toAnsiString(), pUserData);
         }
         else if (event.key.code == sf::Keyboard::Delete)
         {

@@ -126,7 +126,8 @@ void Button::setPosition(sf::Vector2f pos)
 
 void Button::process_input(sf::Event& event)
 {
-    if (event.type == sf::Event::MouseButtonPressed && !m_disabled)
+    if (event.type == sf::Event::MouseButtonPressed &&
+        !m_disabled)
     {
         if (event.mouseButton.x > m_pos.x and
             event.mouseButton.y > m_pos.y and
