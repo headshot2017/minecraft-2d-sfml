@@ -41,8 +41,8 @@ private:
     Callback callback;
     void *pUserData;
 
-    int m_width = 0;
-    bool m_disabled = false;
+    int m_width;
+    bool m_disabled;
 };
 
 #endif // BUTTON_H_INCLUDED

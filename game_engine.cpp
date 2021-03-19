@@ -55,7 +55,10 @@ void GameEngine::init()
     }
 
     m_clock.restart();
+    m_ticks = 0;
+    m_running = true;
     m_paused = false;
+    m_leavegame = 0;
 }
 
 void GameEngine::cleanup()

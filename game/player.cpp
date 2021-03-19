@@ -15,14 +15,25 @@ Player::Player(World* world, GameEngine *engine)
     hspeed = vspeed = gravity = new_x = new_y = x_acc = m_angle = 0.0f;
     m_world = world;
     m_engine = engine;
+
+    m_dir = 1;
+    m_layer = LAYER_BUILD;
+    m_sneak = false;
+
+    m_isPlayer = false;
+    can_move = true;
     m_layer1_collide = false;
     m_fly = false;
+    m_inWater2 = false;
+    m_footstepticks = 0.0;
+    m_ticks = 0;
+    m_armtick = 0;
+    m_footstepwait = 0;
 
-    printf("resize skin vertex\n");
+    m_currblock = 1;
+
     m_skinvertex.resize(7*4);
-    printf("quads\n");
     m_skinvertex.setPrimitiveType(sf::Quads);
-    printf("set skin\n");
     setSkin("steve");
 }
 

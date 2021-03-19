@@ -86,7 +86,7 @@ void TitleScreenSubmenu::onQuitClicked(void* pUserData)
 void TitleScreenSubmenu::setSplashText()
 {
     m_splashtexts.clear();
-    std::ifstream texts = std::ifstream("data/splashes.txt");
+    std::ifstream texts("data/splashes.txt");
     char major[16];
     char minor[16];
     sprintf(major, "%d", m_engine->app.getSettings().majorVersion);

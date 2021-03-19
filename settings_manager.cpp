@@ -5,7 +5,13 @@
 
 SettingsManager::SettingsManager()
 {
-
+    m_fullscreen = false;
+    m_screenwidth = 800;
+    m_screenheight = 480;
+    m_sounddevice = -1;
+    m_mastervol = 100;
+    m_musicvol = 100;
+    m_soundvol = 100;
 }
 
 void SettingsManager::generateSettings()
@@ -35,7 +41,7 @@ void SettingsManager::loadSettings()
                                  line.end());
             if (line[0] == '#' or line.empty())
                 continue;
-            auto delimiterPos = line.find(":");
+            std::size_t delimiterPos = line.find(":");
             std::string name = line.substr(0, delimiterPos);
             std::string value = line.substr(delimiterPos + 1);
 
@@ -200,7 +206,7 @@ void SettingsManager::saveSettings()
     configfile << "sound_volume: " << m_soundvol << "\n";
     configfile << "\n";
 
-    auto keys = m_controls.getKeys();
+    keysMap keys = m_controls.getKeys();
     int maxkeys = static_cast<int>(sf::Keyboard::KeyCount);
 
     configfile << "control_destroy: " << (keys["destroy"].inputType == MouseInput ? (static_cast<int>(keys["destroy"].mouseButton)) + maxkeys : static_cast<int>(keys["destroy"].key)) << "\n";

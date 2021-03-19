@@ -1,4 +1,5 @@
 #include <dirent.h>
+#include <sys/stat.h>
 
 #include "../menu_state.h"
 #include "../ingame_state.h"

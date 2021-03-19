@@ -92,7 +92,7 @@ private:
     std::vector<HSTREAM> m_music;
     std::vector<HSAMPLE> m_samples;
     SettingsManager* m_settings;
-    bool theme_loaded = false;
+    bool theme_loaded;
     const char *curr_theme;
     int m_currmusic;
 };

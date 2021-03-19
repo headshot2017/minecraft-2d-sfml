@@ -12,6 +12,7 @@
 #include "gui/itemlist.h"
 
 #include <vector>
+#include <string>
 
 class MenuState : public GameState
 {

@@ -63,6 +63,14 @@ IngameState::IngameState(GameEngine *engine) : GameState(engine)
     text_cam_pos.setCharacterSize(96);
     text_cam_pos.setOutlineColor(sf::Color::Black);
     text_cam_pos.setOutlineThickness(10);
+
+    m_hotbarslot = 0;
+    m_freecam_add = 32;
+
+    lmb_tick = 0;
+    lmb = false;
+    rmb = false;
+    mmb = false;
 }
 
 IngameState::~IngameState()

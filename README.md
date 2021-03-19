@@ -18,7 +18,12 @@ Clone the SFML repository and build the source code:
 git clone https://github.com/sfml/sfml
 mkdir sfml/build
 cd sfml/build
+
+# if you are on windows/linux:
 cmake .. -DBUILD_SHARED_LIBS=FALSE -DCMAKE_INSTALL_PREFIX=.
+# if you're on macOS:
+cmake .. -DCMAKE_INSTALL_PREFIX=.
+
 make install
 ```
 

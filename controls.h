@@ -5,6 +5,7 @@
 #include <SFML/Window/Mouse.hpp>
 #include <SFML/Window/Event.hpp>
 #include <map>
+#include <string>
 
 enum InputType
 {
@@ -20,6 +21,8 @@ struct MyKeys
     sf::Keyboard::Key key;
     sf::Mouse::Button mouseButton;
 };
+
+typedef std::map<std::string, MyKeys> keysMap;
 
 class Controls
 {
@@ -37,10 +40,10 @@ public:
     bool Pressed(const char *action);
     bool PressedEvent(const char *action, sf::Event& event);
 
-    const std::map<std::string,MyKeys>& getKeys() {return m_keys;}
+    const keysMap& getKeys() {return m_keys;}
 
 private:
-    std::map<std::string,MyKeys> m_keys;
+    keysMap m_keys;
 };
 
 #endif // CONTROLS_H_INCLUDED

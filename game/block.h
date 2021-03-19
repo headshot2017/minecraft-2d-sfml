@@ -59,15 +59,16 @@ enum
 class Block
 {
 public:
+    Block() {m_dir = 1; m_layer = LAYER_BUILD; m_blockflags = 0;}
     void setDir(int dir) {m_dir = dir;}
     void setLayer(sf::Uint8 layer) {m_layer = layer;}
     int getDir() {return m_dir;}
     sf::Uint8 getLayer() {return m_layer;}
-    int m_blockflags = 0;
+    int m_blockflags;
 
 private:
-    int m_dir = 1;
-    sf::Uint8 m_layer = LAYER_BUILD;
+    int m_dir;
+    sf::Uint8 m_layer;
 };
 
 namespace Blocks

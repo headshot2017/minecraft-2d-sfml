@@ -14,13 +14,13 @@ public:
     Controls* controls() {return &m_controls;}
 
     bool m_layerlighting; // not used
-    bool m_fullscreen = false;
-    unsigned int m_screenwidth = 800;
-    unsigned int m_screenheight = 480;
-    int m_sounddevice = -1;
-    int m_mastervol = 100;
-    int m_musicvol = 100;
-    int m_soundvol = 100;
+    bool m_fullscreen;
+    unsigned int m_screenwidth;
+    unsigned int m_screenheight;
+    int m_sounddevice;
+    int m_mastervol;
+    int m_musicvol;
+    int m_soundvol;
     char m_playername[16];
     char m_playerskin[32];
     char m_soundtheme[32];

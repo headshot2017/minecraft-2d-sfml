@@ -160,7 +160,7 @@ void World::setBlock(uint32_t x, uint32_t y, int block, sf::Uint8 layer)
     uint32_t y_block_chunk = y % CHUNK_H;
     uint32_t ind = (y_block_chunk * CHUNK_W + x_block_chunk)*4;
 
-    if (x < 0 or x >= m_width or y < 0 or y >= m_height) return;
+    if (x >= m_width or y >= m_height) return;
 
     m_blocks2[y_ind][x_ind].setBlock(x, y, block, layer);
     sf::VertexArray& m_blocks = getBlocksFromPoint(x, y);
@@ -214,8 +214,6 @@ void World::setBlock(uint32_t x, uint32_t y, int block, sf::Uint8 layer)
 
 int World::getBlock(uint32_t x, uint32_t y)
 {
-    //if (x < 0) x = 0;
-    //if (y < 0) y = 0;
     if (x >= m_width) x = m_width-1;
     if (y >= m_height) y = m_height-1;
 
@@ -230,8 +228,6 @@ int World::getBlock(uint32_t x, uint32_t y)
 
 int World::getBlockFlags(uint32_t x, uint32_t y)
 {
-    //if (x < 0) x = 0;
-    //if (y < 0) y = 0;
     if (x >= m_width) x = m_width-1;
     if (y >= m_height) y = m_height-1;
 
@@ -246,8 +242,6 @@ int World::getBlockFlags(uint32_t x, uint32_t y)
 
 sf::Uint8 World::getBlockLayer(uint32_t x, uint32_t y)
 {
-    //if (x < 0) x = 0;
-    //if (y < 0) y = 0;
     if (x >= m_width) x = m_width-1;
     if (y >= m_height) y = m_height-1;
 
@@ -310,7 +304,7 @@ void World::generateFlatWorld(const char *name, const std::vector<int>& blocks, 
     m_width = width;
     m_height = height;
 
-    printf("%d blocks for flatworld\n", blocks.size());
+    printf("%u blocks for flatworld\n", blocks.size());
 
     for(uint32_t yy=0; yy < m_height/CHUNK_H+1; yy++)
     {
