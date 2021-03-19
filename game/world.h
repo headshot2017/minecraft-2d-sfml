@@ -32,9 +32,9 @@ public:
     World(GameEngine *engine);
     ~World();
 
-    void setBlock(uint32_t x, uint32_t y, int block, int layer=LAYER_BUILD);
+    void setBlock(uint32_t x, uint32_t y, int block, sf::Uint8 layer=LAYER_BUILD);
     int getBlock(uint32_t x, uint32_t y);
-    int getBlockLayer(uint32_t x, uint32_t y);
+    sf::Uint8 getBlockLayer(uint32_t x, uint32_t y);
     int getBlockFlags(uint32_t x, uint32_t y);
 
     void updateLighting(uint32_t x, uint32_t y);

@@ -17,7 +17,7 @@ Chunk::Chunk(GameEngine *engine)
     m_blocks_front.resize(CHUNK_W*CHUNK_H*4);
 }
 
-void Chunk::setBlock(int x, int y, int block, int layer)
+void Chunk::setBlock(int x, int y, int block, sf::Uint8 layer)
 {
     int x_block_chunk = x % CHUNK_W;
     int y_block_chunk = y % CHUNK_H;
@@ -81,10 +81,10 @@ int Chunk::getBlock(int x, int y)
     return block;
 }
 
-int Chunk::getBlockLayer(int x, int y)
+sf::Uint8 Chunk::getBlockLayer(int x, int y)
 {
     int ind = (y * CHUNK_W + x)*4;
-    int block = m_blockflags[ind/4].getLayer();
+    sf::Uint8 block = m_blockflags[ind/4].getLayer();
     return block;
 }
 

@@ -2,8 +2,8 @@
 #include "entities/falling_block.h"
 #include "entities/tnt.h"
 #include "entities/particles/explosion.h"
-#include <fstream>
 #include <stdlib.h>
+#include <string.h>
 #include <math.h>
 #include <zlib.h>
 
@@ -152,7 +152,7 @@ void World::drawEntities()
     }
 }
 
-void World::setBlock(uint32_t x, uint32_t y, int block, int layer)
+void World::setBlock(uint32_t x, uint32_t y, int block, sf::Uint8 layer)
 {
     uint32_t x_ind = x/CHUNK_W;
     uint32_t y_ind = y/CHUNK_H;
@@ -244,7 +244,7 @@ int World::getBlockFlags(uint32_t x, uint32_t y)
     return block;
 }
 
-int World::getBlockLayer(uint32_t x, uint32_t y)
+sf::Uint8 World::getBlockLayer(uint32_t x, uint32_t y)
 {
     //if (x < 0) x = 0;
     //if (y < 0) y = 0;
@@ -256,14 +256,14 @@ int World::getBlockLayer(uint32_t x, uint32_t y)
     uint32_t x_block_chunk = x % CHUNK_W;
     uint32_t y_block_chunk = y % CHUNK_H;
 
-    int block = m_blocks2[y_ind][x_ind].getBlockLayer(x_block_chunk, y_block_chunk);
+    sf::Uint8 block = m_blocks2[y_ind][x_ind].getBlockLayer(x_block_chunk, y_block_chunk);
     return block;
 }
 
 void World::updateLighting(uint32_t x, uint32_t y)
 {
     int block = getBlock(x, y);
-    int layer = getBlockLayer(x, y);
+    sf::Uint8 layer = getBlockLayer(x, y);
     uint32_t x_block_chunk = x % CHUNK_W;
     uint32_t y_block_chunk = y % CHUNK_H;
     uint32_t ind = (y_block_chunk * CHUNK_W + x_block_chunk)*4;
@@ -551,6 +551,8 @@ void World::generateWorld(unsigned int seed, const char *name, uint32_t width, u
             biome = rand()%3;
     }
 
+    printf("world generated %d,%d\n", width, height);
+
     saveWorld();
     printf("lighting up the world...\n");
     for(uint32_t i=0; i<width*height*4; i++)
@@ -568,45 +570,60 @@ void World::generateWorld(unsigned int seed, const char *name, uint32_t width, u
 
 void World::saveWorld()
 {
-    printf("opening file\n");
-    std::fstream file(fileName, std::ios::out | std::ios::binary);
+    unsigned char *buf = new unsigned char[m_width*m_height * ((sizeof(uint32_t)*2) + sizeof(int) + sizeof(unsigned char))];
 
-    file.write((char*)&m_width, sizeof(m_width));
-    file.write((char*)&m_height, sizeof(m_height));
-    file.write((char*)&m_seed, sizeof(m_seed));
-    for(uint32_t i=0; i<m_width*m_height*4; i++)
+    unsigned long bufpos = 0;
+    printf("saving blocks to buf\n");
+    for(uint32_t i=0; i<m_width*m_height; i++)
     {
         uint32_t x = i % m_width;
         uint32_t y = i / m_width;
-        if (x < 0 or x >= m_width or y < 0 or y >= m_height) continue;
         int block = getBlock(x,y);
-        int layer = getBlockLayer(x,y);
+        sf::Uint8 layer = getBlockLayer(x,y);
+        if (x >= m_width || y >= m_height || block == BLOCK_AIR) continue;
 
-        file.write((char*)&x, sizeof(x));
-        file.write((char*)&y, sizeof(x));
-        file.write((char*)&block, sizeof(block));
-        file.write((char*)&layer, sizeof(layer));
+        memcpy(&buf[bufpos], &x, sizeof(x));
+        memcpy(&buf[bufpos+4], &y, sizeof(y));
+        memcpy(&buf[bufpos+8], &block, sizeof(block));
+        memcpy(&buf[bufpos+12], &layer, sizeof(layer));
+
+        bufpos += (sizeof(uint32_t)*2) + sizeof(int) + sizeof(unsigned char);
     }
-    file.close();
+
+    unsigned long compressedSize = compressBound(bufpos);
+    unsigned char *compressed = new unsigned char[compressedSize];
+
+    compress(compressed, &compressedSize, buf, bufpos);
+    printf("compressed world size: %lu\n", compressedSize);
+
+    printf("opening file %s\n", fileName);
+    FILE* file = fopen(fileName, "wb");
+    fwrite((char*)&m_width, 1, sizeof(m_width), file);
+    fwrite((char*)&m_height, 1, sizeof(m_height), file);
+    fwrite((char*)&m_seed, 1, sizeof(m_seed), file);
+    fwrite(compressed, 1, compressedSize, file);
+    fclose(file);
+
+    delete[] buf;
+    delete[] compressed;
+
     printf("world saved to %s\n", fileName);
 }
 
 void World::loadWorld(const char *worldName)
 {
     sprintf(fileName, "worlds/%s.dat", worldName);
-    std::fstream file(fileName, std::ios::in | std::ios::binary);
+    FILE* file = fopen(fileName, "rb");
     loaded = false;
 
     m_blocks2.clear();
 
     printf("loading world %s...\n", fileName);
 
-    uint32_t pos_x, pos_y;
-    int block_type, block_layer;
-
-    file.read((char*)&m_width, sizeof(m_width));
-    file.read((char*)&m_height, sizeof(m_height));
-    file.read((char*)&m_seed, sizeof(m_seed));
+    fread(&m_width, 1, sizeof(m_width), file);
+    fread(&m_height, 1, sizeof(m_height), file);
+    fread(&m_seed, 1, sizeof(m_seed), file);
+    long continuepos = ftell(file);
     printf("world size: %d,%d\nseed: %d\n", m_width, m_height, m_seed);
 
     for(uint32_t yy=0; yy < m_height/CHUNK_H+1; yy++)
@@ -618,19 +635,35 @@ void World::loadWorld(const char *worldName)
         }
     }
 
-    for(uint32_t i=0; i<m_width*m_height*4; i++)
-    {
-        //printf("read %d\n", i);
-        file.read((char*)&pos_x, sizeof(pos_x));
-        file.read((char*)&pos_y, sizeof(pos_y));
-        file.read((char*)&block_type, sizeof(block_type));
-        file.read((char*)&block_layer, sizeof(block_layer));
+    fseek(file, 0, SEEK_END); // get compressed size below
+    unsigned long compressedSize = ftell(file) - (sizeof(unsigned int)*3); // discount the header size (width,height,seed)
+    unsigned char *compressedBuf = new unsigned char[compressedSize];
+    fseek(file, continuepos, SEEK_SET); // go back to pos after the header (12, but i like playing it safe)
+    printf("compressed world size: %lu\n", compressedSize);
 
-        setBlock(pos_x, pos_y, block_type, block_layer);
+    // block data
+    uint32_t block_x, block_y;
+    int block;
+    sf::Uint8 layer;
+
+    // the uncompressed world data
+    unsigned char *buf = new unsigned char[m_width*m_height * ((sizeof(uint32_t)*2) + sizeof(int) + sizeof(unsigned char))];
+    unsigned long bufSize = m_width*m_height * ((sizeof(uint32_t)*2) + sizeof(int) + sizeof(unsigned char));
+    printf("%d\n", uncompress(buf, &bufSize, compressedBuf, compressedSize)); // bufSize is updated with the real size
+    printf("uncompressed world size: %lu\n", bufSize);
+
+    for(uint32_t i=0; i<m_width*m_height; i++)
+    {
+        fread(&block_x, 1, sizeof(block_x), file);
+        fread(&block_y, 1, sizeof(block_y), file);
+        fread(&block, 1, sizeof(block), file);
+        fread(&layer, 1, sizeof(layer), file);
+
+        setBlock(block_x, block_y, block, layer);
     }
 
     printf("lighting up the world...\n");
-    for(uint32_t i=0; i<m_width*m_height*4; i++)
+    for(uint32_t i=0; i<m_width*m_height; i++)
     {
         uint32_t x = i % m_width;
         uint32_t y = i / m_width;
@@ -638,6 +671,10 @@ void World::loadWorld(const char *worldName)
     }
 
     printf("world loaded!\n");
+    fclose(file);
+    delete[] compressedBuf;
+    delete[] buf;
+
     m_player = new Player(this, m_engine);
     m_player->move((m_width*32)/2.0f, 32);
     m_player->moveToGround();

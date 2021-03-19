@@ -12,9 +12,9 @@ public:
     Chunk();
     Chunk(GameEngine *engine);
 
-    void setBlock(int x, int y, int block, int layer);
+    void setBlock(int x, int y, int block, sf::Uint8 layer);
     int getBlock(int x, int y);
-    int getBlockLayer(int x, int y);
+    sf::Uint8 getBlockLayer(int x, int y);
     int getBlockFlags(int x, int y);
     int getBlockDir(int x, int y);
 

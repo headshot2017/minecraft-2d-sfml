@@ -1,6 +1,8 @@
 #ifndef BLOCK_H_INCLUDED
 #define BLOCK_H_INCLUDED
 
+#include <SFML/Config.hpp>
+
 enum
 {
     BLOCK_AIR,
@@ -58,14 +60,14 @@ class Block
 {
 public:
     void setDir(int dir) {m_dir = dir;}
-    void setLayer(int layer) {m_layer = layer;}
+    void setLayer(sf::Uint8 layer) {m_layer = layer;}
     int getDir() {return m_dir;}
-    int getLayer() {return m_layer;}
+    sf::Uint8 getLayer() {return m_layer;}
     int m_blockflags = 0;
 
 private:
     int m_dir = 1;
-    int m_layer = LAYER_BUILD;
+    sf::Uint8 m_layer = LAYER_BUILD;
 };
 
 namespace Blocks
