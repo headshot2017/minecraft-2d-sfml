@@ -49,9 +49,7 @@ private:
 
 
 
-    Label label_renameworld;
-    Button b_confirmrename;
-    Button b_cancelrename;
+
 
 
 

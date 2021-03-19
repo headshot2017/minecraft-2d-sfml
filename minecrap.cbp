@@ -102,6 +102,7 @@
 			<Add library="sfml-system-s" />
 			<Add library="freetype" />
 			<Add library="bass" />
+			<Add library="z" />
 			<Add directory="sfml/build/lib" />
 			<Add directory="sfml/lib" />
 		</Linker>
@@ -160,6 +161,10 @@
 		<Unit filename="sound.h" />
 		<Unit filename="submenus/create_world.cpp" />
 		<Unit filename="submenus/create_world.h" />
+		<Unit filename="submenus/delete_world.cpp" />
+		<Unit filename="submenus/delete_world.h" />
+		<Unit filename="submenus/rename_world.cpp" />
+		<Unit filename="submenus/rename_world.h" />
 		<Unit filename="submenus/singleplayer.cpp" />
 		<Unit filename="submenus/singleplayer.h" />
 		<Unit filename="submenus/submenu.cpp" />
