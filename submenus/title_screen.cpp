@@ -52,6 +52,7 @@ TitleScreenSubmenu::TitleScreenSubmenu(GameEngine* engine, MenuState *menu) : Su
     btn_singleplayer->onClicked(&onSinglePlayerClicked, this);
     btn_quit->onClicked(&onQuitClicked, this);
 
+    btn_singleplayer->setDisabled(false);
     btn_multiplayer->setDisabled(true); // for now...
 }
 
