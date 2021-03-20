@@ -12,7 +12,7 @@ std::string biomeStrs[] = {
     "Superflat"
 };
 
-CreateWorldSubmenu::CreateWorldSubmenu(GameEngine* engine, MenuState* menu) : Submenu(engine, menu)
+CreateWorldSubmenu::CreateWorldSubmenu(GameEngine* engine, MenuState* menu, std::string default_name) : Submenu(engine, menu)
 {
     selected_biome = -1;
 
@@ -20,7 +20,7 @@ CreateWorldSubmenu::CreateWorldSubmenu(GameEngine* engine, MenuState* menu) : Su
 
     label_createworld = new Label(engine, "Create New World", windowsize.x/2, 48, 1, 1);
     label_worldname = new Label(engine, "World name", (windowsize.x/2)-200, 96);
-    input_worldname = new TextInput(engine, "New World", sf::Vector2f((windowsize.x/2)-200, 96+24), 96);
+    input_worldname = new TextInput(engine, default_name, sf::Vector2f((windowsize.x/2)-200, 96+24), 96);
     btn_worldbiome = new Button(engine, "Biome: " + biomeStrs[selected_biome+1], (windowsize.x/2)-200, 96+88);
     btn_confirmcreate = new Button(engine, "Create New World", (windowsize.x/2)-300-8, windowsize.y-48, 300);
     btn_cancelcreate = new Button(engine, "Cancel", (windowsize.x/2)+8, windowsize.y-48, 300);

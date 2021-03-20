@@ -74,6 +74,7 @@ SingleplayerSubmenu::SingleplayerSubmenu(GameEngine* engine, MenuState *menu) : 
     btn_createworld->onClicked(&onCreateWorldClicked, this);
     btn_renameworld->onClicked(&onRenameWorldClicked, this);
     btn_deleteworld->onClicked(&onDeleteWorldClicked, this);
+    btn_recreate_world->onClicked(&onRecreateWorldClicked, this);
     btn_cancel->onClicked(&onCancelClicked, this);
 
     btn_playworld->setDisabled(true);
@@ -137,6 +138,14 @@ void SingleplayerSubmenu::onDeleteWorldClicked(void* pUserData)
     SingleplayerSubmenu* self = (SingleplayerSubmenu*)pUserData;
 
     DeleteWorldSubmenu* newstate = new DeleteWorldSubmenu(self->m_engine, self->m_menu, self->list_worlds->getSelectedItem());
+    self->m_menu->changeSubmenu(newstate);
+}
+
+void SingleplayerSubmenu::onRecreateWorldClicked(void* pUserData)
+{
+    SingleplayerSubmenu* self = (SingleplayerSubmenu*)pUserData;
+
+    CreateWorldSubmenu* newstate = new CreateWorldSubmenu(self->m_engine, self->m_menu, self->list_worlds->getSelectedItem());
     self->m_menu->changeSubmenu(newstate);
 }
 

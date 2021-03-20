@@ -13,7 +13,7 @@
 class CreateWorldSubmenu : public Submenu
 {
 public:
-    CreateWorldSubmenu(GameEngine* engine, MenuState* menu);
+    CreateWorldSubmenu(GameEngine* engine, MenuState* menu, std::string default_name="New World");
     ~CreateWorldSubmenu();
 
     void update(float delta);
