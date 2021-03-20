@@ -44,7 +44,7 @@ public:
     void drawEntities();
     std::vector<Entity*> getNearestEntities(float x, float y, int type, int radius);
 
-    void generateWorld(unsigned int seed, const char *name, uint32_t width=DEFAULT_WORLD_W, uint32_t height=DEFAULT_WORLD_H, int biome=-1);
+    void generateWorld(unsigned int seed, const char *name, int biome=-1, uint32_t width=DEFAULT_WORLD_W, uint32_t height=DEFAULT_WORLD_H);
     void generateFlatWorld(const char *name, const std::vector<int>& blocks, uint32_t width=DEFAULT_WORLD_W, uint32_t height=DEFAULT_WORLD_H);
     void loadWorld(const char *worldName);
     void saveWorld();
