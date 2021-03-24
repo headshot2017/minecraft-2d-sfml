@@ -79,6 +79,7 @@ MenuState::MenuState(GameEngine* engine) : GameState(engine)
     m_engine = engine;
     srand(time(0));
 
+    m_submenu_to_delete = 0;
     m_submenu = (engine->isPaused()) ? new TitleScreenSubmenu(engine, this) : new TitleScreenSubmenu(engine, this);
 
     m_musicticks = 60*5;
@@ -353,6 +354,11 @@ void MenuState::update(float delta)
         }
     }
 
+    if (m_submenu_to_delete)
+    {
+        delete m_submenu_to_delete;
+        m_submenu_to_delete = 0;
+    }
     m_submenu->update(delta);
 }
 
@@ -884,6 +890,6 @@ void MenuState::changeBind(const char* keybind)
 
 void MenuState::changeSubmenu(Submenu* submenu)
 {
-    delete m_submenu;
+    m_submenu_to_delete = m_submenu;
     m_submenu = submenu;
 }

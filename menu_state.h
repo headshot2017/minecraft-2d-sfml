@@ -34,6 +34,7 @@ public:
 
 private:
     Submenu* m_submenu;
+    Submenu* m_submenu_to_delete;
     GameEngine *m_engine;
 
     int m_musicticks;

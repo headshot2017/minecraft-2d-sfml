@@ -59,6 +59,7 @@ void GameEngine::init()
     m_running = true;
     m_paused = false;
     m_leavegame = 0;
+    state_to_delete = 0;
 }
 
 void GameEngine::cleanup()
@@ -76,6 +77,12 @@ void GameEngine::cleanup()
 
 void GameEngine::update()
 {
+    if (state_to_delete)
+    {
+        delete state_to_delete;
+        state_to_delete = 0;
+    }
+
     float delta = m_clock.getElapsedTime().asSeconds();
     states.back()->update(delta);
     m_clock.restart();
@@ -139,9 +146,10 @@ void GameEngine::changeState(GameState* state)
 {
     if (not states.empty())
     {
-        delete states.back();
+        state_to_delete = states.back();
         states.pop_back();
     }
+
     states.push_back(state);
 }
 

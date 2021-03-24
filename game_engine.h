@@ -66,6 +66,7 @@ private:
     int m_leavegame;
     std::vector<sf::VideoMode> m_videomodes;
     std::vector<GameState*> states;
+    GameState* state_to_delete;
     SoundEngine *m_sound;
     SettingsManager m_settings;
     sf::Clock m_clock;
